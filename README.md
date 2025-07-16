@@ -169,8 +169,8 @@
 ▶️ 인기 판매 상품 조회 로직
 
 1. 배치 프로세스를 만들어(약 30분) 일정 시간마다 최근 3일간 많이 팔린 상위 5개 상품을 조회한다.(상품 id 단위로 옵션 수량 합산 집계)
-2. 조회한 5개의 상품을 topProduct 테이블에 저장한다.
-3. 조회할 때마다 topProduct 반환한다.
+2. 조회한 5개의 상품을 productRank 테이블에 저장한다.
+3. 조회할 때마다 productRank 반환한다.
 
 ---
 
@@ -216,7 +216,7 @@
 
 ### 3. 인기 상품 다이어그램
 
-<img width="3840" height="1434" alt="Image" src="https://github.com/user-attachments/assets/1e8b91f2-1a1e-495e-8b4b-c1a3747a36e7" />
+<img width="3840" height="1485" alt="Image" src="https://github.com/user-attachments/assets/428fa5a6-a1a7-43bf-b805-e4d508623e52" />
 
 
 ## ✅ ERD
