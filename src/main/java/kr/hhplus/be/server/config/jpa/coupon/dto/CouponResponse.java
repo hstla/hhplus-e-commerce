@@ -9,6 +9,7 @@ public record CouponResponse(
 	String couponName,
 	CouponType couponType,
 	int discountValue,
+	boolean isUsed,
 	LocalDateTime expireAt
 ) {
 }

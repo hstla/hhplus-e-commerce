@@ -20,15 +20,15 @@ public class CouponController implements CouponApiSpec{
 	@Override
 	@PostMapping
 	public ResponseEntity<CouponResponse> publishCoupon(CouponPublishRequest couponPublishRequest) {
-		CouponResponse coupon = new CouponResponse(1L, "음식 쿠폰", CouponType.PERCENT, 10, LocalDateTime.now());
+		CouponResponse coupon = new CouponResponse(1L, "음식 쿠폰", CouponType.PERCENT, 10, false, LocalDateTime.now());
 		return ResponseEntity.ok(coupon);
 	}
 
 	@Override
 	@GetMapping("/{userId}")
 	public ResponseEntity<UserCouponResponse> getUserCoupon(Long userId) {
-		CouponResponse coupon1 = new CouponResponse(1L, "음식 쿠폰", CouponType.PERCENT, 10, LocalDateTime.now());
-		CouponResponse coupon2 = new CouponResponse(2L, "옷 쿠폰", CouponType.FIXED, 1000, LocalDateTime.now());
+		CouponResponse coupon1 = new CouponResponse(1L, "음식 쿠폰", CouponType.PERCENT, 10, true, LocalDateTime.now());
+		CouponResponse coupon2 = new CouponResponse(2L, "옷 쿠폰", CouponType.FIXED, 1000, false, LocalDateTime.now());
 		return ResponseEntity.ok(new UserCouponResponse(1L, List.of(coupon1, coupon2)));
 	}
 }
