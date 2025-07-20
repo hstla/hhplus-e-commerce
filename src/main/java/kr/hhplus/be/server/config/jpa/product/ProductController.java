@@ -11,7 +11,7 @@ import kr.hhplus.be.server.config.jpa.product.dto.ProductDetailsResponse;
 import kr.hhplus.be.server.config.jpa.product.dto.ProductOptionResponse;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/products")
 public class ProductController implements ProductApiSpec {
 
 	@Override
@@ -24,7 +24,7 @@ public class ProductController implements ProductApiSpec {
 	}
 
 	@Override
-	@GetMapping("/rank")
+	@GetMapping("/ranks")
 	public ResponseEntity<List<ProductDetailsResponse>> getProductRank() {
 		ProductOptionResponse productOption1 = new ProductOptionResponse(1L, "김풍", "보스", 2_000L, 50);
 		ProductOptionResponse productOption2 = new ProductOptionResponse(2L, "빠니보틀", "행동대장", 1_000L, 100);

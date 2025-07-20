@@ -11,7 +11,7 @@ import kr.hhplus.be.server.config.jpa.point.dto.ChargePointRequest;
 
 
 @RestController
-@RequestMapping("/api/point")
+@RequestMapping("/api/points")
 public class PointController implements PointApiSpec {
 
 	@Override

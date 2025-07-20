@@ -10,7 +10,7 @@ import kr.hhplus.be.server.config.jpa.order.dto.CreateOrderRequest;
 import kr.hhplus.be.server.config.jpa.order.dto.OrderResponse;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/orders")
 public class OrderController implements OrderApiSpec {
 
 	@Override

@@ -9,7 +9,7 @@ import kr.hhplus.be.server.config.jpa.payment.dto.CreatePaymentRequest;
 import kr.hhplus.be.server.config.jpa.payment.dto.PaymentResponse;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api/payments")
 public class PaymentController implements PaymentApiSpec {
 
 	@Override

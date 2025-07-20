@@ -11,7 +11,7 @@ import kr.hhplus.be.server.config.jpa.user.dto.UpdateUserRequest;
 import kr.hhplus.be.server.config.jpa.user.dto.UserDetailsResponse;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController implements UserApiSpec{
 
 	@Override

@@ -14,11 +14,11 @@ import kr.hhplus.be.server.config.jpa.coupon.dto.CouponResponse;
 import kr.hhplus.be.server.config.jpa.coupon.dto.UserCouponResponse;
 
 @RestController
-@RequestMapping("/api/coupon")
+@RequestMapping("/api/coupons")
 public class CouponController implements CouponApiSpec{
 
 	@Override
-	@PostMapping
+	@PostMapping("/publish")
 	public ResponseEntity<CouponResponse> publishCoupon(CouponPublishRequest couponPublishRequest) {
 		CouponResponse coupon = new CouponResponse(1L, "음식 쿠폰", CouponType.PERCENT, 10, false, LocalDateTime.now());
 		return ResponseEntity.ok(coupon);
