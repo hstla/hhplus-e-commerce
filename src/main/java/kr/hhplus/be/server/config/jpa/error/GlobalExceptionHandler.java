@@ -1,54 +1,81 @@
 package kr.hhplus.be.server.config.jpa.error;
 
-import org.springframework.http.HttpStatus;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-	// @Valid 실패 - DTO
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-		String message = ex.getBindingResult().getFieldError().getDefaultMessage();
-		return ResponseEntity.badRequest()
-			.body(new ErrorResponse(ErrorCode.VALIDATION_ERROR.getCode(), message));
+	@ExceptionHandler(RestApiException.class)
+	public ResponseEntity<Object> handleCustomValidation(RestApiException e) {
+		ErrorCode errorCode = e.getErrorCode();
+		return handleExceptionInternal(errorCode);
 	}
 
-	// @RequestParam, @PathVariable 등의 제약 조건 실패
-	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
-		return ResponseEntity.badRequest()
-			.body(new ErrorResponse(ErrorCode.INVALID_PARAMETER.getCode(),ErrorCode.INVALID_PARAMETER.getMessage()));
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<Object> handleIllegalArgumentValidation(IllegalArgumentException e) {
+		log.warn("handleIllegalArgumentValidation", e);
+		ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
+		return handleExceptionInternal(errorCode, e.getMessage());
 	}
 
-	// PathVariable 타입 불일치
-	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-	public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-		return ResponseEntity.badRequest()
-			.body(new ErrorResponse(ErrorCode.TYPE_MISMATCH.getCode(), ErrorCode.TYPE_MISMATCH.getMessage()));
+	@Override
+	protected ResponseEntity<Object> handleMethodArgumentNotValid(
+		MethodArgumentNotValidException ex,
+		HttpHeaders headers,
+		HttpStatusCode status,
+		WebRequest request) {
+		log.warn("handleIllegalArgumentValidation", ex);
+		ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
+		return handleExceptionInternal(ex, errorCode);
 	}
 
-	// 지원하지 않는 HTTP 메서드
-	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-	public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
-		return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
-			.body(new ErrorResponse(ErrorCode.METHOD_NOT_ALLOWED.getCode(),ErrorCode.METHOD_NOT_ALLOWED.getMessage()));
-	}
-
-	// 예상하지 못한 모든 예외
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-		log.error(ex);
-		return ResponseEntity.internalServerError()
-			.body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.getCode(),ErrorCode.INVALID_PARAMETER.getMessage()));
+	public ResponseEntity<Object> handleException(Exception ex) {
+		log.warn("handleAllException", ex);
+		ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
+		return handleExceptionInternal(errorCode);
+	}
+
+	private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
+		return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorCodeBody(errorCode));
+	}
+
+	private ErrorResponse makeErrorCodeBody(ErrorCode errorCode) {
+		return new ErrorResponse(errorCode.name(), errorCode.getMessage(), null);
+	}
+
+	private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String errorMessage) {
+		return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorCodeBody(errorCode, errorMessage));
+	}
+
+	private ErrorResponse makeErrorCodeBody(ErrorCode errorCode, String errorMessage) {
+		return new ErrorResponse(errorCode.name(), errorMessage, null);
+	}
+
+	private ResponseEntity<Object> handleExceptionInternal(BindException ex, ErrorCode errorCode) {
+		return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorCodeBody(ex, errorCode));
+	}
+
+	private ErrorResponse makeErrorCodeBody(BindException ex, ErrorCode errorCode) {
+		List<ErrorResponse.ValidationError> validationErrors = ex.getBindingResult()
+			.getFieldErrors()
+			.stream()
+			.map(ErrorResponse.ValidationError::of)
+			.toList();
+		return new ErrorResponse(errorCode.name(), errorCode.getMessage(), validationErrors);
 	}
 }
