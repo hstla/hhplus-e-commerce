@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.config.jpa.error;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import kr.hhplus.be.server.config.jpa.common.CommonResponse;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
-		return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorCodeBody(errorCode));
+		return ResponseEntity.status(errorCode.getHttpStatus()).body(CommonResponse.fail(makeErrorCodeBody(errorCode)));
 	}
 
 	private ErrorResponse makeErrorCodeBody(ErrorCode errorCode) {
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String errorMessage) {
-		return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorCodeBody(errorCode, errorMessage));
+		return ResponseEntity.status(errorCode.getHttpStatus()).body(CommonResponse.fail(makeErrorCodeBody(errorCode, errorMessage)));
 	}
 
 	private ErrorResponse makeErrorCodeBody(ErrorCode errorCode, String errorMessage) {
@@ -67,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	private ResponseEntity<Object> handleExceptionInternal(BindException ex, ErrorCode errorCode) {
-		return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorCodeBody(ex, errorCode));
+		return ResponseEntity.status(errorCode.getHttpStatus()).body(CommonResponse.fail(makeErrorCodeBody(ex, errorCode)));
 	}
 
 	private ErrorResponse makeErrorCodeBody(BindException ex, ErrorCode errorCode) {

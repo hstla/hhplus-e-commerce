@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order;
+package kr.hhplus.be.server.config.jpa.order.adapter.in;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,8 +7,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.hhplus.be.server.config.jpa.order.dto.CreateOrderRequest;
-import kr.hhplus.be.server.config.jpa.order.dto.OrderResponse;
+import kr.hhplus.be.server.config.jpa.common.CommonResponse;
+import kr.hhplus.be.server.config.jpa.order.adapter.in.dto.CreateOrderRequest;
+import kr.hhplus.be.server.config.jpa.order.adapter.in.dto.OrderResponse;
 
 /**
  * 4️⃣ **`주요`** **주문 / 결제 API**
@@ -24,7 +25,7 @@ import kr.hhplus.be.server.config.jpa.order.dto.OrderResponse;
 public interface OrderApiSpec {
 
 	@Operation(summary = "주문 생성", description = "상품, 상품 옵션, 유저 정보를 받아 주문을 생성합니다.")
-	ResponseEntity<OrderResponse> createOrder(
+	ResponseEntity<CommonResponse<OrderResponse>> createOrder(
 		@Parameter(description = "상품 옵션, 아이디, 쿠폰 사용 여부", required = true) @RequestBody @Valid CreateOrderRequest createOrderRequest
 	);
 }
