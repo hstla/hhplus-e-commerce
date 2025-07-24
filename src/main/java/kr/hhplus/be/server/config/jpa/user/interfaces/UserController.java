@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.user.adapter.in;
+package kr.hhplus.be.server.config.jpa.user.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,13 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
-import kr.hhplus.be.server.config.jpa.user.adapter.in.dto.user.CreateUserRequest;
-import kr.hhplus.be.server.config.jpa.user.adapter.in.dto.user.UpdateUserRequest;
-import kr.hhplus.be.server.config.jpa.user.adapter.in.dto.user.UserDetailsResponse;
-import kr.hhplus.be.server.config.jpa.user.application.port.in.FindUserUseCase;
-import kr.hhplus.be.server.config.jpa.user.application.port.in.SignUpUserUseCase;
-import kr.hhplus.be.server.config.jpa.user.application.port.in.UpdateUserUseCase;
-import kr.hhplus.be.server.config.jpa.user.domain.User;
+import kr.hhplus.be.server.config.jpa.user.application.UserFacade;
+import kr.hhplus.be.server.config.jpa.user.application.UserResult;
+import kr.hhplus.be.server.config.jpa.user.interfaces.dto.user.UserRequest;
+import kr.hhplus.be.server.config.jpa.user.interfaces.dto.user.UserResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,29 +18,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController implements UserApiSpec{
 
-	private final FindUserUseCase findUserUseCase;
-	private final SignUpUserUseCase signUpUseCase;
-	private final UpdateUserUseCase updateUserUseCase;
+	private final UserFacade userFacade;
 
 	@Override
 	@GetMapping("/{userId}")
-	public ResponseEntity<CommonResponse<UserDetailsResponse>> getUserDetails(long userId) {
-		User findUser = findUserUseCase.findUser(userId);
-		UserDetailsResponse userResponse = UserDetailsResponse.of(findUser);
-		return ResponseEntity.ok(CommonResponse.success(userResponse));
+	public ResponseEntity<CommonResponse<UserResponse.User>> getUserDetails(long userId) {
+		UserResult.User findUser = userFacade.findUser(userId);
+		return ResponseEntity.ok(CommonResponse.success(UserResponse.User.of(findUser)));
 	}
 
 	@Override
 	@PostMapping
-	public ResponseEntity<CommonResponse<UserDetailsResponse>> createUser(CreateUserRequest createUserRequest) {
-		User user = signUpUseCase.signUpUser(createUserRequest.name(), createUserRequest.email(), createUserRequest.password());
-		return ResponseEntity.ok(CommonResponse.success(UserDetailsResponse.of(user)));
+	public ResponseEntity<CommonResponse<UserResponse.User>> createUser(UserRequest.SignUp signUp) {
+		UserResult.User createUser = userFacade.signUpUser(signUp.toCommand());
+		return ResponseEntity.ok(CommonResponse.success(UserResponse.User.of(createUser)));
 	}
 
 	@Override
 	@PostMapping("/{userId}")
-	public ResponseEntity<CommonResponse<UserDetailsResponse>> updateUser(long userId, UpdateUserRequest updateUserRequest) {
-		User updateUser = updateUserUseCase.updateUser(userId, updateUserRequest.name(), updateUserRequest.email());
-		return ResponseEntity.ok(CommonResponse.success(UserDetailsResponse.of(updateUser)));
+	public ResponseEntity<CommonResponse<UserResponse.User>> updateUser(long userId, UserRequest.Update update) {
+		UserResult.User updateUser = userFacade.updateUser(userId, update.toCommand());
+		return ResponseEntity.ok(CommonResponse.success(UserResponse.User.of(updateUser)));
 	}
 }
