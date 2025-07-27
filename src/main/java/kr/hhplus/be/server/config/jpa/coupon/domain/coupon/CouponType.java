@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.coupon;
+package kr.hhplus.be.server.config.jpa.coupon.domain.coupon;
 
 import lombok.Getter;
 
