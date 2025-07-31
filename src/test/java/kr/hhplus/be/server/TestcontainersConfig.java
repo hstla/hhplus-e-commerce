@@ -1,13 +1,15 @@
 package kr.hhplus.be.server;
 
-import jakarta.annotation.PreDestroy;
-
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
-@TestConfiguration
-class TestcontainersConfiguration {
+import lombok.extern.log4j.Log4j2;
+
+@Configuration
+@Log4j2
+public class TestcontainersConfig {
 
 	public static final MySQLContainer<?> MYSQL_CONTAINER;
 
@@ -15,18 +17,26 @@ class TestcontainersConfiguration {
 		MYSQL_CONTAINER = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
 			.withDatabaseName("hhplus")
 			.withUsername("test")
-			.withPassword("test");
+			.withPassword("test")
+			.withReuse(true)  // 컨테이너 재사용
+			.waitingFor(Wait.forListeningPort())
+			.withCommand("--character-set-server=utf8mb4",
+				"--collation-server=utf8mb4_unicode_ci",
+				"--skip-name-resolve");
+
+		// 컨테이너 시작
 		MYSQL_CONTAINER.start();
 
-		System.setProperty("spring.datasource.url", MYSQL_CONTAINER.getJdbcUrl() + "?characterEncoding=UTF-8&serverTimezone=UTC");
+		// 시스템 프로퍼티 설정
+		System.setProperty("spring.datasource.url", MYSQL_CONTAINER.getJdbcUrl());
 		System.setProperty("spring.datasource.username", MYSQL_CONTAINER.getUsername());
 		System.setProperty("spring.datasource.password", MYSQL_CONTAINER.getPassword());
-	}
+		System.setProperty("spring.datasource.driver-class-name", "com.mysql.cj.jdbc.Driver");
 
-	@PreDestroy
-	public void preDestroy() {
-		if (MYSQL_CONTAINER.isRunning()) {
-			MYSQL_CONTAINER.stop();
-		}
+		// 연결 확인을 위한 로그
+		log.info("=== Testcontainer MySQL Started ===");
+		log.info("JDBC URL: {}", MYSQL_CONTAINER.getJdbcUrl());
+		log.info("Username: {}", MYSQL_CONTAINER.getUsername());
+		log.info("================================");
 	}
 }
