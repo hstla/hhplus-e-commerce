@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.config.jpa.payment.interfaces.dto;
+package kr.hhplus.be.server.config.jpa.api.payment.controller.dto;
 
-import kr.hhplus.be.server.config.jpa.payment.application.PaymentResult;
-import kr.hhplus.be.server.config.jpa.payment.domain.PaymentStatus;
+import kr.hhplus.be.server.config.jpa.api.payment.usecase.PaymentResult;
+import kr.hhplus.be.server.config.jpa.payment.model.PaymentStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

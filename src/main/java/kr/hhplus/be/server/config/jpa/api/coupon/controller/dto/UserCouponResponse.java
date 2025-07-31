@@ -1,10 +1,11 @@
-package kr.hhplus.be.server.config.jpa.api.coupon.dto;
+package kr.hhplus.be.server.config.jpa.api.coupon.controller.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import kr.hhplus.be.server.config.jpa.coupon.application.CouponResult;
-import kr.hhplus.be.server.config.jpa.coupon.domain.coupon.CouponType;
+import kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto.CouponResult;
+import kr.hhplus.be.server.config.jpa.coupon.model.CouponType;
+import kr.hhplus.be.server.config.jpa.coupon.model.UserCouponStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,34 +24,40 @@ public class UserCouponResponse {
 			this.couponResponseList = couponResponseList;
 		}
 
-		public static UserCoupons of(Long userId, List<CouponResult.UserCoupon> result) {
+		public static UserCoupons of(Long userId, List<CouponResult.UserCouponInfo> result) {
 			return new UserCoupons(userId, result.stream().map(UserCoupon::of).toList());
 		}
 	}
 
+	@Getter
 	@NoArgsConstructor
 	public static class UserCoupon {
+		// coupon info
+		Long userCouponId;
+		UserCouponStatus couponStatus;
+		LocalDateTime usedAt;
+		// userCoupon info
 		Long couponId;
 		String couponName;
 		CouponType couponType;
-		int discountValue;
+		Long discountValue;
 		LocalDateTime expireAt;
-		LocalDateTime usedAt;
 
-		private UserCoupon(Long couponId, String couponName, CouponType couponType, int discountValue,
-			LocalDateTime expireAt,
-			LocalDateTime usedAt) {
+		public UserCoupon(Long userCouponId, UserCouponStatus couponStatus, LocalDateTime usedAt, Long couponId,
+			String couponName, CouponType couponType, Long discountValue, LocalDateTime expireAt) {
+			this.userCouponId = userCouponId;
+			this.couponStatus = couponStatus;
+			this.usedAt = usedAt;
 			this.couponId = couponId;
 			this.couponName = couponName;
 			this.couponType = couponType;
 			this.discountValue = discountValue;
 			this.expireAt = expireAt;
-			this.usedAt = usedAt;
 		}
 
-		public static UserCouponResponse.UserCoupon of(CouponResult.UserCoupon result) {
-			return new UserCouponResponse.UserCoupon(result.getCouponId(), result.getCouponName(),
-				result.getCouponType(), result.getDiscountValue(), result.getExpireAt(), result.getUsedAt());
+		public static UserCouponResponse.UserCoupon of(CouponResult.UserCouponInfo result) {
+			return new UserCouponResponse.UserCoupon(result.getUserCouponId(), result.getCouponStatus(), result.getUsedAt(),
+				result.getCouponId(), result.getCouponName(), result.getCouponType(), result.getDiscountValue(), result.getExpireAt());
 		}
 	}
 }

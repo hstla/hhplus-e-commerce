@@ -1,6 +1,6 @@
-package kr.hhplus.be.server.config.jpa.payment.application;
+package kr.hhplus.be.server.config.jpa.api.payment.usecase;
 
-import kr.hhplus.be.server.config.jpa.payment.domain.PaymentType;
+import kr.hhplus.be.server.config.jpa.payment.model.PaymentType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,15 +12,17 @@ public class PaymentCommand {
 	@NoArgsConstructor
 	public static class Pay {
 		Long orderId;
+		Long userId;
 		PaymentType type;
 
-		private Pay(Long orderId, PaymentType type) {
+		private Pay(Long orderId, Long userId, PaymentType type) {
 			this.orderId = orderId;
+			this.userId = userId;
 			this.type = type;
 		}
 
-		public static Pay of(Long orderId, PaymentType type) {
-			return new Pay(orderId, type);
+		public static Pay of(Long orderId, Long userId, PaymentType type) {
+			return new Pay(orderId, userId, type);
 		}
 	}
 }

@@ -1,15 +1,15 @@
-package kr.hhplus.be.server.config.jpa.payment.interfaces;
+package kr.hhplus.be.server.config.jpa.api.payment.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.hhplus.be.server.config.jpa.api.payment.controller.dto.PaymentRequest;
+import kr.hhplus.be.server.config.jpa.api.payment.controller.dto.PaymentResponse;
+import kr.hhplus.be.server.config.jpa.api.payment.usecase.CreatePaymentUseCase;
+import kr.hhplus.be.server.config.jpa.api.payment.usecase.PaymentResult;
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
-import kr.hhplus.be.server.config.jpa.payment.application.PaymentFacade;
-import kr.hhplus.be.server.config.jpa.payment.application.PaymentResult;
-import kr.hhplus.be.server.config.jpa.payment.interfaces.dto.PaymentRequest;
-import kr.hhplus.be.server.config.jpa.payment.interfaces.dto.PaymentResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -17,13 +17,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController implements PaymentApiSpec {
 
-	private final PaymentFacade paymentFacade;
+	private final CreatePaymentUseCase paymentUseCase;
 
 	@Override
 	@PostMapping
 	public ResponseEntity<CommonResponse<PaymentResponse.Payment>> createPayment(PaymentRequest.Payment paymentRequest) {
-		// PaymentResult.Pay payment = paymentFacade.pay(paymentRequest.toCommand());
-		// return ResponseEntity.ok(CommonResponse.success(PaymentResponse.Payment.of(payment)));
-		return null;
+		PaymentResult.Pay payment = paymentUseCase.pay(paymentRequest.toCommand());
+		return ResponseEntity.ok(CommonResponse.success(PaymentResponse.Payment.of(payment)));
 	}
 }

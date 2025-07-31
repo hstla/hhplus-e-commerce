@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.user.interfaces;
+package kr.hhplus.be.server.config.jpa.api.user.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.hhplus.be.server.config.jpa.api.user.controller.dto.point.UserPointRequest;
+import kr.hhplus.be.server.config.jpa.api.user.controller.dto.point.UserPointResponse;
+import kr.hhplus.be.server.config.jpa.api.user.usecase.ChargeUserPointUseCase;
+import kr.hhplus.be.server.config.jpa.api.user.usecase.FindUserPointUseCase;
+import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserPointResult;
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
-import kr.hhplus.be.server.config.jpa.user.application.UserFacade;
-import kr.hhplus.be.server.config.jpa.user.application.UserResult;
-import kr.hhplus.be.server.config.jpa.user.interfaces.dto.point.UserPointRequest;
-import kr.hhplus.be.server.config.jpa.user.interfaces.dto.point.UserPointResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -18,19 +19,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserPointController implements UserPointApiSpec {
 
-	private final UserFacade userFacade;
+	private final FindUserPointUseCase findUserPointUseCase;
+	private final ChargeUserPointUseCase chargeUserPointUseCase;
 
 	@Override
 	@GetMapping("/{userId}/points")
 	public ResponseEntity<CommonResponse<UserPointResponse.UserPoint>> getPoint(Long userId) {
-		UserResult.UserPoint findUserPoint = userFacade.findUserPoint(userId);
-		return ResponseEntity.ok(CommonResponse.success(UserPointResponse.UserPoint.of(findUserPoint.getId(), findUserPoint.getPoint())));
+		UserPointResult.UserPoint userPoint = findUserPointUseCase.execute(userId);
+		return ResponseEntity.ok(CommonResponse.success(UserPointResponse.UserPoint.of(userPoint)));
 	}
 
 	@Override
 	@PostMapping("/{userId}/points")
 	public ResponseEntity<CommonResponse<UserPointResponse.UserPoint>> chargePoint(Long userId, UserPointRequest.ChargePoint chargePoint) {
-		UserResult.UserPoint chargeUserPoint = userFacade.chargeUserPoint(userId, chargePoint.getChargePoint());
-		return  ResponseEntity.ok(CommonResponse.success(UserPointResponse.UserPoint.of(chargeUserPoint.getId(), chargeUserPoint.getPoint())));
+		UserPointResult.UserPoint userPoint = chargeUserPointUseCase.execute(userId, chargePoint.getChargePoint());
+		return ResponseEntity.ok(CommonResponse.success(UserPointResponse.UserPoint.of(userPoint)));
 	}
 }

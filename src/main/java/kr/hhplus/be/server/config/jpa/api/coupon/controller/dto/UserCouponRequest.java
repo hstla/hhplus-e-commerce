@@ -2,13 +2,13 @@ package kr.hhplus.be.server.config.jpa.api.coupon.controller.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto.CouponCommand;
+import kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto.UserCouponCommand;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CouponRequest{
+public class UserCouponRequest {
 
 	@Getter
 	@NoArgsConstructor
@@ -21,8 +21,8 @@ public class CouponRequest{
 			this.couponId = couponId;
 		}
 
-		public CouponCommand.Publish toCommand() {
-			return CouponCommand.Publish.of(userId, couponId);
+		public UserCouponCommand.Publish toCommand() {
+			return UserCouponCommand.Publish.of(userId, couponId);
 		}
 
 		public static Publish of(Long userId, Long couponId) {

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.coupon.application;
+package kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,5 +22,4 @@ public class UserCouponCommand {
 			return new Publish(userId, couponId);
 		}
 	}
-
 }

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.api.user.dto.point;
+package kr.hhplus.be.server.config.jpa.api.user.controller.dto.point;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

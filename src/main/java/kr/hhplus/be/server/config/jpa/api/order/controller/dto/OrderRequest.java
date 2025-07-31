@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order.interfaces.dto;
+package kr.hhplus.be.server.config.jpa.api.order.controller.dto;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import kr.hhplus.be.server.config.jpa.order.application.OrderCommand;
+import kr.hhplus.be.server.config.jpa.api.order.usecase.dto.OrderCommand;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +29,7 @@ public class OrderRequest {
 			this.orderProductRequests = orderItemRequests;
 		}
 
-		private static Order of(Long userId, Long userCouponId, List<OrderProduct> orderItemRequests) {
+		public static Order of(Long userId, Long userCouponId, List<OrderProduct> orderItemRequests) {
 			return new Order(userId, userCouponId, orderItemRequests);
 		}
 

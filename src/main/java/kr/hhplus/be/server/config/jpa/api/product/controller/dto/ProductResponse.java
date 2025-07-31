@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.api.product.controller;
+package kr.hhplus.be.server.config.jpa.api.product.controller.dto;
 
 import java.util.List;
 
@@ -40,13 +40,6 @@ public class ProductResponse {
 			return new ProductOptions(productId, productName, productDescription, productCategory, options);
 		}
 	}
-
-	@Getter
-	@NoArgsConstructor
-	public static class ProductRankList {
-		private Long productOptionId;
-	}
-
 
 	@Getter
 	@NoArgsConstructor

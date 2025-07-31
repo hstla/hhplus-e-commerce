@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order.interfaces;
+package kr.hhplus.be.server.config.jpa.api.order.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,9 +7,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.hhplus.be.server.config.jpa.api.order.controller.dto.OrderRequest;
+import kr.hhplus.be.server.config.jpa.api.order.controller.dto.OrderResponse;
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
-import kr.hhplus.be.server.config.jpa.order.interfaces.dto.OrderRequest;
-import kr.hhplus.be.server.config.jpa.order.interfaces.dto.OrderResponse;
 
 @Tag(name="주문", description = "주문 관련 API")
 public interface OrderApiSpec {

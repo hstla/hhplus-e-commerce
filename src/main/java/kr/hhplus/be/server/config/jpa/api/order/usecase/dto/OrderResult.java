@@ -1,6 +1,7 @@
-package kr.hhplus.be.server.config.jpa.api.order.usecase;
+package kr.hhplus.be.server.config.jpa.api.order.usecase.dto;
 
 import kr.hhplus.be.server.config.jpa.order.model.OrderStatus;
+import kr.hhplus.be.server.config.jpa.order.service.OrderInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,9 +26,9 @@ public class OrderResult {
 			this.status = status;
 		}
 
-		public static Order of(OrderInfo.Info orderResultInfo) {
-			return new Order(orderResultInfo.getId(), orderResultInfo.getUserId(),
-				orderResultInfo.getUserCouponId(), orderResultInfo.getTotalPrice(), orderResultInfo.getStatus());
+		public static Order of(OrderInfo.Info info) {
+			return new Order(info.getId(), info.getUserId(),
+				info.getUserCouponId(), info.getTotalPrice(), info.getStatus());
 		}
 	}
 }

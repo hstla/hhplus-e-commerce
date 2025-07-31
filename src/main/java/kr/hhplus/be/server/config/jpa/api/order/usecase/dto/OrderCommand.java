@@ -1,7 +1,8 @@
-package kr.hhplus.be.server.config.jpa.api.order.usecase;
+package kr.hhplus.be.server.config.jpa.api.order.usecase.dto;
 
 import java.util.List;
 
+import kr.hhplus.be.server.config.jpa.product.service.ProductInput;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,10 +27,6 @@ public class OrderCommand {
 			return new Order(userId, userCouponId, orderProductCommand);
 		}
 
-		public OrderInput.Create toInput() {
-			return OrderInput.Create.of(userId, userCouponId, orderItemRequests.stream().map(
-				oi ->OrderInput.OrderProduct.of(oi.productOptionId, oi.quantity)).toList());
-		}
 	}
 
 	@Getter
@@ -47,8 +44,8 @@ public class OrderCommand {
 			return new OrderProduct(productOptionId, quantity);
 		}
 
-		public OrderInput.OrderProduct toInput() {
-			return OrderInput.OrderProduct.of(productOptionId, quantity);
+		public ProductInput.order toInput() {
+			return ProductInput.order.of(this.getProductOptionId(), this.getQuantity());
 		}
 	}
 }

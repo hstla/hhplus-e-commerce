@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.config.jpa.payment.application;
+package kr.hhplus.be.server.config.jpa.api.payment.usecase;
 
-import kr.hhplus.be.server.config.jpa.payment.domain.PaymentInfo;
-import kr.hhplus.be.server.config.jpa.payment.domain.PaymentStatus;
+import kr.hhplus.be.server.config.jpa.payment.model.PaymentStatus;
+import kr.hhplus.be.server.config.jpa.payment.service.PaymentInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

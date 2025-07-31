@@ -1,8 +1,10 @@
-package kr.hhplus.be.server.config.jpa.product.application;
+package kr.hhplus.be.server.config.jpa.api.product.usecase.dto;
 
 import java.util.List;
 
+import kr.hhplus.be.server.config.jpa.product.model.Product;
 import kr.hhplus.be.server.config.jpa.product.model.ProductCategory;
+import kr.hhplus.be.server.config.jpa.product.model.ProductOption;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,14 +14,14 @@ public class ProductResult {
 
 	@Getter
 	@NoArgsConstructor
-	public static class ProductOption {
+	public static class ProductOptionInfo {
 		private Long productId;
 		private String productName;
 		private ProductCategory category;
 		private String description;
-		private List<Option>  options;
+		private List<Option> options;
 
-		private ProductOption(Long productId, String productName, ProductCategory category, String description,
+		private ProductOptionInfo(Long productId, String productName, ProductCategory category, String description,
 			List<Option> options) {
 			this.productId = productId;
 			this.productName = productName;
@@ -28,13 +30,10 @@ public class ProductResult {
 			this.options = options;
 		}
 
-		public static ProductOption of(Long productId, String productName, ProductCategory category, String description, List<ProductInfo.OptionInfo> optionInfoList) {
-			List<ProductResult.Option> options = optionInfoList.stream().map(
-				os -> ProductResult.Option.of(os.getProductOptionId(), os.getOptionName(), os.getPrice(), os.getStock())
-			).toList();
-			return new ProductOption(productId, productName, category, description, options);
+		public static ProductOptionInfo of(Product product, List<ProductOption> productOption) {
+			List<Option> options = productOption.stream().map(Option::of).toList();
+			return new ProductOptionInfo(product.getId(), product.getName(), product.getCategory(), product.getDescription(), options);
 		}
-
 	}
 
 	@Getter
@@ -52,8 +51,8 @@ public class ProductResult {
 			this.stock = stock;
 		}
 
-		public static Option of(Long productOptionId, String optionName, Long price, int stock) {
-			return new Option(productOptionId, optionName, price, stock);
+		public static Option of(ProductOption productOption) {
+			return new Option(productOption.getId(),  productOption.getOptionName(), productOption.getPrice(), productOption.getStock());
 		}
 	}
 }

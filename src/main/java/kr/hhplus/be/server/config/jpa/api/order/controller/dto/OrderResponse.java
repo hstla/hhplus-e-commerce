@@ -1,9 +1,7 @@
-package kr.hhplus.be.server.config.jpa.order.interfaces.dto;
+package kr.hhplus.be.server.config.jpa.api.order.controller.dto;
 
-import java.time.LocalDateTime;
-
-import kr.hhplus.be.server.config.jpa.order.application.OrderResult;
-import kr.hhplus.be.server.config.jpa.order.domain.OrderStatus;
+import kr.hhplus.be.server.config.jpa.api.order.usecase.dto.OrderResult;
+import kr.hhplus.be.server.config.jpa.order.model.OrderStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

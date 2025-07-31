@@ -1,12 +1,12 @@
-package kr.hhplus.be.server.config.jpa.api.user.controller.dto.point;
+package kr.hhplus.be.server.config.jpa.api.user.usecase.dto;
 
-import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserPointResult;
+import kr.hhplus.be.server.config.jpa.user.domain.model.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserPointResponse {
+public class UserPointResult {
 
 	@Getter
 	@NoArgsConstructor
@@ -19,8 +19,8 @@ public class UserPointResponse {
 			this.point = point;
 		}
 
-		public static UserPoint of(UserPointResult.UserPoint user) {
-			return new UserPoint(user.getUserId(), user.getPoint());
+		public static UserPoint of(User user) {
+			return new UserPoint(user.getId(), user.getPoint().getAmount());
 		}
 	}
 }

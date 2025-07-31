@@ -1,12 +1,12 @@
-package kr.hhplus.be.server.config.jpa.api.user.controller.dto.user;
+package kr.hhplus.be.server.config.jpa.api.user.usecase.dto;
 
-import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
+import kr.hhplus.be.server.config.jpa.user.domain.model.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserResponse {
+public class UserResult {
 
 	@Getter
 	@NoArgsConstructor
@@ -21,7 +21,7 @@ public class UserResponse {
 			this.email = email;
 		}
 
-		public static UserInfo of(UserResult.UserInfo user) {
+		public static UserInfo of(User user) {
 			return new UserInfo(user.getId(), user.getName(), user.getEmail());
 		}
 	}

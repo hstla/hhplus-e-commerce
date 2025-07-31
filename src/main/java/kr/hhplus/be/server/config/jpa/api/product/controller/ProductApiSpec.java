@@ -1,6 +1,4 @@
-package kr.hhplus.be.server.config.jpa.product.interfaces;
-
-import java.util.List;
+package kr.hhplus.be.server.config.jpa.api.product.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,8 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.PositiveOrZero;
+import kr.hhplus.be.server.config.jpa.api.product.controller.dto.ProductResponse;
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
-import kr.hhplus.be.server.config.jpa.product.interfaces.dto.ProductResponse;
 
 @Tag(name="상품", description = "상품 관련 API")
 public interface ProductApiSpec {
@@ -19,6 +17,6 @@ public interface ProductApiSpec {
 	ResponseEntity<CommonResponse<ProductResponse.ProductOptions>> getProductDetails(
 		@Parameter(description = "상품 아이디", required = true) @PathVariable @PositiveOrZero Long productId);
 
-	@Operation(summary = "인기 상품 조회", description = "인기 상품 5개를 조회합니다.")
-	ResponseEntity<CommonResponse<List<ProductResponse.ProductRankList>>> getProductRank();
+	// @Operation(summary = "인기 상품 조회", description = "인기 상품 5개를 조회합니다.")
+	// ResponseEntity<CommonResponse<List<ProductResponse>>> getProductRank();
 }

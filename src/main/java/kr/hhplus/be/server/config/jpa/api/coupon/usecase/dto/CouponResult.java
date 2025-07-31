@@ -1,8 +1,11 @@
-package kr.hhplus.be.server.config.jpa.coupon.application;
+package kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto;
 
 import java.time.LocalDateTime;
 
-import kr.hhplus.be.server.config.jpa.coupon.domain.coupon.CouponType;
+import kr.hhplus.be.server.config.jpa.coupon.model.Coupon;
+import kr.hhplus.be.server.config.jpa.coupon.model.CouponType;
+import kr.hhplus.be.server.config.jpa.coupon.model.UserCoupon;
+import kr.hhplus.be.server.config.jpa.coupon.model.UserCouponStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,15 +15,15 @@ public class CouponResult {
 
 	@Getter
 	@NoArgsConstructor
-	public static class Coupon {
+	public static class CouponInfo {
 		Long couponId;
 		String couponName;
 		CouponType couponType;
-		int discountValue;
+		Long discountValue;
 		LocalDateTime expireAt;
 
-		private Coupon(Long couponId, String couponName, CouponType couponType,
-			int discountValue, LocalDateTime expireAt
+		private CouponInfo(Long couponId, String couponName, CouponType couponType,
+			Long discountValue, LocalDateTime expireAt
 		) {
 			this.couponId = couponId;
 			this.couponName = couponName;
@@ -29,34 +32,40 @@ public class CouponResult {
 			this.expireAt = expireAt;
 		}
 
-		public static Coupon of(CouponInfo.Info info) {
-			return new Coupon(info.getId(), info.getName(), info.getDiscountType(), info.getDiscountValue(), info.getExpireAt());
+		public static CouponInfo of(Coupon coupon) {
+			return new CouponInfo(coupon.getId(), coupon.getName(), coupon.getDiscountType(), coupon.getDiscountValue(), coupon.getExpireAt());
 		}
 	}
 
 	@Getter
 	@NoArgsConstructor
-	public static class UserCoupon {
+	public static class UserCouponInfo {
+		// UserCoupon fields
+		Long userCouponId;
+		UserCouponStatus couponStatus;
+		LocalDateTime usedAt;
+		// coupon fields
 		Long couponId;
 		String couponName;
 		CouponType couponType;
-		int discountValue;
+		Long discountValue;
 		LocalDateTime expireAt;
-		LocalDateTime usedAt;
 
-		private UserCoupon(Long couponId, String couponName, CouponType couponType, int discountValue,
-			LocalDateTime expireAt,
-			LocalDateTime usedAt) {
+		private UserCouponInfo(Long userCouponId, UserCouponStatus couponStatus, LocalDateTime usedAt, Long couponId,
+			String couponName, CouponType couponType, Long discountValue, LocalDateTime expireAt) {
+			this.userCouponId = userCouponId;
+			this.couponStatus = couponStatus;
+			this.usedAt = usedAt;
 			this.couponId = couponId;
 			this.couponName = couponName;
 			this.couponType = couponType;
 			this.discountValue = discountValue;
 			this.expireAt = expireAt;
-			this.usedAt = usedAt;
 		}
 
-		public static UserCoupon of(CouponInfo.Info info, LocalDateTime usedAt) {
-			return new UserCoupon(info.getId(), info.getName(), info.getDiscountType(), info.getDiscountValue(), info.getExpireAt(), usedAt);
+		public static UserCouponInfo of(UserCoupon userCoupon, Coupon coupon) {
+			return new UserCouponInfo(userCoupon.getId(), userCoupon.getStatus(), userCoupon.getUsedAt(),
+				coupon.getId(), coupon.getName(), coupon.getDiscountType(), coupon.getDiscountValue(), coupon.getExpireAt());
 		}
 	}
 }
