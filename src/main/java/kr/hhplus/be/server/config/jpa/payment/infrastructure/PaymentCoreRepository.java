@@ -1,15 +1,21 @@
 package kr.hhplus.be.server.config.jpa.payment.infrastructure;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import kr.hhplus.be.server.config.jpa.payment.domain.Payment;
-import kr.hhplus.be.server.config.jpa.payment.domain.PaymentRepository;
+import kr.hhplus.be.server.config.jpa.payment.model.Payment;
+import kr.hhplus.be.server.config.jpa.payment.repository.PaymentRepository;
+import lombok.RequiredArgsConstructor;
 
-@Component
-public class PaymentRepositoryImpl implements PaymentRepository {
+@Repository
+@RequiredArgsConstructor
+public class PaymentCoreRepository implements PaymentRepository {
+
+	private final JpaPaymentRepository jpaPaymentRepository;
+	private final PaymentMapper paymentMapper;
 
 	@Override
 	public Payment save(Payment payment) {
-		return null;
+		PaymentEntity save = jpaPaymentRepository.save(paymentMapper.toEntity(payment));
+		return paymentMapper.toModel(save);
 	}
 }

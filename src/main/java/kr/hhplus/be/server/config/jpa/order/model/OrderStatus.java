@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order.domain;
+package kr.hhplus.be.server.config.jpa.order.model;
 
 import lombok.Getter;
 

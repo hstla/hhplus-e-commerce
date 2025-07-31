@@ -1,10 +1,11 @@
-package kr.hhplus.be.server.config.jpa.product.domain;
+package kr.hhplus.be.server.config.jpa.product.repository;
 
 import java.util.List;
-import java.util.Optional;
+
+import kr.hhplus.be.server.config.jpa.product.model.ProductOption;
 
 public interface ProductOptionRepository {
-	boolean existsById(Long productOptionId);
-	List<ProductOption> findAllById(List<Long> productOptionIds);
-	Optional<ProductOption> findById(Long productOptionId);
+	ProductOption save(ProductOption productOption);
+	List<ProductOption> findAllByProductId(Long productIds);
+	ProductOption findById(Long productOptionId);
 }

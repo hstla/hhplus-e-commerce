@@ -1,51 +1,41 @@
 package kr.hhplus.be.server.config.jpa.user.domain.infrastructure;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.stereotype.Repository;
 
+import kr.hhplus.be.server.config.jpa.error.RestApiException;
+import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
 import kr.hhplus.be.server.config.jpa.user.domain.model.User;
 import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 
 @Repository
-public class UserCoreRepositoryImpl implements UserRepository {
+@RequiredArgsConstructor
+public class UserCoreRepository implements UserRepository {
 
-
-
-
-	@Override
-	public boolean existsById(Long userId) {
-		return false;
-	}
+	private final JpaUserRepository jpaUserRepository;
+	private final UserEntityMapper userMapper;
 
 	@Override
-	public Optional<User> findById(Long userId) {
-		return Optional.empty();
+	public User findById(Long userId) {
+		return jpaUserRepository.findById(userId).map(userMapper::toUserModel)
+			.orElseThrow(() -> new RestApiException(UserErrorCode.INACTIVE_USER));
 	}
 
 	@Override
 	public User save(User user) {
-		return null;
+		UserEntity userEntity = userMapper.toEntity(user);
+		UserEntity savedEntity = jpaUserRepository.save(userEntity);
+		return userMapper.toUserModel(savedEntity);
 	}
 
 	@Override
-	public void deleteById(Long userId) {
-
-	}
-
-	@Override
-	public void clear() {
-
-	}
-
-	@Override
-	public List<User> findAll() {
-		return List.of();
+	public User findByEmail(String email) {
+		return jpaUserRepository.findByEmail(email).map(userMapper::toUserModel)
+			.orElseThrow(() -> new RestApiException(UserErrorCode.INACTIVE_USER));
 	}
 
 	@Override
 	public boolean existsByEmail(String email) {
-		return false;
+		return jpaUserRepository.existsByEmail(email);
 	}
 }

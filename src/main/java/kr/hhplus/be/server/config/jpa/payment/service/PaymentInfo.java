@@ -1,5 +1,7 @@
-package kr.hhplus.be.server.config.jpa.payment.domain;
+package kr.hhplus.be.server.config.jpa.payment.service;
 
+import kr.hhplus.be.server.config.jpa.payment.model.Payment;
+import kr.hhplus.be.server.config.jpa.payment.model.PaymentStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,14 +1,5 @@
-package kr.hhplus.be.server.config.jpa.product.domain;
+package kr.hhplus.be.server.config.jpa.product.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import kr.hhplus.be.server.config.jpa.common.BaseEntity;
 import kr.hhplus.be.server.config.jpa.error.ProductErrorCode;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import lombok.AccessLevel;
@@ -16,41 +7,49 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ProductOption extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "product_option_id", unique = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class ProductOption {
 	private Long id;
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "product_id", nullable = false)
-	private Product product;
+	private Long productId;
 	private String optionName;
 	private Long price;
 	private int stock;
 
-	public ProductOption(Product product, String optionName, Long price, int stock) {
-		this.product = product;
-		this.optionName = optionName;
-		this.price = price;
-		this.stock = stock;
+	public static ProductOption create(Long productId, String optionName, Long price, int stockQuantity) {
+		validateStock(stockQuantity);
+		validateName(optionName);
+		validatePrice(price);
+		return new ProductOption(null, productId, optionName, price, stockQuantity);
 	}
 
-	public static ProductOption createProductOption(Product product, String optionName, Long price, int stockQuantity) {
-		return new ProductOption(product, optionName, price, stockQuantity);
+	private static void validateName(String name) {
+		if (name == null || name.isBlank()) {
+			throw new RestApiException(ProductErrorCode.INVALID_OPTION_NAME);
+		}
 	}
 
-	public void setProduct(Product product) {
-		this.product = product;
+	private static void validateStock(int stock) {
+		if (stock < 0) {
+			throw new RestApiException(ProductErrorCode.INVALID_STOCK);
+		}
 	}
 
-	public void decreaseStock(int quantity) {
+	private static void validatePrice(Long price) {
+		if (price == null || price < 0) {
+			throw new RestApiException(ProductErrorCode.INVALID_PRICE);
+		}
+	}
+
+	public void order(int quantity) {
+		validateOrderStock(quantity);
+		this.stock -= quantity;
+	}
+
+	private void validateOrderStock(int quantity) {
 		if (this.stock < quantity) {
 			throw new RestApiException(ProductErrorCode.OUT_OF_STOCK);
 		}
-		this.stock -= quantity;
 	}
 }

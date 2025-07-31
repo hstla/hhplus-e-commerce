@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order.domain.discount;
+package kr.hhplus.be.server.config.jpa.coupon.compnent.discount;
 
 import org.springframework.stereotype.Component;
 

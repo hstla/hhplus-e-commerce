@@ -1,21 +1,10 @@
-package kr.hhplus.be.server.config.jpa.user.domain;
+package kr.hhplus.be.server.config.jpa.user.domain.repository;
 
-import java.util.List;
-import java.util.Optional;
+import kr.hhplus.be.server.config.jpa.user.domain.model.User;
 
 public interface UserRepository {
-
-	boolean existsById(Long userId);
-
-	Optional<User> findById(Long userId);
-
+	User findById(Long userId);
 	User save(User user);
-
-	void deleteById(Long userId);
-
-	void clear();
-
-	List<User> findAll();
-
+	User findByEmail(String email);
 	boolean existsByEmail(String email);
 }

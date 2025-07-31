@@ -1,10 +1,8 @@
-package kr.hhplus.be.server.config.jpa.product.domain;
+package kr.hhplus.be.server.config.jpa.product.repository;
 
-import java.util.Optional;
+import kr.hhplus.be.server.config.jpa.product.model.Product;
 
 public interface ProductRepository {
-	Optional<Product> findById(Long productId);
+	Product findById(Long productId);
 	Product save(Product product);
-	void deleteById(Long productId);
-	void clear();
 }

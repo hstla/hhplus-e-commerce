@@ -1,8 +1,8 @@
-package kr.hhplus.be.server.config.jpa.order.domain;
+package kr.hhplus.be.server.config.jpa.order.repository;
 
-import java.util.Optional;
+import kr.hhplus.be.server.config.jpa.order.model.Order;
 
 public interface OrderRepository {
 	Order save(Order order);
-	Optional<Order> findById(Long orderId);
+	Order findById(Long orderId);
 }

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order.domain.discount;
+package kr.hhplus.be.server.config.jpa.coupon.compnent.discount;
 
 import org.springframework.stereotype.Component;
 
@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 public class FixedDiscountPolicy implements DiscountPolicy {
 	@Override
 	public long calculateDiscount(long totalPrice, long discountValue) {
-		return totalPrice - discountValue;
+		return discountValue;
 	}
 }

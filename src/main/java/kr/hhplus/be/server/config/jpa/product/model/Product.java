@@ -1,49 +1,36 @@
-package kr.hhplus.be.server.config.jpa.product.domain;
+package kr.hhplus.be.server.config.jpa.product.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import kr.hhplus.be.server.config.jpa.common.BaseEntity;
+import kr.hhplus.be.server.config.jpa.error.ProductErrorCode;
+import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Product extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "product_id", unique = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class Product {
 	private Long id;
 	private String name;
 	private ProductCategory category;
 	private String description;
-	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProductOption> options = new ArrayList<>();
 
-	public Product(String name, ProductCategory category, String description) {
-		this.name = name;
-		this.category = category;
-		this.description = description;
-		this.options = new ArrayList<>();
+	public static Product create(String name, ProductCategory category, String description) {
+		validateName(name);
+		validateDescription(description);
+		return new Product(null, name, category, description);
 	}
 
-	public static Product createProduct(String name, ProductCategory category, String description) {
-		return new Product(name, category,description);
+	private static void validateName(String name) {
+		if (name == null || name.isBlank()) {
+			throw new RestApiException(ProductErrorCode.INVALID_PRODUCT_NAME);
+		}
 	}
 
-	public void addOption(ProductOption option) {
-		options.add(option);
-		option.setProduct(this);
+	private static void validateDescription(String description) {
+		if (description == null || description.isBlank()) {
+			throw new RestApiException(ProductErrorCode.INVALID_DESCRIPTION);
+		}
 	}
 }

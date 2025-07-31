@@ -1,37 +1,52 @@
-package kr.hhplus.be.server.config.jpa.order.domain;
+package kr.hhplus.be.server.config.jpa.order.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import kr.hhplus.be.server.config.jpa.error.OrderErrorCode;
+import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class OrderProduct {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "order_product_id", unique = true)
 	private Long id;
 	private Long orderId;
 	private Long productOptionId;
 	private int quantity;
-	private int unitPrice;
+	private Long unitPrice;
 
-	public OrderProduct(Long orderId, Long productOptionId, int quantity, int unitPrice) {
-		this.orderId = orderId;
-		this.productOptionId = productOptionId;
-		this.quantity = quantity;
-		this.unitPrice = unitPrice;
+	public static OrderProduct create(Long orderId, Long productOptionId, int quantity, Long unitPrice) {
+		validateOptionId(productOptionId);
+		validateQuantity(quantity);
+		validateUnitPrice(unitPrice);
+		return new OrderProduct(null, orderId, productOptionId, quantity, unitPrice);
 	}
 
-	public static OrderProduct CreateOrderProduct(Long orderId, Long productOptionId, int quantity, int unitPrice) {
-		return new OrderProduct(orderId, productOptionId, quantity, unitPrice);
+	private static void validateOptionId(Long productOptionId) {
+		if (productOptionId == null) {
+			throw new RestApiException(OrderErrorCode.OPTION_NOT_FOUND);
+		}
+	}
+
+	private static void validateQuantity(int quantity) {
+		if (quantity <= 0) {
+			throw new RestApiException(OrderErrorCode.INVALID_ORDER_QUANTITY);
+		}
+	}
+
+	private static void validateUnitPrice(Long unitPrice) {
+		if (unitPrice < 0) {
+			throw new RestApiException(OrderErrorCode.OPTION_NOT_PURCHASABLE);
+		}
+	}
+
+	public long getCalculateAmount() {
+		return quantity * unitPrice;
+	}
+
+	public void setOrderId(Long id) {
+		this.orderId = id;
 	}
 }

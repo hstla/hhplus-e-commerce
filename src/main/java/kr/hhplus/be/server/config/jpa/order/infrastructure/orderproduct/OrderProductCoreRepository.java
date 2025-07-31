@@ -1,9 +1,10 @@
-package kr.hhplus.be.server.config.jpa.order.infrastructure;
+package kr.hhplus.be.server.config.jpa.order.infrastructure.orderproduct;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import kr.hhplus.be.server.config.jpa.order.infrastructure.OrderMapper;
 import kr.hhplus.be.server.config.jpa.order.model.OrderProduct;
 import kr.hhplus.be.server.config.jpa.order.repository.OrderProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,13 @@ public class OrderProductCoreRepository implements OrderProductRepository {
 
 	@Override
 	public List<OrderProduct> findByOrderId(Long orderId) {
-		return List.of();
+		List<OrderProductEntity> entities = jpaOrderProductRepository.findAllByOrderId(orderId);
+		return entities.stream().map(orderMapper::toModel).toList();
+	}
+
+	@Override
+	public OrderProduct save(OrderProduct orderProduct) {
+		OrderProductEntity save = jpaOrderProductRepository.save(orderMapper.toEntity(orderProduct));
+		return orderMapper.toModel(save);
 	}
 }

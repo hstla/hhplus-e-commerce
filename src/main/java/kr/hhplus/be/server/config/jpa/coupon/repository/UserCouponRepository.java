@@ -1,12 +1,12 @@
-package kr.hhplus.be.server.config.jpa.coupon.domain.usercoupon;
+package kr.hhplus.be.server.config.jpa.coupon.repository;
 
 import java.util.List;
-import java.util.Optional;
+
+import kr.hhplus.be.server.config.jpa.coupon.model.UserCoupon;
 
 public interface UserCouponRepository {
 	UserCoupon save(UserCoupon userCoupon);
-	void clear();
-	boolean existsByUserAndCoupon(long userId, long couponId);
 	List<UserCoupon> findAllByUserId(Long userId);
-	Optional<UserCoupon> findByIdAndUserId(Long userId, Long userCouponId);
+	boolean existsByUserIdAndCouponId(Long userId, Long couponId);
+	UserCoupon findById(Long userCouponId);
 }

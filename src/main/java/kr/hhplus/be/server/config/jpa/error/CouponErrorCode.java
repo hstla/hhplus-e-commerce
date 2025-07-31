@@ -15,6 +15,8 @@ public enum CouponErrorCode implements ErrorCode {
 	ALREADY_USED_COUPON(HttpStatus.CONFLICT, "Coupon has already been used."),
 	NOT_FOUND_USER_COUPON(HttpStatus.NOT_FOUND, "User coupon not found."),
 	INVALID_PERCENT_DISCOUNT(HttpStatus.BAD_REQUEST, "Discount value for percent coupon cannot exceed 100."),
+	INVALID_FIXED_DISCOUNT(HttpStatus.BAD_REQUEST, "Discount value for fixed coupon must be greater than 0."),
+	INVALID_COUPON_TYPE(HttpStatus.BAD_REQUEST, "Invalid coupon type provided."),
 	;
 
 	private final HttpStatus httpStatus;

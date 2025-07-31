@@ -1,10 +1,12 @@
-package kr.hhplus.be.server.config.jpa.product.infrastructure;
+package kr.hhplus.be.server.config.jpa.product.infrastructure.productoption;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import kr.hhplus.be.server.config.jpa.error.ProductErrorCode;
+import kr.hhplus.be.server.config.jpa.error.RestApiException;
+import kr.hhplus.be.server.config.jpa.product.infrastructure.mapper.ProductMapper;
 import kr.hhplus.be.server.config.jpa.product.model.ProductOption;
 import kr.hhplus.be.server.config.jpa.product.repository.ProductOptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,20 +16,24 @@ import lombok.RequiredArgsConstructor;
 public class ProductOptionCoreRepository implements ProductOptionRepository {
 
 	private final JpaProductOptionRepository jpaProductOptionRepository;
-
+	private final ProductMapper productMapper;
 
 	@Override
-	public boolean existsById(Long productOptionId) {
-		return false;
+	public ProductOption findById(Long productOptionId) {
+		ProductOptionEntity productOptionEntity = jpaProductOptionRepository.findById(productOptionId).orElseThrow(() ->
+			new RestApiException(ProductErrorCode.NOT_FOUND_PRODUCT_OPTION));
+		return productMapper.toModel(productOptionEntity);
 	}
 
 	@Override
-	public List<ProductOption> findAllById(List<Long> productOptionIds) {
-		return List.of();
+	public ProductOption save(ProductOption productOption) {
+		ProductOptionEntity save = jpaProductOptionRepository.save(productMapper.toEntity(productOption));
+		return productMapper.toModel(save);
 	}
 
 	@Override
-	public Optional<ProductOption> findById(Long productOptionId) {
-		return Optional.empty();
+	public List<ProductOption> findAllByProductId(Long productId) {
+		List<ProductOptionEntity> optionEntities = jpaProductOptionRepository.findAllByProductId(productId);
+		return optionEntities.stream().map(productMapper::toModel).toList();
 	}
 }
