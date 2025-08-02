@@ -15,6 +15,8 @@ public enum UserErrorCode implements ErrorCode {
 	INVALID_USER_EMAIL(HttpStatus.BAD_REQUEST, "User email must be a valid email format."),
 	INVALID_USER_PASSWORD(HttpStatus.BAD_REQUEST, "User password must be between 5 and 20 characters."),
 	INSUFFICIENT_USER_POINT(HttpStatus.BAD_REQUEST, "Insufficient user points"),
+	INVALID_CHARGE_AMOUNT(HttpStatus.BAD_REQUEST, "Charge amount must be a positive value."),
+	INVALID_PAY_AMOUNT(HttpStatus.BAD_REQUEST, "Payment amount must be a positive value."),
 	;
 
 	private final HttpStatus httpStatus;

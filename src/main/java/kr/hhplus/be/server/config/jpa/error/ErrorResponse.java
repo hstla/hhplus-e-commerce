@@ -1,7 +1,9 @@
 package kr.hhplus.be.server.config.jpa.error;
 
 import java.util.List;
+
 import org.springframework.validation.FieldError;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Getter;
