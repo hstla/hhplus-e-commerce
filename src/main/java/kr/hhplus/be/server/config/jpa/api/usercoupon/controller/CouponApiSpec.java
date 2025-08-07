@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.api.coupon.controller;
+package kr.hhplus.be.server.config.jpa.api.usercoupon.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,9 +9,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
-import kr.hhplus.be.server.config.jpa.api.coupon.controller.dto.CouponResponse;
-import kr.hhplus.be.server.config.jpa.api.coupon.controller.dto.UserCouponRequest;
-import kr.hhplus.be.server.config.jpa.api.coupon.controller.dto.UserCouponResponse;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.controller.dto.CouponResponse;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.controller.dto.UserCouponRequest;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.controller.dto.UserCouponResponse;
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
 
 @Tag(name="쿠폰", description = "쿠폰 관련 API")

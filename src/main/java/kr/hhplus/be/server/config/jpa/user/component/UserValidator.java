@@ -1,10 +1,10 @@
-package kr.hhplus.be.server.config.jpa.user.domain.component;
+package kr.hhplus.be.server.config.jpa.user.component;
 
 import org.springframework.stereotype.Component;
 
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component

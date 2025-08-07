@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.api.coupon.controller;
+package kr.hhplus.be.server.config.jpa.api.usercoupon.controller;
 
 import java.util.List;
 
@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import kr.hhplus.be.server.config.jpa.api.coupon.controller.dto.CouponResponse;
-import kr.hhplus.be.server.config.jpa.api.coupon.controller.dto.UserCouponRequest;
-import kr.hhplus.be.server.config.jpa.api.coupon.controller.dto.UserCouponResponse;
-import kr.hhplus.be.server.config.jpa.api.coupon.usecase.FindUserCouponUseCase;
-import kr.hhplus.be.server.config.jpa.api.coupon.usecase.PublishCouponUseCase;
-import kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto.CouponResult;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.controller.dto.CouponResponse;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.controller.dto.UserCouponRequest;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.controller.dto.UserCouponResponse;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.usecase.FindUserCouponUseCase;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.usecase.PublishCouponUseCase;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.usecase.dto.CouponResult;
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
 import lombok.RequiredArgsConstructor;
 
