@@ -1,23 +1,12 @@
-package kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto;
+package kr.hhplus.be.server.config.jpa.api.usercoupon.usecase.dto;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserCouponCommand {
 
-	@Getter
-	@NoArgsConstructor
-	public static class Publish{
-		private Long userId;
-		private Long couponId;
-
-		private Publish(Long userId, Long couponId) {
-			this.userId = userId;
-			this.couponId = couponId;
-		}
-
+	public record Publish(Long userId, Long couponId) {
 		public static Publish of(Long userId, Long couponId) {
 			return new Publish(userId, couponId);
 		}

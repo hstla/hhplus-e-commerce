@@ -5,28 +5,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserCommand;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserRequest {
 
-	@Getter
-	@NoArgsConstructor
-	public static class SignUp {
-		@NotBlank
-		private String name;
-		@NotNull @Email
-		private String email;
-		@NotBlank
-		private String password;
-
-		private SignUp(String name, String email, String password) {
-			this.name = name;
-			this.email = email;
-			this.password = password;
-		}
-
+	public record SignUp (
+		@NotBlank String name,
+		@NotNull @Email String email,
+		@NotBlank String password
+	) {
 		public static SignUp of(String name, String email, String password) {
 			return new SignUp(name, email, password);
 		}
@@ -36,16 +24,9 @@ public class UserRequest {
 		}
 	}
 
-	@Getter
-	@NoArgsConstructor
-	public static class Update {
-		@NotBlank
-		private String name;
-
-		private Update(String name) {
-			this.name = name;
-		}
-
+	public record Update (
+		@NotBlank String name
+	) {
 		public static Update of(String name) {
 			return new Update(name);
 		}

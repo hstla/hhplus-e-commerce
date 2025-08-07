@@ -1,26 +1,18 @@
-package kr.hhplus.be.server.config.jpa.api.coupon.controller.dto;
+package kr.hhplus.be.server.config.jpa.api.usercoupon.controller.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import kr.hhplus.be.server.config.jpa.api.coupon.usecase.dto.UserCouponCommand;
+import kr.hhplus.be.server.config.jpa.api.usercoupon.usecase.dto.UserCouponCommand;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserCouponRequest {
 
-	@Getter
-	@NoArgsConstructor
-	public static class Publish{
-		@NotNull @PositiveOrZero Long userId;
-		@NotNull @PositiveOrZero Long couponId;
-
-		private Publish(Long userId, Long couponId) {
-			this.userId = userId;
-			this.couponId = couponId;
-		}
-
+	public record Publish(
+		@NotNull @PositiveOrZero Long userId,
+		@NotNull @PositiveOrZero Long couponId
+	) {
 		public UserCouponCommand.Publish toCommand() {
 			return UserCouponCommand.Publish.of(userId, couponId);
 		}
