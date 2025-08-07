@@ -1,74 +1,122 @@
 package kr.hhplus.be.server.config.jpa.api.payment.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+import kr.hhplus.be.server.config.jpa.error.RestApiException;
+import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
+import kr.hhplus.be.server.config.jpa.order.infrastructure.JpaOrderRepository;
 import kr.hhplus.be.server.config.jpa.order.model.Order;
-import kr.hhplus.be.server.config.jpa.order.model.OrderStatus;
-import kr.hhplus.be.server.config.jpa.order.service.OrderInfo;
-import kr.hhplus.be.server.config.jpa.order.service.OrderService;
-import kr.hhplus.be.server.config.jpa.payment.model.Payment;
-import kr.hhplus.be.server.config.jpa.payment.model.PaymentStatus;
+import kr.hhplus.be.server.config.jpa.payment.infrastructure.JpaPaymentRepository;
 import kr.hhplus.be.server.config.jpa.payment.model.PaymentType;
-import kr.hhplus.be.server.config.jpa.payment.service.PaymentInfo;
-import kr.hhplus.be.server.config.jpa.payment.service.PaymentService;
-import kr.hhplus.be.server.config.jpa.user.domain.service.UserService;
+import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.User;
 
-@ExtendWith(MockitoExtension.class)
-@DisplayName("CreatePaymentUseCase 단위 테스트")
+@SpringBootTest
+@ActiveProfiles("test")
+@DisplayName("CreatePaymentUseCase 동시성 통합 테스트")
 class CreatePaymentUseCaseTest {
 
-	@Mock
-	private PaymentService paymentService;
-
-	@Mock
-	private OrderService orderService;
-
-	@Mock
-	private UserService userService;
-
-	@InjectMocks
+	@Autowired
 	private CreatePaymentUseCase createPaymentUseCase;
+	@Autowired
+	private JpaUserRepository userRepository;
+	@Autowired
+	private JpaOrderRepository orderRepository;
+	@Autowired
+	private JpaPaymentRepository paymentRepository;
 
-	@Test
-	@DisplayName("pay 메서드는 주문 완료 처리, 포인트 결제, 결제 저장 후 결제 결과를 반환한다")
-	void pay_success() {
-		// given
-		Long orderId = 1L;
-		Long userId = 2L;
-		long totalPrice = 5000L;
-		Order order = new Order(orderId, userId, null, totalPrice, OrderStatus.CREATED, LocalDateTime.now());
-		Payment payment = new Payment(1L, orderId, userId, totalPrice, PaymentStatus.PENDING);
+	private long userId;
+	private final long orderPrice = 20_000L;
+	private final int numberOfThreads = 2;
 
-		PaymentCommand.Pay command = PaymentCommand.Pay.of(orderId, userId, PaymentType.POINT);
-		OrderInfo.Info orderInfo = OrderInfo.Info.of(order);
-		PaymentInfo.Info paymentInfo = PaymentInfo.Info.of(payment);
+	@BeforeEach
+	void setUp() {
+		paymentRepository.deleteAll();
+		orderRepository.deleteAll();
+		userRepository.deleteAll();
 
-		given(orderService.payComplete(orderId)).willReturn(orderInfo);
-		willDoNothing().given(userService).pointPay(userId, totalPrice);
-		given(paymentService.pay(orderId, userId, totalPrice)).willReturn(paymentInfo);
+		User user = User.create("name", "test@email.com", "password");
+		user.chargePoint(20_000L);
+		User savedUser = userRepository.save(user);
+		userId = savedUser.getId();
 
-		// when
-		PaymentResult.Pay result = createPaymentUseCase.pay(command);
+		IntStream.range(0, numberOfThreads)
+			.forEach(i -> orderRepository.save(
+				Order.create(userId, null, orderPrice, 0L, orderPrice, LocalDateTime.now())
+			));
+	}
 
-		// then
-		then(orderService).should(times(1)).payComplete(orderId);
-		then(userService).should(times(1)).pointPay(userId, totalPrice);
-		then(paymentService).should(times(1)).pay(orderId, userId, totalPrice);
+	@AfterEach
+	void tearDown() {
+		paymentRepository.deleteAll();
+		orderRepository.deleteAll();
+		userRepository.deleteAll();
+	}
 
-		assertThat(result).isNotNull();
-		assertThat(result.getId()).isEqualTo(paymentInfo.getId());
-		assertThat(result.getOrderId()).isEqualTo(paymentInfo.getOrderId());
-		assertThat(result.getUserId()).isEqualTo(paymentInfo.getUserId());
-		assertThat(result.getPaymentAmount()).isEqualTo(paymentInfo.getPaymentAmount());
+	@Nested
+	@DisplayName("payment 동시성 테스트")
+	class Payment {
+
+		@Test
+		@DisplayName("2개의 주문을 동시에 결제하면 1개는 성공, 1개는 실패하며 포인트는 0이 되어야 한다")
+		void pay_success_and_fail_when_concurrently() throws InterruptedException {
+			// given
+			List<Long> orderIds = orderRepository.findByUserId(userId)
+				.stream()
+				.map(Order::getId)
+				.toList();
+
+			ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+			CountDownLatch latch = new CountDownLatch(numberOfThreads);
+
+			List<Throwable> exceptions = new ArrayList<>();
+
+			// when
+			for (Long orderId : orderIds) {
+				executorService.submit(() -> {
+					try {
+						PaymentCommand.Pay command = PaymentCommand.Pay.of(orderId, userId, PaymentType.POINT);
+						createPaymentUseCase.execute(command);
+					} catch (Exception e) {
+						synchronized (exceptions) {
+							exceptions.add(e);
+						}
+					} finally {
+						latch.countDown();
+					}
+				});
+			}
+
+			latch.await();
+			executorService.shutdown();
+
+			// then
+			long paymentCount = paymentRepository.count();
+			assertThat(paymentCount).isEqualTo(1);
+
+			User userAfterPayment = userRepository.findById(userId).orElseThrow();
+			assertThat(userAfterPayment.getPoint().getAmount()).isEqualTo(0L);
+
+			assertThat(exceptions.size()).isEqualTo(1);
+			assertThat(exceptions.get(0)).isInstanceOf(RestApiException.class);
+			assertThat(exceptions.get(0).getMessage()).isEqualTo(UserErrorCode.INSUFFICIENT_USER_POINT.getMessage());
+		}
 	}
 }
