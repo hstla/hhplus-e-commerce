@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.user.domain.component;
+package kr.hhplus.be.server.config.jpa.user.component;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
-import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
 import kr.hhplus.be.server.config.jpa.user.model.Point;
 import kr.hhplus.be.server.config.jpa.user.model.User;
 import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;

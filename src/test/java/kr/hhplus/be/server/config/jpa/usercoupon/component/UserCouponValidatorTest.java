@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.coupon.compnent;
+package kr.hhplus.be.server.config.jpa.usercoupon.component;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import kr.hhplus.be.server.config.jpa.usercoupon.component.UserCouponValidator;
 import kr.hhplus.be.server.config.jpa.usercoupon.repository.UserCouponRepository;
 import kr.hhplus.be.server.config.jpa.error.CouponErrorCode;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
@@ -23,13 +22,12 @@ class UserCouponValidatorTest {
 
 	@Mock
 	private UserCouponRepository userCouponRepository;
-
 	@InjectMocks
 	private UserCouponValidator userCouponValidator;
 
 	@Nested
 	@DisplayName("validateUserDoesNotHaveCoupon 테스트 시")
-	class validateUserDoesNotHaveCoupon {
+	class validateUserDoesNotHaveCouponTest {
 
 		@Test
 		@DisplayName("유저가 쿠폰을 보유하고 있지 않다면 예외를 던지지 않는다")

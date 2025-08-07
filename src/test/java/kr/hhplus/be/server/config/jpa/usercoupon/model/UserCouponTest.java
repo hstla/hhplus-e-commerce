@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.coupon.model;
+package kr.hhplus.be.server.config.jpa.usercoupon.model;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -12,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.hhplus.be.server.config.jpa.error.CouponErrorCode;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
-import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
-import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCouponStatus;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserCoupon 도메인 테스트")
@@ -92,6 +90,44 @@ class UserCouponTest {
 			assertThatThrownBy(() -> userCoupon.use(LocalDateTime.now()))
 				.isInstanceOf(RestApiException.class)
 				.hasMessage(CouponErrorCode.INVALID_COUPON_TYPE.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("validateOwnerShip 메서드는")
+	class validateOwnerShipTest {
+
+		@Test
+		@DisplayName("쿠폰의 주인이 입력받은 유저와 같아 정상동작한다")
+		void validateownership_success() {
+			// given
+			Long userId = 1L;
+			Long couponId = 100L;
+			LocalDateTime now = LocalDateTime.now();
+			UserCoupon userCoupon = UserCoupon.publish(userId, couponId, now);
+
+			// when
+			boolean validated = userCoupon.validateOwnerShip(userId);
+
+			// then
+			assertThat(validated).isTrue();
+		}
+
+		@Test
+		@DisplayName("쿠폰의 주인이 입력받은 유저와 달라 에러가 발생한다")
+		void validateownership_fail() {
+			// given
+			Long userId = 1L;
+			Long otherUserId = 2L;
+			Long couponId = 100L;
+			LocalDateTime now = LocalDateTime.now();
+			UserCoupon userCoupon = UserCoupon.publish(userId, couponId, now);
+
+			// when then
+			assertThatThrownBy(() -> userCoupon.validateOwnerShip(otherUserId))
+				.isInstanceOf(RestApiException.class)
+				.hasMessage(CouponErrorCode.INVALID_COUPON_OWNERSHIP.getMessage());
+
 		}
 	}
 }

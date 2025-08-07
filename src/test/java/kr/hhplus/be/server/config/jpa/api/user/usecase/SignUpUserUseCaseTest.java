@@ -3,7 +3,6 @@ package kr.hhplus.be.server.config.jpa.api.user.usecase;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.any;
-import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,10 +16,10 @@ import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserCommand;
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
-import kr.hhplus.be.server.config.jpa.user.domain.component.UserValidator;
-import kr.hhplus.be.server.config.jpa.user.domain.model.Point;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
+import kr.hhplus.be.server.config.jpa.user.model.Point;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SignUpUserUseCase 단위 테스트")
@@ -50,9 +49,9 @@ class SignUpUserUseCaseTest {
 			UserResult.UserInfo userInfo = signUpUserUseCase.execute(signUpRequest);
 
 			// Then
-			assertThat(userInfo.getId()).isEqualTo(userId);
-			assertThat(userInfo.getEmail()).isEqualTo("test@email.com");
-			assertThat(userInfo.getName()).isEqualTo("testName");
+			assertThat(userInfo.id()).isEqualTo(userId);
+			assertThat(userInfo.email()).isEqualTo("test@email.com");
+			assertThat(userInfo.name()).isEqualTo("testName");
 
 			verify(userValidator, times(1)).validateEmailNotDuplicated(findUser.getEmail());
 		}

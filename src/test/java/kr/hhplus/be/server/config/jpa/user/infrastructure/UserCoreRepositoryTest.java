@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.user.domain.infrastructure;
+package kr.hhplus.be.server.config.jpa.user.infrastructure;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
@@ -14,8 +14,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import kr.hhplus.be.server.TestcontainersConfig;
-import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
-import kr.hhplus.be.server.config.jpa.user.infrastructure.UserCoreRepository;
 import kr.hhplus.be.server.config.jpa.user.model.User;
 
 @DataJpaTest
@@ -44,7 +42,7 @@ class UserCoreRepositoryTest {
 
 		@BeforeEach
 		void setUp() {
-			User testUser = User.signUpUser("TestUser", "test@example.com", "password123");
+			User testUser = User.create("TestUser", "test@example.com", "password123");
 			testUser.chargePoint(1_000L);
 			jpaUserRepository.save(testUser);
 		}
@@ -84,7 +82,7 @@ class UserCoreRepositoryTest {
 
 		@BeforeEach
 		void setUp() {
-			User testUser = User.signUpUser("TestUser", "test@example.com", "password123");
+			User testUser = User.create("TestUser", "test@example.com", "password123");
 			testUser.chargePoint(1_000L);
 			savedUser = jpaUserRepository.save(testUser);
 		}

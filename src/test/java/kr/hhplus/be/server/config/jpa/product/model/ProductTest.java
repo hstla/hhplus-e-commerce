@@ -2,10 +2,14 @@ package kr.hhplus.be.server.config.jpa.product.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.hhplus.be.server.config.jpa.error.ProductErrorCode;
@@ -37,13 +41,13 @@ class ProductTest {
 			assertThat(product.getDescription()).isEqualTo(description);
 		}
 
-		@Test
-		@DisplayName("name이 null이면 INVALID_PRODUCT_NAME 예외를 던진다")
-		void throw_when_name_is_null() {
+		@ParameterizedTest
+		@MethodSource("invalidNames")
+		@DisplayName("name의 길이가 허용 범위를 초과하면 예외가 발생한다")
+		void throw_when_name_fail(String name) {
 			// given
-			String name = null;
 			ProductCategory category = ProductCategory.CLOTHING;
-			String description = "Nice";
+			String description = "Mechanical keyboard";
 
 			// when & then
 			assertThatThrownBy(() -> Product.create(name, category, description))
@@ -51,27 +55,20 @@ class ProductTest {
 				.hasMessage(ProductErrorCode.INVALID_PRODUCT_NAME.getMessage());
 		}
 
-		@Test
-		@DisplayName("name이 공백이면 INVALID_PRODUCT_NAME 예외를 던진다")
-		void throw_when_name_is_blank() {
-			// given
-			String name = "   ";
-			ProductCategory category = ProductCategory.CLOTHING;
-			String description = "Nice";
-
-			// when & then
-			assertThatThrownBy(() -> Product.create(name, category, description))
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(ProductErrorCode.INVALID_PRODUCT_NAME.getMessage());
+		static Stream<String> invalidNames() {
+			return Stream.of(
+				"",
+				"a".repeat(31)
+			);
 		}
 
-		@Test
-		@DisplayName("description이 null이면 INVALID_DESCRIPTION 예외를 던진다")
-		void throw_when_description_is_null() {
+		@ParameterizedTest
+		@MethodSource("invalidDescription")
+		@DisplayName("description길이가 길이가 허용 범위를 초과하면 예외가 발생한다")
+		void throw_when_description_fail(String description) {
 			// given
 			String name = "Keyboard";
 			ProductCategory category = ProductCategory.CLOTHING;
-			String description = null;
 
 			// when & then
 			assertThatThrownBy(() -> Product.create(name, category, description))
@@ -79,18 +76,11 @@ class ProductTest {
 				.hasMessage(ProductErrorCode.INVALID_DESCRIPTION.getMessage());
 		}
 
-		@Test
-		@DisplayName("description이 공백이면 INVALID_DESCRIPTION 예외를 던진다")
-		void throw_when_description_is_blank() {
-			// given
-			String name = "Keyboard";
-			ProductCategory category = ProductCategory.CLOTHING;
-			String description = "   ";
-
-			// when & then
-			assertThatThrownBy(() -> Product.create(name, category, description))
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(ProductErrorCode.INVALID_DESCRIPTION.getMessage());
+		static Stream<String> invalidDescription() {
+			return Stream.of(
+				"",
+				"a".repeat(201)
+			);
 		}
 	}
 }

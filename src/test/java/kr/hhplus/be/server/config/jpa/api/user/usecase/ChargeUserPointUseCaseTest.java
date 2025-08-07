@@ -16,9 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserPointResult;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
-import kr.hhplus.be.server.config.jpa.user.domain.model.Point;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.Point;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ChargeUserPointUseCase 단위 테스트")
@@ -47,8 +47,8 @@ class ChargeUserPointUseCaseTest {
 			UserPointResult.UserPoint userPoint = userPointUseCase.execute(userId, chargePoint);
 
 			// Then
-			assertThat(userPoint.getUserId()).isEqualTo(userId);
-			assertThat(userPoint.getPoint()).isEqualTo(2_000L); // 1_000 + 1_000
+			assertThat(userPoint.userId()).isEqualTo(userId);
+			assertThat(userPoint.point()).isEqualTo(2_000L); // 1_000 + 1_000
 
 			verify(userRepository, times(1)).findById(userId);
 			verify(userRepository, times(1)).save(any(User.class));

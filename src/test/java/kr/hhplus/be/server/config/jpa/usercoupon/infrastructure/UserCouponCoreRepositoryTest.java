@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.coupon.infrastructure.usercoupon;
+package kr.hhplus.be.server.config.jpa.usercoupon.infrastructure;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
@@ -18,17 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 import kr.hhplus.be.server.TestcontainersConfig;
 import kr.hhplus.be.server.config.jpa.coupon.infrastructure.JpaCouponRepository;
-import kr.hhplus.be.server.config.jpa.coupon.infrastructure.mapper.CouponMapper;
+import kr.hhplus.be.server.config.jpa.coupon.model.Coupon;
 import kr.hhplus.be.server.config.jpa.coupon.model.CouponType;
-import kr.hhplus.be.server.config.jpa.usercoupon.infrastructure.JpaUserCouponRepository;
 import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
-import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCouponStatus;
-import kr.hhplus.be.server.config.jpa.error.CouponErrorCode;
-import kr.hhplus.be.server.config.jpa.error.RestApiException;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-@Import({UserCouponCoreRepository.class, CouponMapper.class, TestcontainersConfig.class})
+@Import({UserCouponCoreRepository.class, TestcontainersConfig.class})
 @ActiveProfiles("test")
 @DisplayName("UserCouponCoreRepository 테스트")
 class UserCouponCoreRepositoryTest {
@@ -47,59 +43,9 @@ class UserCouponCoreRepositoryTest {
 		jpaCouponRepository.deleteAll();
 
 		LocalDateTime expireAt = LocalDateTime.now().plusDays(10);
-		CouponEntity testCouponEntity = new CouponEntity(CouponType.FIXED, "2000원 할인 쿠폰", 2_000L, 10, expireAt);
+		Coupon testCouponEntity = Coupon.create("2000원 할인 쿠폰", CouponType.FIXED, 2_000L, 10, expireAt, 1L);
 		testCouponEntity = jpaCouponRepository.save(testCouponEntity);
 		testCouponId = testCouponEntity.getId();
-	}
-
-	@Nested
-	@DisplayName("save 메서드 테스트")
-	class SaveTests {
-
-		@Test
-		@DisplayName("새로운 UserCoupon 도메인 모델을 성공적으로 저장해야 한다")
-		void save() {
-			// given
-			Long userId = 1L;
-			LocalDateTime issuedAt = LocalDateTime.now();
-			UserCoupon newUserCoupon = UserCoupon.publish(userId, testCouponId, issuedAt);
-
-			// when
-			UserCoupon savedUserCoupon = userCouponCoreRepository.save(newUserCoupon);
-
-			// then
-			assertThat(savedUserCoupon.getId()).isNotNull();
-			assertThat(savedUserCoupon.getUserId()).isEqualTo(userId);
-			assertThat(savedUserCoupon.getCouponId()).isEqualTo(testCouponId);
-			assertThat(savedUserCoupon.getStatus()).isEqualTo(UserCouponStatus.ISSUED);
-			assertThat(savedUserCoupon.getIssuedAt()).isEqualTo(issuedAt);
-			assertThat(savedUserCoupon.getUsedAt()).isNull();
-		}
-
-		@Test
-		@DisplayName("기존 UserCoupon 도메인 모델의 상태를 성공적으로 업데이트해야 한다")
-		void save_update() {
-			// given
-			Long userId = 2L;
-			LocalDateTime issuedAt = LocalDateTime.now().minusDays(5);
-			UserCouponEntity existingEntity = new UserCouponEntity(
-				userId, testCouponId, UserCouponStatus.ISSUED, issuedAt, null
-			);
-			UserCouponEntity savedOriginalEntity = jpaUserCouponRepository.save(existingEntity);
-
-			UserCoupon userCouponToUpdate = userCouponCoreRepository.findById(savedOriginalEntity.getId());
-			LocalDateTime usedAt = LocalDateTime.now();
-			userCouponToUpdate.use(usedAt);
-
-			// when
-			UserCoupon updatedUserCoupon = userCouponCoreRepository.save(userCouponToUpdate);
-
-			// then
-			assertThat(updatedUserCoupon).isNotNull();
-			assertThat(updatedUserCoupon.getId()).isEqualTo(savedOriginalEntity.getId());
-			assertThat(updatedUserCoupon.getStatus()).isEqualTo(UserCouponStatus.USED);
-			assertThat(updatedUserCoupon.getUsedAt()).isEqualToIgnoringNanos(usedAt);
-		}
 	}
 
 	@Nested
@@ -113,18 +59,15 @@ class UserCouponCoreRepositoryTest {
 		@BeforeEach
 		void setUp() {
 			LocalDateTime expireAt = LocalDateTime.now().plusDays(10);
-			CouponEntity testCouponEntity = new CouponEntity(CouponType.FIXED, "1000원 할인 쿠폰", 1_000L, 10, expireAt);
-			CouponEntity otherCoupon = jpaCouponRepository.save(testCouponEntity);
+			Coupon testCoupon = Coupon.create("1000원 할인 쿠폰", CouponType.FIXED, 1_000L, 10, expireAt, 1L);
+			Coupon otherCoupon = jpaCouponRepository.save(testCoupon);
 			otherCouponId = otherCoupon.getId();
 
 			// user1에는 2개의 쿠폰 저장
-			jpaUserCouponRepository.save(new UserCouponEntity(null, userId1, testCouponId, UserCouponStatus.ISSUED,
-				LocalDateTime.now().minusDays(1), null));
-			jpaUserCouponRepository.save(new UserCouponEntity(null, userId1, otherCouponId, UserCouponStatus.ISSUED,
-				LocalDateTime.now().minusDays(2), null));
+			jpaUserCouponRepository.save(UserCoupon.publish(userId1, testCouponId, LocalDateTime.now().minusDays(1)));
+			jpaUserCouponRepository.save(UserCoupon.publish(userId1, otherCouponId, LocalDateTime.now().minusDays(2)));
 			// user2에는 1개의 쿠폰 저장
-			jpaUserCouponRepository.save(new UserCouponEntity(null, userId2, testCouponId, UserCouponStatus.ISSUED,
-				LocalDateTime.now().minusDays(3), null));
+			jpaUserCouponRepository.save(UserCoupon.publish(userId2, testCouponId, LocalDateTime.now().minusDays(3)));
 		}
 
 		@Test
@@ -162,8 +105,7 @@ class UserCouponCoreRepositoryTest {
 		@BeforeEach
 		void setUp() {
 			// 테스트용 사용자 쿠폰 저장
-			jpaUserCouponRepository.save(
-				new UserCouponEntity(userId, testCouponId, UserCouponStatus.ISSUED, LocalDateTime.now(), null));
+			jpaUserCouponRepository.save(UserCoupon.publish(userId, testCouponId, LocalDateTime.now()));
 		}
 
 		@Test
@@ -214,46 +156,6 @@ class UserCouponCoreRepositoryTest {
 
 			// then
 			assertThat(exists).isFalse();
-		}
-	}
-
-	@Nested
-	@DisplayName("findById 메서드 테스트")
-	class FindByIdTests {
-
-		private UserCouponEntity savedUserCouponEntity;
-		private Long testUserId = 40L;
-
-		@BeforeEach
-		void setUp() {
-			// 테스트용 UserCouponEntity 저장
-			UserCouponEntity testEntity = new UserCouponEntity(testUserId, testCouponId, UserCouponStatus.ISSUED, LocalDateTime.now(), null);
-			savedUserCouponEntity = jpaUserCouponRepository.save(testEntity);
-		}
-
-		@Test
-		@DisplayName("존재하는 ID로 조회 시 UserCoupon 도메인 모델을 반환해야 한다")
-		void findById() {
-			// when
-			UserCoupon foundUserCoupon = userCouponCoreRepository.findById(savedUserCouponEntity.getId());
-
-			// then
-			assertThat(foundUserCoupon.getId()).isEqualTo(savedUserCouponEntity.getId());
-			assertThat(foundUserCoupon.getUserId()).isEqualTo(testUserId);
-			assertThat(foundUserCoupon.getCouponId()).isEqualTo(testCouponId);
-			assertThat(foundUserCoupon.getIssuedAt()).isEqualToIgnoringNanos(savedUserCouponEntity.getIssuedAt());
-		}
-
-		@Test
-		@DisplayName("존재하지 않는 ID로 조회 시 NOT_FOUND_USER_COUPON 에러를 반환해야 한다")
-		void findById_fail_not_found() {
-			// given
-			Long nonExistentId = 999L;
-
-			// when then
-			assertThatThrownBy(() -> userCouponCoreRepository.findById(nonExistentId))
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(CouponErrorCode.NOT_FOUND_USER_COUPON.getMessage());
 		}
 	}
 }
