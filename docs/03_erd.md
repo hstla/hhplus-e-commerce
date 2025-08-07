@@ -1,6 +1,6 @@
 ## ✅ Domain Class Diagram
 
-<img width="751" height="441" alt="Image" src="https://github.com/user-attachments/assets/e3ef9a6c-aa9e-4b68-9093-f5218ef842a6" />
+<img width="751" height="441" alt="Image" src="https://github.com/user-attachments/assets/94ac663b-c189-4717-bbaa-71ad09c3d3fe" />
 
 ### Aggregate root 분리 이유
 user_coupon를 user, payment를 order와 하나의 aggregate로 묶을지 고민했지만, 다음과 같은 이유로 별도의 aggregate로 분리하기로 결정하였습니다.
@@ -20,7 +20,7 @@ DB 성능 저하 및 Lock 경합이 발생할 수 있습니다.
 
 ## ✅ ERD
 
-<img width="741" height="1171" alt="Image" src="https://github.com/user-attachments/assets/b2a1cf25-1ca9-4a55-9293-a7ff1afc781c" />
+<img width="745" height="931" alt="Image" src="https://github.com/user-attachments/assets/caae5de2-caf3-41ab-a76c-28e8b35591f4" />
 
 
 ### 테이블 설명
