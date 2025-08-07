@@ -5,9 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserCommand;
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
-import kr.hhplus.be.server.config.jpa.user.domain.component.UserValidator;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -19,9 +19,9 @@ public class SignUpUserUseCase {
 
 	@Transactional
 	public UserResult.UserInfo execute(UserCommand.SignUp signUpRequest) {
-		userValidator.validateEmailNotDuplicated(signUpRequest.getEmail());
+		userValidator.validateEmailNotDuplicated(signUpRequest.email());
 
-		User newUser = User.signUpUser(signUpRequest.getName(), signUpRequest.getEmail(), signUpRequest.getPassword());
+		User newUser = User.create(signUpRequest.name(), signUpRequest.email(), signUpRequest.password());
 		User savedUser = userRepository.save(newUser);
 
 		return UserResult.UserInfo.of(savedUser);

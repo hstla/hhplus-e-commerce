@@ -22,8 +22,8 @@ public class ProductController implements ProductApiSpec {
 	@GetMapping("/{productId}")
 	public ResponseEntity<CommonResponse<ProductResponse.ProductOptions>> getProductDetails(Long productId) {
 		ProductResult.ProductOptionInfo findProductOptions = findProductUseCase.findProductOptionsById(productId);
-		return ResponseEntity.ok(CommonResponse.success(ProductResponse.ProductOptions.of(findProductOptions.getProductId(),
-			findProductOptions.getProductName(), findProductOptions.getDescription(), findProductOptions.getCategory(), findProductOptions.getOptions()
+		return ResponseEntity.ok(CommonResponse.success(ProductResponse.ProductOptions.of(findProductOptions.productId(),
+			findProductOptions.productName(), findProductOptions.description(), findProductOptions.category(), findProductOptions.options()
 		)));
 	}
 }

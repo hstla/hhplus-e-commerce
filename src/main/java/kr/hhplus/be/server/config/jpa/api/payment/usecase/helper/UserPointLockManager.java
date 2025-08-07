@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.api.payment.usecase;
+package kr.hhplus.be.server.config.jpa.api.payment.usecase.helper;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

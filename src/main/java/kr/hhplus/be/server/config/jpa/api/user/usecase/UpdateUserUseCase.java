@@ -5,8 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserCommand;
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,7 +19,7 @@ public class UpdateUserUseCase {
 	public UserResult.UserInfo execute(Long userId, UserCommand.Update updateRequest) {
 		User findUser = userRepository.findById(userId);
 
-		findUser.updateName(updateRequest.getName());
+		findUser.updateName(updateRequest.name());
 		User savedUser = userRepository.save(findUser);
 
 		return UserResult.UserInfo.of(savedUser);
