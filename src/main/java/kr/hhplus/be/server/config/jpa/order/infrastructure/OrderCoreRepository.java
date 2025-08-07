@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order.infrastructure.order;
+package kr.hhplus.be.server.config.jpa.order.infrastructure;
 
 import org.springframework.stereotype.Component;
 

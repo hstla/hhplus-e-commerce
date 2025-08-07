@@ -2,61 +2,65 @@ package kr.hhplus.be.server.config.jpa.coupon.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import kr.hhplus.be.server.config.jpa.common.BaseEntity;
 import kr.hhplus.be.server.config.jpa.error.CouponErrorCode;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Coupon {
+@Builder
+@Entity
+@Table(name = "coupon")
+public class Coupon extends BaseEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "coupon_id")
 	private Long id;
-	private CouponType discountType;
+	@Column(name = "name", length = 30, nullable = false)
 	private String name;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "discount_type", nullable = false)
+	private CouponType discountType;
+	@Column(name = "discount_value", nullable = false)
 	private Long discountValue;
-	private int quantity;
+	@Column(name = "initial_stock", nullable = false)
+	private int initialStock;
+	@Column(name = "coupon_stock_id", nullable = false)
+	private Long couponStockId;
+	@Column(name = "expire_at", nullable = false)
 	private LocalDateTime expireAt;
 
-	public static Coupon create(CouponType discountType, String name,
-		Long discountValue, int quantity, LocalDateTime expireAt) {
+	public static Coupon create(String name, CouponType discountType,
+		Long discountValue, int initialStock, LocalDateTime expireAt, Long couponStockId) {
 		validateDiscountValue(discountType, discountValue);
-		return new Coupon(null, discountType, name, discountValue, quantity, expireAt);
-	}
-
-	public void validateForPublish(LocalDateTime nowDateTime) {
-		validateStock();
-		validateNotExpired(nowDateTime);
-	}
-
-	public void decreaseQuantity() {
-		this.quantity--;
+		return new Coupon(null, name, discountType, discountValue, initialStock, couponStockId, expireAt);
 	}
 
 	public void validateNotExpired(LocalDateTime nowDateTime) {
-		if (this.expireAt == null || this.expireAt.isBefore(nowDateTime)) {
+		if (this.expireAt.isBefore(nowDateTime)) {
 			throw new RestApiException(CouponErrorCode.EXPIRED_COUPON);
 		}
 	}
 
-	private void validateStock() {
-		if (this.quantity < 1) {
-			throw new RestApiException(CouponErrorCode.OUT_OF_STOCK_COUPON);
-		}
-	}
-
 	private static void validateDiscountValue(CouponType discountType, Long discountValue) {
-		if (discountType == null) {
-			throw new RestApiException(CouponErrorCode.INVALID_COUPON_TYPE);
-		}
 		if (discountType == CouponType.PERCENT) {
 			validatePercentDiscountValue(discountValue);
-		} else if (discountType == CouponType.FIXED) {
-			if (discountValue <= 0) {
-				throw new RestApiException(CouponErrorCode.INVALID_FIXED_DISCOUNT);
-			}
+		} else if (discountValue <= 0) {
+			throw new RestApiException(CouponErrorCode.INVALID_FIXED_DISCOUNT);
 		}
 	}
 

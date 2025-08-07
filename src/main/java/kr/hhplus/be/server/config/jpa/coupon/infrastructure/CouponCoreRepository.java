@@ -1,8 +1,7 @@
-package kr.hhplus.be.server.config.jpa.coupon.infrastructure.coupon;
+package kr.hhplus.be.server.config.jpa.coupon.infrastructure;
 
 import org.springframework.stereotype.Component;
 
-import kr.hhplus.be.server.config.jpa.coupon.infrastructure.mapper.CouponMapper;
 import kr.hhplus.be.server.config.jpa.coupon.model.Coupon;
 import kr.hhplus.be.server.config.jpa.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.config.jpa.error.CouponErrorCode;
@@ -17,14 +16,12 @@ public class CouponCoreRepository implements CouponRepository {
 
 	@Override
 	public Coupon save(Coupon coupon) {
-		CouponEntity save = jpaCouponRepository.save(couponMapper.toEntity(coupon));
-		return couponMapper.toModel(save);
+		return jpaCouponRepository.save(coupon);
 	}
 
 	@Override
 	public Coupon findById(Long couponId) {
-		CouponEntity findCouponEntity = jpaCouponRepository.findById(couponId).
+		return jpaCouponRepository.findById(couponId).
 			orElseThrow(() -> new RestApiException(CouponErrorCode.INACTIVE_COUPON));
-		return couponMapper.toModel(findCouponEntity);
 	}
 }

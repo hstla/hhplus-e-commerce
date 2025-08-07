@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.order.infrastructure.orderproduct;
+package kr.hhplus.be.server.config.jpa.order.infrastructure;
 
 import java.util.List;
 

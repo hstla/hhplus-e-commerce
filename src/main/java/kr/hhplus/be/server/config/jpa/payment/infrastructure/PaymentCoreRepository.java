@@ -11,11 +11,9 @@ import lombok.RequiredArgsConstructor;
 public class PaymentCoreRepository implements PaymentRepository {
 
 	private final JpaPaymentRepository jpaPaymentRepository;
-	private final PaymentMapper paymentMapper;
 
 	@Override
 	public Payment save(Payment payment) {
-		PaymentEntity save = jpaPaymentRepository.save(paymentMapper.toEntity(payment));
-		return paymentMapper.toModel(save);
+		return jpaPaymentRepository.save(payment);
 	}
 }

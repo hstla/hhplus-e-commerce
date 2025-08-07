@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.product.infrastructure.product;
+package kr.hhplus.be.server.config.jpa.product.infrastructure;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

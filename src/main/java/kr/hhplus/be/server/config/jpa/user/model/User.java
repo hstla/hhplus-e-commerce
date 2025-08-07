@@ -1,5 +1,13 @@
-package kr.hhplus.be.server.config.jpa.user.domain.model;
+package kr.hhplus.be.server.config.jpa.user.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import kr.hhplus.be.server.config.jpa.common.BaseEntity;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
 import lombok.AccessLevel;
@@ -10,19 +18,28 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User {
+@Entity
+@Table(name = "user")
+public class User extends BaseEntity {
 	private static final int MIN_NAME_LENGTH = 2;
 	private static final int MAX_NAME_LENGTH = 20;
 	private static final int MIN_PASSWORD_LENGTH = 5;
 	private static final int MAX_PASSWORD_LENGTH = 30;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "user_id")
 	private Long id;
+	@Column(name = "name", length = 20, nullable = false)
 	private String name;
+	@Column(name = "email", length = 50, nullable = false, unique = true)
 	private String email;
+	@Column(name = "password", nullable = false)
 	private String password;
+	@Embedded
 	private Point point;
 
-	public static User signUpUser(String name, String email, String password) {
+	public static User create(String name, String email, String password) {
 		validateName(name);
 		validatePassword(password);
 		return new User(null, name, email, password, Point.zero());

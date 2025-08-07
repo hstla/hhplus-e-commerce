@@ -1,22 +1,26 @@
-package kr.hhplus.be.server.config.jpa.user.domain.model;
+package kr.hhplus.be.server.config.jpa.user.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 public class Point {
 	private static final Long MIN_CHARGE_AMOUNT = 1_000L;
 	private static final Long MAX_CHARGE_AMOUNT = 1_000_000L;
 
-	private final Long amount;
+	@Column(name = "point", nullable = false)
+	private Long amount;
 
 	private Point(Long amount) {
-		if (amount < 0 || amount > MAX_CHARGE_AMOUNT) {
-			throw new RestApiException(UserErrorCode.INVALID_USER_POINT);
-		}
 		this.amount = amount;
 	}
 
@@ -32,7 +36,7 @@ public class Point {
 		if (chargeAmount <= 0) {
 			throw new RestApiException(UserErrorCode.INVALID_CHARGE_AMOUNT);
 		}
-		if (chargeAmount < MIN_CHARGE_AMOUNT) {
+		if (chargeAmount < MIN_CHARGE_AMOUNT ||  chargeAmount > MAX_CHARGE_AMOUNT) {
 			throw new RestApiException(UserErrorCode.INVALID_USER_POINT);
 		}
 		return new Point(this.amount + chargeAmount);

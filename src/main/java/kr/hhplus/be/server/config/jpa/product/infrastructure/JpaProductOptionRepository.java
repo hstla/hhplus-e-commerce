@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.jpa.product.infrastructure.productoption;
+package kr.hhplus.be.server.config.jpa.product.infrastructure;
 
 import java.util.List;
 

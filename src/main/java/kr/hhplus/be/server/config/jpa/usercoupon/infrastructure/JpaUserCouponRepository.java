@@ -1,12 +1,13 @@
-package kr.hhplus.be.server.config.jpa.coupon.infrastructure.usercoupon;
+package kr.hhplus.be.server.config.jpa.usercoupon.infrastructure;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JpaUserCouponRepository extends JpaRepository<UserCouponEntity, Long> {
+import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
 
-	List<UserCouponEntity> findAllByUserId(Long userId);
-	Optional<UserCouponEntity> findByUserIdAndCouponId(Long userId, Long couponId);
+public interface JpaUserCouponRepository extends JpaRepository<UserCoupon, Long> {
+	List<UserCoupon> findAllByUserId(Long userId);
+	boolean existsByUserIdAndCouponId(Long userId, Long couponId);
 }
