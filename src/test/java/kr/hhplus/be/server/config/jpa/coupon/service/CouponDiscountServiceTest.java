@@ -58,7 +58,7 @@ class CouponDiscountServiceTest {
 			LocalDateTime now = LocalDateTime.now();
 
 			UserCoupon userCoupon = UserCoupon.publish(100L, 200L, now.minusDays(1));
-			Coupon coupon = new Coupon(200L, "Fixed Coupon", CouponType.FIXED, 2_000L, 10, 1L, now.plusDays(1));
+			Coupon coupon = new Coupon(200L, "Fixed Coupon", CouponType.FIXED, 2_000L, 10, now.plusDays(1));
 
 			// when
 			long discountedAmount = couponService.calculateDiscount(userCoupon, coupon, originPrice, now);
@@ -78,7 +78,7 @@ class CouponDiscountServiceTest {
 			LocalDateTime usedAt = now.plusDays(1);
 
 			UserCoupon userCoupon = UserCoupon.publish(100L, 201L, now.minusDays(1));
-			Coupon coupon = new Coupon(201L, "Percent Coupon", CouponType.PERCENT, 20L, 10, 1L, usedAt);
+			Coupon coupon = new Coupon(201L, "Percent Coupon", CouponType.PERCENT, 20L, 10, usedAt);
 
 			// when
 			long discountedAmount = couponService.calculateDiscount(userCoupon, coupon, totalAmount, now);

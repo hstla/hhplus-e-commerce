@@ -47,11 +47,9 @@ class FindUserCouponUseCaseTest {
 		userId = jpaUserRepository.save(User.create("userName", "teste@email.com", "password")).getId();
 		LocalDateTime expireAt = LocalDateTime.now().plusDays(1);
 		Long couponId1 = jpaCouponRepository.save(
-			Coupon.create("1000원 할인 쿠폰", CouponType.FIXED, 1_000L, 10, expireAt, 1L))
-			.getId();
+			Coupon.create("1000원 할인 쿠폰", CouponType.FIXED, 1_000L, 10, expireAt)).getId();
 		Long couponId2 = jpaCouponRepository.save(
-			Coupon.create("20% 할인 쿠폰", CouponType.PERCENT, 20L, 10, expireAt, 2L))
-			.getId();
+			Coupon.create("20% 할인 쿠폰", CouponType.PERCENT, 20L, 10, expireAt)).getId();
 
 		LocalDateTime now = LocalDateTime.now();
 		jpaUserCouponRepository.save(UserCoupon.publish(userId, couponId1, now));

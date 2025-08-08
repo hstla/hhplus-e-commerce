@@ -4,5 +4,5 @@ import kr.hhplus.be.server.config.jpa.coupon.model.CouponStock;
 
 public interface CouponStockRepository {
 	CouponStock save(CouponStock couponStock);
-	CouponStock findByIdLock(Long couponStockId);
+	CouponStock findWithLockByCouponId(Long couponId);
 }

@@ -20,19 +20,18 @@ public class CouponCreateUseCase {
 
 	@Transactional
 	public CouponResult.Info execute(CouponCommand.CouponCreate command) {
-		CouponStock stock =  couponStockRepository.save(
-			CouponStock.create(command.initialStock())
-		);
 
 		Coupon coupon = Coupon.create(
 			command.name(),
 			command.couponType(),
 			command.discountValue(),
 			command.initialStock(),
-			command.expireAt(),
-			stock.getId()
+			command.expireAt()
 		);
+
 		Coupon savedCoupon = couponRepository.save(coupon);
+
+		couponStockRepository.save(CouponStock.create(savedCoupon.getId(), command.initialStock()));
 
 		return CouponResult.Info.of(savedCoupon);
 	}

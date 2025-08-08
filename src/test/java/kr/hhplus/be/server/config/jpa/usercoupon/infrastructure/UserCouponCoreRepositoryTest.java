@@ -43,7 +43,7 @@ class UserCouponCoreRepositoryTest {
 		jpaCouponRepository.deleteAll();
 
 		LocalDateTime expireAt = LocalDateTime.now().plusDays(10);
-		Coupon testCouponEntity = Coupon.create("2000원 할인 쿠폰", CouponType.FIXED, 2_000L, 10, expireAt, 1L);
+		Coupon testCouponEntity = Coupon.create("2000원 할인 쿠폰", CouponType.FIXED, 2_000L, 10, expireAt);
 		testCouponEntity = jpaCouponRepository.save(testCouponEntity);
 		testCouponId = testCouponEntity.getId();
 	}
@@ -59,7 +59,7 @@ class UserCouponCoreRepositoryTest {
 		@BeforeEach
 		void setUp() {
 			LocalDateTime expireAt = LocalDateTime.now().plusDays(10);
-			Coupon testCoupon = Coupon.create("1000원 할인 쿠폰", CouponType.FIXED, 1_000L, 10, expireAt, 1L);
+			Coupon testCoupon = Coupon.create("1000원 할인 쿠폰", CouponType.FIXED, 1_000L, 10, expireAt);
 			Coupon otherCoupon = jpaCouponRepository.save(testCoupon);
 			otherCouponId = otherCoupon.getId();
 

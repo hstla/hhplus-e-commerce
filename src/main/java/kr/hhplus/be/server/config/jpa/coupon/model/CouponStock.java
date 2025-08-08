@@ -23,11 +23,13 @@ public class CouponStock {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "coupon_stock_id")
 	private Long id;
+	@Column(name = "coupon_id", nullable = false)
+	private Long couponId;
 	@Column(name = "stock", nullable = false)
 	private int stock;
 
-	public static CouponStock create(int stock) {
-		return new CouponStock(null, stock);
+	public static CouponStock create(Long couponId, int stock) {
+		return new CouponStock(null, couponId, stock);
 	}
 
 	public boolean decreaseStock() {

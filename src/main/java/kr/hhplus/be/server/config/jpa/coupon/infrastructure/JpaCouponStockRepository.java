@@ -13,6 +13,6 @@ import kr.hhplus.be.server.config.jpa.coupon.model.CouponStock;
 public interface JpaCouponStockRepository extends JpaRepository<CouponStock, Long> {
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("SELECT cs FROM CouponStock cs WHERE cs.id = :id")
-	Optional<CouponStock> findByIdWithLock(@Param("id") Long stockId);
+	@Query("SELECT cs FROM CouponStock cs WHERE cs.couponId = :id")
+	Optional<CouponStock> findWithLockByCouponId(@Param("id") Long couponId);
 }

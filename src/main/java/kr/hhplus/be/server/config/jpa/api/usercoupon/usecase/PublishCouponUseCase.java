@@ -39,7 +39,7 @@ public class PublishCouponUseCase {
 		userCouponValidator.validateUserDoesNotHaveCoupon(userId, findCoupon.getId());
 
 		//Lock
-		CouponStock couponStock = couponStockRepository.findByIdLock(findCoupon.getCouponStockId());
+		CouponStock couponStock = couponStockRepository.findWithLockByCouponId(findCoupon.getId());
 		couponStock.decreaseStock();
 		couponStockRepository.save(couponStock);
 

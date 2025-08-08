@@ -39,15 +39,13 @@ public class Coupon extends BaseEntity {
 	private Long discountValue;
 	@Column(name = "initial_stock", nullable = false)
 	private int initialStock;
-	@Column(name = "coupon_stock_id", nullable = false)
-	private Long couponStockId;
 	@Column(name = "expire_at", nullable = false)
 	private LocalDateTime expireAt;
 
 	public static Coupon create(String name, CouponType discountType,
-		Long discountValue, int initialStock, LocalDateTime expireAt, Long couponStockId) {
+		Long discountValue, int initialStock, LocalDateTime expireAt) {
 		validateDiscountValue(discountType, discountValue);
-		return new Coupon(null, name, discountType, discountValue, initialStock, couponStockId, expireAt);
+		return new Coupon(null, name, discountType, discountValue, initialStock, expireAt);
 	}
 
 	public void validateNotExpired(LocalDateTime nowDateTime) {

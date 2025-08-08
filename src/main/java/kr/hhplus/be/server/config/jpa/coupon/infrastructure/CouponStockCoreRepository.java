@@ -20,8 +20,8 @@ public class CouponStockCoreRepository implements CouponStockRepository {
 	}
 
 	@Override
-	public CouponStock findByIdLock(Long stockId) {
-		return jpaCouponStockRepository.findByIdWithLock(stockId)
-			.orElseThrow(() -> new RestApiException(CouponErrorCode.NOT_FOUND_COUPON_STOCK));
+	public CouponStock findWithLockByCouponId(Long couponId) {
+		return jpaCouponStockRepository.findWithLockByCouponId(couponId)
+			.orElseThrow(() -> new RestApiException(CouponErrorCode.INACTIVE_COUPON));
 	}
 }

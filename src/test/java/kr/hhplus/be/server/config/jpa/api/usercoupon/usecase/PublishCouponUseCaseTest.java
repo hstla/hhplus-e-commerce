@@ -56,11 +56,12 @@ class PublishCouponUseCaseTest {
 		userCouponRepository.deleteAll();
 		userRepository.deleteAll();
 
-		CouponStock stock = CouponStock.create(5);
+		Coupon coupon = Coupon.create("할인쿠폰", CouponType.FIXED, 1_000L, 5, LocalDateTime.now().plusDays(1));
+		couponId = couponRepository.save(coupon).getId();
+
+		CouponStock stock = CouponStock.create(couponId, 5);
 		CouponStock couponStock = couponStockRepository.save(stock);
 		couponStockId = couponStock.getId();
-		Coupon coupon = Coupon.create("할인쿠폰", CouponType.FIXED, 1_000L, 5, LocalDateTime.now().plusDays(1), couponStock.getId());
-		couponId = couponRepository.save(coupon).getId();
 
 		for (int i = 1; i <= 10; i++) {
 			User user = new User(null, "User" + i, "user" + i + "@test.com", "password" + i, Point.zero());

@@ -31,7 +31,7 @@ class CouponTest {
 			LocalDateTime expireAt = LocalDateTime.now().plusDays(1);
 
 			// when
-			Coupon coupon = Coupon.create("5000원 할인", CouponType.FIXED, 5_000L, 10, expireAt, 1L);
+			Coupon coupon = Coupon.create("5000원 할인", CouponType.FIXED, 5_000L, 10, expireAt);
 
 			// then
 			assertThat(coupon.getId()).isNull();
@@ -45,7 +45,7 @@ class CouponTest {
 		@DisplayName("퍼센트 할인값이 0 이하거나 100 초과면 예외 발생")
 		void create_fail_invalid_percent_discount(long discountValue) {
 			assertThatThrownBy(() ->
-				Coupon.create("퍼센트 쿠폰", CouponType.PERCENT, discountValue, 10, LocalDateTime.now(), 1L))
+				Coupon.create("퍼센트 쿠폰", CouponType.PERCENT, discountValue, 10, LocalDateTime.now()))
 				.isInstanceOf(RestApiException.class)
 				.hasMessage(CouponErrorCode.INVALID_PERCENT_DISCOUNT.getMessage());
 		}
@@ -54,7 +54,7 @@ class CouponTest {
 		@DisplayName("정액 할인값이 0 이하이면 예외 발생")
 		void create_fail_invalid_fixed_discount() {
 			assertThatThrownBy(() ->
-				Coupon.create("정액 쿠폰", CouponType.FIXED, 0L, 10, LocalDateTime.now(), 1L))
+				Coupon.create("정액 쿠폰", CouponType.FIXED, 0L, 10, LocalDateTime.now()))
 				.isInstanceOf(RestApiException.class)
 				.hasMessage(CouponErrorCode.INVALID_FIXED_DISCOUNT.getMessage());
 		}
@@ -68,7 +68,8 @@ class CouponTest {
 		@DisplayName("쿠폰 재고가 있어 정상적으로 감소한다")
 		void decreaseStock_success() {
 			// given
-			CouponStock couponStock = CouponStock.create(10);
+			long couponId = 100L;
+			CouponStock couponStock = CouponStock.create(couponId,10);
 
 			// when
 			boolean isStock = couponStock.decreaseStock();
@@ -81,7 +82,8 @@ class CouponTest {
 		@DisplayName("쿠폰 재고가 없어서 예외를 발생한다")
 		void decreaseStock_fail() {
 			// given
-			CouponStock couponStock = CouponStock.create(0);
+			long couponId = 100L;
+			CouponStock couponStock = CouponStock.create(couponId, 0);
 
 			// when then
 			assertThatThrownBy(couponStock::decreaseStock)
