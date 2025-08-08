@@ -2,7 +2,6 @@ package kr.hhplus.be.server.config.jpa.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,9 +12,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserPointResult;
-import kr.hhplus.be.server.config.jpa.user.domain.model.Point;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.Point;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("FindUserPointUseCase 단위 테스트")
@@ -42,8 +41,8 @@ class FindUserPointUseCaseTest {
 			UserPointResult.UserPoint userPoint = userPointUseCase.execute(userId);
 
 			// Then
-			assertThat(userPoint.getUserId()).isEqualTo(userId);
-			assertThat(userPoint.getPoint()).isEqualTo(1_000L);
+			assertThat(userPoint.userId()).isEqualTo(userId);
+			assertThat(userPoint.point()).isEqualTo(1_000L);
 
 			verify(userRepository, times(1)).findById(userId);
 		}

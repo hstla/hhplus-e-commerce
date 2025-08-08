@@ -1,5 +1,14 @@
 package kr.hhplus.be.server.config.jpa.product.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import kr.hhplus.be.server.config.jpa.common.BaseEntity;
 import kr.hhplus.be.server.config.jpa.error.ProductErrorCode;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import lombok.AccessLevel;
@@ -7,13 +16,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "product")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Product {
+public class Product extends BaseEntity {
+
+	private static final int MIN_NAME_LENGTH = 1;
+	private static final int MAX_NAME_LENGTH = 30;
+	private static final int MIN_DESCRIPTION_LENGTH = 10;
+	private static final int MAX_DESCRIPTION_LENGTH = 200;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "product_id", nullable = false)
 	private Long id;
+	@Column(name = "name", nullable = false, length = MAX_NAME_LENGTH)
 	private String name;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "category", nullable = false)
 	private ProductCategory category;
+	@Column(name = "description", nullable = false, length = MAX_DESCRIPTION_LENGTH)
 	private String description;
 
 	public static Product create(String name, ProductCategory category, String description) {
@@ -23,13 +47,13 @@ public class Product {
 	}
 
 	private static void validateName(String name) {
-		if (name == null || name.isBlank()) {
+		if (name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH) {
 			throw new RestApiException(ProductErrorCode.INVALID_PRODUCT_NAME);
 		}
 	}
 
 	private static void validateDescription(String description) {
-		if (description == null || description.isBlank()) {
+		if (description.length() < MIN_DESCRIPTION_LENGTH || description.length() > MAX_DESCRIPTION_LENGTH) {
 			throw new RestApiException(ProductErrorCode.INVALID_DESCRIPTION);
 		}
 	}

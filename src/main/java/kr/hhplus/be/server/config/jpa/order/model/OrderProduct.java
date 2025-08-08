@@ -1,52 +1,34 @@
 package kr.hhplus.be.server.config.jpa.order.model;
 
-import kr.hhplus.be.server.config.jpa.error.OrderErrorCode;
-import kr.hhplus.be.server.config.jpa.error.RestApiException;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import kr.hhplus.be.server.config.jpa.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "order_product")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class OrderProduct {
+public class OrderProduct extends BaseEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "order_product_id", nullable = false)
 	private Long id;
+	@Column(name = "order_id", nullable = false)
 	private Long orderId;
-	private Long productOptionId;
-	private int quantity;
-	private Long unitPrice;
+	@Embedded
+	private ProductOptionSnapshot productOptionVO;
 
-	public static OrderProduct create(Long orderId, Long productOptionId, int quantity, Long unitPrice) {
-		validateOptionId(productOptionId);
-		validateQuantity(quantity);
-		validateUnitPrice(unitPrice);
-		return new OrderProduct(null, orderId, productOptionId, quantity, unitPrice);
-	}
-
-	private static void validateOptionId(Long productOptionId) {
-		if (productOptionId == null) {
-			throw new RestApiException(OrderErrorCode.OPTION_NOT_FOUND);
-		}
-	}
-
-	private static void validateQuantity(int quantity) {
-		if (quantity <= 0) {
-			throw new RestApiException(OrderErrorCode.INVALID_ORDER_QUANTITY);
-		}
-	}
-
-	private static void validateUnitPrice(Long unitPrice) {
-		if (unitPrice < 0) {
-			throw new RestApiException(OrderErrorCode.OPTION_NOT_PURCHASABLE);
-		}
-	}
-
-	public long getCalculateAmount() {
-		return quantity * unitPrice;
-	}
-
-	public void setOrderId(Long id) {
-		this.orderId = id;
+	public static OrderProduct create(Long orderId, ProductOptionSnapshot snapshot) {
+		return new OrderProduct(null, orderId, snapshot);
 	}
 }

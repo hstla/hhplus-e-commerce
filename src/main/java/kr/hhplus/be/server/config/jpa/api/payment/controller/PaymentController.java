@@ -22,7 +22,7 @@ public class PaymentController implements PaymentApiSpec {
 	@Override
 	@PostMapping
 	public ResponseEntity<CommonResponse<PaymentResponse.Payment>> createPayment(PaymentRequest.Payment paymentRequest) {
-		PaymentResult.Pay payment = paymentUseCase.pay(paymentRequest.toCommand());
+		PaymentResult.Pay payment = paymentUseCase.execute(paymentRequest.toCommand());
 		return ResponseEntity.ok(CommonResponse.success(PaymentResponse.Payment.of(payment)));
 	}
 }

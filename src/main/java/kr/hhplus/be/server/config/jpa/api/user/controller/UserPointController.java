@@ -32,7 +32,7 @@ public class UserPointController implements UserPointApiSpec {
 	@Override
 	@PostMapping("/{userId}/points")
 	public ResponseEntity<CommonResponse<UserPointResponse.UserPoint>> chargePoint(Long userId, UserPointRequest.ChargePoint chargePoint) {
-		UserPointResult.UserPoint userPoint = chargeUserPointUseCase.execute(userId, chargePoint.getChargePoint());
+		UserPointResult.UserPoint userPoint = chargeUserPointUseCase.execute(userId, chargePoint.chargePoint());
 		return ResponseEntity.ok(CommonResponse.success(UserPointResponse.UserPoint.of(userPoint)));
 	}
 }

@@ -17,9 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.hhplus.be.server.config.jpa.api.user.controller.dto.point.UserPointRequest;
-import kr.hhplus.be.server.config.jpa.user.domain.infrastructure.JpaUserRepository;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,7 +41,7 @@ class UserPointControllerTest {
 	@BeforeEach
 	void setUp() {
 		jpaUserRepository.deleteAll();
-		User user = User.signUpUser("testUser", "testuser@mail.com", "password");
+		User user = User.create("testUser", "testuser@mail.com", "password");
 		savedUser = UserRepository.save(user);
 	}
 
