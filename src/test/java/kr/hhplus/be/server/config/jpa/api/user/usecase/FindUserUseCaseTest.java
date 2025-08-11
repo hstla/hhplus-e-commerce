@@ -1,51 +1,75 @@
 package kr.hhplus.be.server.config.jpa.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
-import kr.hhplus.be.server.config.jpa.user.model.Point;
+import kr.hhplus.be.server.config.jpa.error.RestApiException;
+import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
+import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.server.config.jpa.user.model.User;
-import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
-@ExtendWith(MockitoExtension.class)
-@DisplayName("FindUserUseCase 단위 테스트")
+@SpringBootTest
+@ActiveProfiles("test")
+@DisplayName("FindUserUseCase 통합 테스트")
 class FindUserUseCaseTest {
 
-	@Mock
-	private UserRepository userRepository;
-	@InjectMocks
-	private FindUserUseCase userUseCase;
+    @Autowired
+    private JpaUserRepository jpaUserRepository;
+    @Autowired
+    private FindUserUseCase findUserUseCase;
 
-	@Nested
-	@DisplayName("유저 검색")
-	class FindUserTest {
+    @BeforeEach
+    void setUp() {
+        jpaUserRepository.deleteAll();
+    }
 
-		@Test
-		@DisplayName("유저 검색에 성공한다")
-		void execute() {
-			// given
-			Long userId = 1L;
-			User findUser = new User(userId, "testName", "test@email.com", "1234", Point.zero());
-			given(userRepository.findById(userId)).willReturn(findUser);
+    @Nested
+    @DisplayName("유저 조회")
+    class FindUser {
 
-			// When
-			UserResult.UserInfo userInfo = userUseCase.execute(userId);
+        @Test
+        @DisplayName("사용자를 찾아 조회에 성공한다")
+        void findUser_success() {
+            // given
+            User user = User.create("testUser", "testuser@mail.com", "password");
+            User savedUser = jpaUserRepository.save(user);
 
-			// Then
-			assertThat(userInfo.id()).isEqualTo(userId);
-			assertThat(userInfo.email()).isEqualTo("test@email.com");
-			assertThat(userInfo.name()).isEqualTo("testName");
+            // when
+            UserResult.UserInfo userInfo = findUserUseCase.execute(savedUser.getId());
 
-			verify(userRepository, times(1)).findById(userId);
-		}
-	}
+			// then
+			User findUser = jpaUserRepository.findById(savedUser.getId()).get();
+			assertAll(
+                () -> assertThat(savedUser.getId()).isEqualTo(userInfo.id()),
+                () -> assertThat(savedUser.getName()).isEqualTo(userInfo.name()),
+                () -> assertThat(savedUser.getEmail()).isEqualTo(userInfo.email()),
+				// DB
+                () -> assertThat(findUser.getId()).isEqualTo(userInfo.id()),
+				() -> assertThat(findUser.getName()).isEqualTo(userInfo.name()),
+				() -> assertThat(findUser.getEmail()).isEqualTo(userInfo.email())
+            );
+        }
+
+        @Test
+        @DisplayName("사용자를 찾을 수 없어 조회에 실패한다")
+        void findUser_fail() {
+            // given
+            Long notExistUserId = 999L;
+
+            // when & then
+			assertThatThrownBy(() -> findUserUseCase.execute(notExistUserId))
+				.isInstanceOf(RestApiException.class)
+				.hasMessage(UserErrorCode.INACTIVE_USER.getMessage());
+        }
+    }
 }

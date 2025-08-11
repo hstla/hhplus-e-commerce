@@ -105,7 +105,7 @@ class PublishCouponUseCaseTest {
 
 			assertThat(issuedCount).isEqualTo(5);
 			assertThat(stock.getStock()).isEqualTo(0);
-			assertThat(exceptions.size()).isEqualTo(5);
+			assertThat(exceptions).hasSize(5);
 			assertThat(exceptions.get(0).getMessage()).isEqualTo(CouponErrorCode.OUT_OF_STOCK_COUPON.getMessage());
 		}
 	}

@@ -26,12 +26,6 @@ public class UserCoreRepository implements UserRepository {
 	}
 
 	@Override
-	public User findByEmail(String email) {
-		return jpaUserRepository.findByEmail(email)
-			.orElseThrow(() -> new RestApiException(UserErrorCode.INACTIVE_USER));
-	}
-
-	@Override
 	public boolean existsByEmail(String email) {
 		return jpaUserRepository.existsByEmail(email);
 	}

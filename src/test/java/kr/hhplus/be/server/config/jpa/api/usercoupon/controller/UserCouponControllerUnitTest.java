@@ -85,13 +85,12 @@ class UserCouponControllerUnitTest {
 				.andExpect(status().isBadRequest());
 		}
 
-		static Stream<Arguments> invalidNameProvider() {
+		private static Stream<Arguments> invalidNameProvider() {
 			return Stream.of(
 				Arguments.of(null, null),
 				Arguments.of(-1L, -1L)
 			);
 		}
-
 	}
 
 	@Nested
