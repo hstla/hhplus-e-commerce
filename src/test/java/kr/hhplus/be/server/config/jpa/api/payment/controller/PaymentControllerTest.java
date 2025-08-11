@@ -1,76 +1,81 @@
-// package kr.hhplus.be.server.config.jpa.api.payment.controller;
-//
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-//
-// import java.time.LocalDateTime;
-//
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.DisplayName;
-// import org.junit.jupiter.api.Nested;
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-// import org.springframework.boot.test.context.SpringBootTest;
-// import org.springframework.http.MediaType;
-// import org.springframework.test.context.ActiveProfiles;
-// import org.springframework.test.web.servlet.MockMvc;
-//
-// import com.fasterxml.jackson.databind.ObjectMapper;
-//
-// import kr.hhplus.be.server.config.jpa.api.payment.controller.dto.PaymentRequest;
-// import kr.hhplus.be.server.config.jpa.order.infrastructure.JpaOrderRepository;
-// import kr.hhplus.be.server.config.jpa.order.model.OrderStatus;
-// import kr.hhplus.be.server.config.jpa.payment.model.PaymentStatus;
-// import kr.hhplus.be.server.config.jpa.payment.model.PaymentType;
-// import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
-//
-// @SpringBootTest
-// @AutoConfigureMockMvc
-// @ActiveProfiles("test")
-// @DisplayName("PaymentController 통합 테스트")
-// class PaymentControllerTest {
-//
-// 	@Autowired
-// 	MockMvc mockMvc;
-//
-// 	@Autowired
-// 	ObjectMapper objectMapper;
-// 	@Autowired
-// 	JpaOrderRepository jpaOrderRepository;
-// 	@Autowired
-// 	JpaUserRepository jpaUserRepository;
-//
-// 	private Long orderId;
-// 	private Long userId;
-//
-// 	@BeforeEach
-// 	void setUp() {
-// 		jpaOrderRepository.deleteAll();
-// 		jpaUserRepository.deleteAll();
-//
-// 		orderId = jpaOrderRepository.save(new OrderEntity(1L, null, 10_000L, OrderStatus.CREATED, LocalDateTime.now().minusMinutes(2))).getId();
-// 		userId = jpaUserRepository.save(new UserEntity("name", "test@email.com", "12345", 20_000L)).getId();
-// 	}
-//
-// 	@Nested
-// 	@DisplayName("결제 생성 API (/api/payments)")
-// 	class CreatePaymentTest {
-//
-// 		@Test
-// 		@DisplayName("정상적으로 결제를 생성한다")
-// 		void shouldCreatePaymentSuccessfully() throws Exception {
-// 			// given
-// 			PaymentRequest.Payment request = PaymentRequest.Payment.of(orderId, userId, PaymentType.POINT);
-//
-// 			// when & then
-// 			mockMvc.perform(post("/api/payments")
-// 					.contentType(MediaType.APPLICATION_JSON)
-// 					.content(objectMapper.writeValueAsString(request)))
-// 				.andExpect(status().isOk())
-// 				.andExpect(jsonPath("$.data.orderId").value(orderId))
-// 				.andExpect(jsonPath("$.data.paymentAmount").value(10_000L))
-// 				.andExpect(jsonPath("$.data.status").value(PaymentStatus.COMPLETED.name()));
-// 		}
-// 	}
-// }
+package kr.hhplus.be.server.config.jpa.api.payment.controller;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.hhplus.be.server.config.jpa.api.payment.controller.dto.PaymentRequest;
+import kr.hhplus.be.server.config.jpa.api.payment.usecase.CreatePaymentUseCase;
+import kr.hhplus.be.server.config.jpa.api.payment.usecase.PaymentResult;
+import kr.hhplus.be.server.config.jpa.payment.model.PaymentStatus;
+import kr.hhplus.be.server.config.jpa.payment.model.PaymentType;
+
+@WebMvcTest(PaymentController.class)
+@DisplayName("PaymentController 단위 테스트")
+class PaymentControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private CreatePaymentUseCase createPaymentUseCase;
+
+    @Nested
+    @DisplayName("POST /api/payments - 결제 생성")
+    class CreatePayment {
+
+		@Test
+		@DisplayName("결제 생성에 성공한다")
+		void createPayment_success() throws Exception {
+			// given
+			PaymentRequest.Payment request = new PaymentRequest.Payment(1L, 1L, PaymentType.POINT);
+			PaymentResult.Pay result = new PaymentResult.Pay(1L, 1L, 10000L, PaymentStatus.COMPLETED);
+			given(createPaymentUseCase.execute(any())).willReturn(result);
+
+			// when & then
+			mockMvc.perform(post("/api/payments")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.orderId").value(1L))
+				.andExpect(jsonPath("$.data.paymentAmount").value(10000L));
+		}
+
+		@ParameterizedTest
+		@CsvSource({
+			"-1, 1, POINT",
+			"1, -1, POINT"
+		})
+		@DisplayName("유효하지 않은 요청값으로 결제 생성에 실패한다")
+		void createPayment_fail_invalidRequest(Long orderId, Long userId, PaymentType type) throws Exception {
+			// given
+			PaymentRequest.Payment request = new PaymentRequest.Payment(orderId, userId, type);
+
+			// when & then
+			mockMvc.perform(post("/api/payments")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+		}
+	}
+}

@@ -1,9 +1,7 @@
 package kr.hhplus.be.server.config.jpa.api.order.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -11,7 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -113,7 +110,7 @@ class CreateOrderUseCaseTest {
 	class CreateOrder {
 
 		@Test
-		@DisplayName("10개의 스레드가 동시에 2개씩 주문하면 5개만 성공하고 재고는 0이 되어야 한다")
+		@DisplayName("여러 스레드가 동시에 주문 시 재고가 정확하게 차감되어야 한다")
 		void createOrder_concurrent_success() {
 			// given
 			AtomicInteger successCount = new AtomicInteger();
@@ -128,13 +125,11 @@ class CreateOrderUseCaseTest {
 					successCount.incrementAndGet();
 				} catch (Exception e) {
 					failCount.incrementAndGet();
-					System.out.println("실패한 스레드 예외: " + e.getClass().getSimpleName() + " - " + e.getMessage());
 				}
 			});
 
 			// then
 			assertThat(successCount.get()).isEqualTo(expectedSuccesses);
-
 			assertThat(failCount.get()).isEqualTo(numberOfThreads - expectedSuccesses);
 
 			ProductOption finalOption = productOptionRepository.findById(productOptionId).get();
