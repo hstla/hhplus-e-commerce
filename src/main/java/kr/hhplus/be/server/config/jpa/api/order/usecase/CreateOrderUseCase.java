@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.config.jpa.api.order.usecase;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -8,12 +9,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.config.jpa.api.order.usecase.dto.OrderCommand;
 import kr.hhplus.be.server.config.jpa.api.order.usecase.dto.OrderResult;
-import kr.hhplus.be.server.config.jpa.coupon.service.CouponService;
+import kr.hhplus.be.server.config.jpa.coupon.model.Coupon;
+import kr.hhplus.be.server.config.jpa.coupon.repository.CouponRepository;
+import kr.hhplus.be.server.config.jpa.coupon.service.CouponDiscountService;
+import kr.hhplus.be.server.config.jpa.order.component.OrderPriceCalculator;
+import kr.hhplus.be.server.config.jpa.order.model.Order;
+import kr.hhplus.be.server.config.jpa.order.model.OrderProduct;
+import kr.hhplus.be.server.config.jpa.order.model.ProductOptionSnapshot;
+import kr.hhplus.be.server.config.jpa.order.repository.OrderProductRepository;
+import kr.hhplus.be.server.config.jpa.order.repository.OrderRepository;
 import kr.hhplus.be.server.config.jpa.order.service.OrderInfo;
-import kr.hhplus.be.server.config.jpa.order.service.OrderService;
 import kr.hhplus.be.server.config.jpa.product.model.ProductOption;
-import kr.hhplus.be.server.config.jpa.product.service.ProductService;
-import kr.hhplus.be.server.config.jpa.user.domain.component.UserValidator;
+import kr.hhplus.be.server.config.jpa.api.order.usecase.helper.ProductOptionStockLockManager;
+import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
+import kr.hhplus.be.server.config.jpa.usercoupon.component.UserCouponValidator;
+import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
+import kr.hhplus.be.server.config.jpa.usercoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -21,30 +32,51 @@ import lombok.RequiredArgsConstructor;
 public class CreateOrderUseCase {
 
 	private final UserValidator userValidator;
-	private final CouponService couponService;
-	private final ProductService productService;
-	private final OrderService orderService;
+	private final OrderPriceCalculator orderPriceCalculator;
+	private final UserCouponRepository userCouponRepository;
+	private final CouponRepository couponRepository;
+	private final OrderRepository orderRepository;
+	private final OrderProductRepository orderProductRepository;
+
+	private final ProductOptionStockLockManager productOptionStockService;
+	private final CouponDiscountService couponDiscountService;
 
 	@Transactional
 	public OrderResult.Order execute(OrderCommand.Order command) {
 		LocalDateTime now = LocalDateTime.now();
-		userValidator.validateExistingUser(command.getUserId());
+		userValidator.validateExistingUser(command.userId());
 
-		List<ProductOption> options = productService.orderProductOptions(command.getOrderItemRequests().stream().map(
-			OrderCommand.OrderProduct::toInput).toList());
+		List<ProductOptionSnapshot> snapshots = new ArrayList<>();
+		long originPrice = 0L;
+		for (OrderCommand.OrderProduct op : command.orderItemRequests()) {
+			ProductOption option = productOptionStockService.decreaseStockWithLock(op.productOptionId(), op.quantity());
 
-		OrderInfo.PreOrderInfo preOrderInfo = orderService.prepareOrderItems(options, command.getOrderItemRequests());
+			ProductOptionSnapshot snapshot = ProductOptionSnapshot.create(option.getName(), op.quantity(), option.getPrice());
+			originPrice += snapshot.calculateOriginPrice();
+			snapshots.add(snapshot);
+		}
 
-		long discountAmount = calculateDiscount(command.getUserCouponId(), preOrderInfo.getTotalAmount());
+		long discountPrice = 0L;
+		// 쿠폰 사용 안할 시 discountPrice = 0
+		if (command.userCouponId() != null) {
+			UserCoupon userCoupon = userCouponRepository.findById(command.userCouponId());
+			userCoupon.validateOwnerShip(command.userId());
+			Coupon findCoupon = couponRepository.findById(userCoupon.getCouponId());
+			findCoupon.validateNotExpired(now);
 
-		OrderInfo.Info saveOrder = orderService.createOrder(command.getUserId(),
-			command.getUserCouponId(), preOrderInfo, discountAmount, now);
+			discountPrice = couponDiscountService.calculateDiscount(userCoupon, findCoupon, originPrice, now);
+			userCouponRepository.save(userCoupon);
+		}
+		long totalPrice = orderPriceCalculator.calculateTotalPrice(originPrice, discountPrice);
 
-		return OrderResult.Order.of(saveOrder);
-	}
+		Order order = Order.create(command.userId(), command.userCouponId(), originPrice, discountPrice, totalPrice, now);
+		Order savedOrder = orderRepository.save(order);
 
-	private long calculateDiscount(Long couponId, long totalAmount) {
-		if (couponId == null) return 0L;
-		return couponService.useUserCoupon(couponId, totalAmount, LocalDateTime.now());
+		for (ProductOptionSnapshot snapshot : snapshots) {
+			OrderProduct orderProduct = OrderProduct.create(command.userId(), snapshot);
+			orderProductRepository.save(orderProduct);
+		}
+		OrderInfo.Info info = OrderInfo.Info.of(savedOrder);
+		return OrderResult.Order.of(info);
 	}
 }

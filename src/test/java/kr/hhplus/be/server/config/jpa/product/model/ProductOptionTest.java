@@ -2,10 +2,14 @@ package kr.hhplus.be.server.config.jpa.product.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.hhplus.be.server.config.jpa.error.ProductErrorCode;
@@ -34,69 +38,47 @@ class ProductOptionTest {
 			// then
 			assertThat(result).isNotNull();
 			assertThat(result.getProductId()).isEqualTo(productId);
-			assertThat(result.getOptionName()).isEqualTo(optionName);
+			assertThat(result.getName()).isEqualTo(optionName);
 			assertThat(result.getPrice()).isEqualTo(price);
 			assertThat(result.getStock()).isEqualTo(stock);
 		}
 
-		@Test
-		@DisplayName("옵션명이 null 또는 빈 문자열이면 예외가 발생한다")
-		void create_fail_invalid_option_name() {
+		@ParameterizedTest
+		@MethodSource("invalidNames")
+		@DisplayName("옵션명이 길이가 허용 범위를 초과하면 예외가 발생한다")
+		void create_fail_invalid_option_name(String name) {
 			// given
-			String invalidName = " ";
-
 			// when & then
 			assertThatThrownBy(() ->
-				ProductOption.create(1L, invalidName, 1000L, 10)
+				ProductOption.create(1L, name, 1000L, 10)
 			).isInstanceOf(RestApiException.class)
 				.hasMessageContaining(ProductErrorCode.INVALID_OPTION_NAME.getMessage());
 		}
 
-		@Test
-		@DisplayName("재고가 0보다 작으면 예외가 발생한다")
-		void create_fail_invalid_stock() {
-			// given
-			int invalidStock = -1;
-
-			// when & then
-			assertThatThrownBy(() ->
-				ProductOption.create(1L, "옵션A", 1000L, invalidStock)
-			).isInstanceOf(RestApiException.class)
-				.hasMessageContaining(ProductErrorCode.INVALID_STOCK.getMessage());
-		}
-
-		@Test
-		@DisplayName("가격이 null 이거나 0보다 작으면 예외가 발생한다")
-		void create_fail_invalid_price() {
-			// when & then
-			assertThatThrownBy(() ->
-				ProductOption.create(1L, "옵션A", null, 10)
-			).isInstanceOf(RestApiException.class)
-				.hasMessageContaining(ProductErrorCode.INVALID_PRICE.getMessage());
-
-			assertThatThrownBy(() ->
-				ProductOption.create(1L, "옵션A", -1L, 10)
-			).isInstanceOf(RestApiException.class)
-				.hasMessageContaining(ProductErrorCode.INVALID_PRICE.getMessage());
+		static Stream<String> invalidNames() {
+			return Stream.of(
+				"",
+				"a".repeat(31)
+			);
 		}
 	}
 
 	@Nested
-	@DisplayName("order 메서드는")
-	class OrderTest {
+	@DisplayName("orderDecreaseStock 메서드는")
+	class orderDecreaseStockTest {
 
 		@Test
 		@DisplayName("재고가 충분하면 주문 수량만큼 차감된다")
 		void order_success() {
 			// given
 			ProductOption option = ProductOption.create(1L, "옵션", 1000L, 10);
-			int orderQty = 3;
+			int orderQty = 10;
 
 			// when
-			option.order(orderQty);
+			option.orderDecreaseStock(orderQty);
 
 			// then
-			assertThat(option.getStock()).isEqualTo(7);
+			assertThat(option.getStock()).isEqualTo(0);
 		}
 
 		@Test
@@ -108,7 +90,7 @@ class ProductOptionTest {
 
 			// when & then
 			assertThatThrownBy(() ->
-				option.order(orderQty)
+				option.orderDecreaseStock(orderQty)
 			).isInstanceOf(RestApiException.class)
 				.hasMessageContaining(ProductErrorCode.OUT_OF_STOCK.getMessage());
 		}

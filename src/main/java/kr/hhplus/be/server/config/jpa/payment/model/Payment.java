@@ -1,28 +1,44 @@
 package kr.hhplus.be.server.config.jpa.payment.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import kr.hhplus.be.server.config.jpa.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "payment")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Payment {
+public class Payment extends BaseEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "payment_id")
 	private Long id;
+	@Column(name = "order_id", nullable = false)
 	private Long orderId;
-	private Long userId;
+	@Column(name = "payment_amount", nullable = false)
 	private Long paymentAmount;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
 	private PaymentStatus status;
 
-	public Payment(Long orderId, Long userId, Long paymentAmount, PaymentStatus status) {
+	private Payment(Long orderId, Long paymentAmount, PaymentStatus status) {
 		this.orderId = orderId;
-		this.userId = userId;
 		this.paymentAmount = paymentAmount;
 		this.status = status;
 	}
 
-	public static Payment create(Long orderId, Long userId, Long paymentAmount) {
-		return new Payment(orderId, userId, paymentAmount, PaymentStatus.COMPLETED);
+	public static Payment create(Long orderId, Long paymentAmount) {
+		return new Payment(orderId, paymentAmount, PaymentStatus.COMPLETED);
 	}
 }

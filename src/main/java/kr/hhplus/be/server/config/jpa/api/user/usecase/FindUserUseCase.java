@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component

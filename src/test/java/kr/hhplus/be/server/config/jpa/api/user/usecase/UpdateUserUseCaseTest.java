@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,9 +17,9 @@ import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserCommand;
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
-import kr.hhplus.be.server.config.jpa.user.domain.model.Point;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.Point;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UpdateUserUseCase 단위 테스트")
@@ -50,9 +49,9 @@ class UpdateUserUseCaseTest {
 			UserResult.UserInfo userInfo = updateUserUseCase.execute(userId, updateName);
 
 			// Then
-			assertThat(userInfo.getId()).isEqualTo(userId);
-			assertThat(userInfo.getEmail()).isEqualTo("test@email.com");
-			assertThat(userInfo.getName()).isEqualTo("updateName");
+			assertThat(userInfo.id()).isEqualTo(userId);
+			assertThat(userInfo.email()).isEqualTo("test@email.com");
+			assertThat(userInfo.name()).isEqualTo("updateName");
 
 			verify(userRepository, times(1)).findById(userId);
 			verify(userRepository, times(1)).save(any(User.class));

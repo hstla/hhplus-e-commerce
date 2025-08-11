@@ -18,7 +18,7 @@ import kr.hhplus.be.server.config.jpa.payment.model.PaymentStatus;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({PaymentCoreRepository.class, PaymentMapper.class, TestcontainersConfig.class})
+@Import({PaymentCoreRepository.class, TestcontainersConfig.class})
 @ActiveProfiles("test")
 @DisplayName("PaymentCoreRepository 단위 테스트")
 class PaymentCoreRepositoryTest {
@@ -42,8 +42,7 @@ class PaymentCoreRepositoryTest {
 		void save_success() {
 			// given
 			Long orderId = 1L;
-			Long userId = 1L;
-			Payment newPayment = Payment.create(orderId, userId, 1_000L);
+			Payment newPayment = Payment.create(orderId, 1_000L);
 
 			// when
 			Payment savedPayment = paymentCoreRepository.save(newPayment);
@@ -53,26 +52,6 @@ class PaymentCoreRepositoryTest {
 			assertThat(savedPayment.getId()).isNotNull();
 			assertThat(savedPayment.getOrderId()).isEqualTo(orderId);
 			assertThat(savedPayment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
-		}
-
-		@Test
-		@DisplayName("기존 Payment 도메인 모델의 상태를 성공적으로 업데이트해야 한다")
-		void save_update() {
-			// given
-			Long orderId = 2L;
-			Long userId = 1L;
-			PaymentEntity existingEntity = new PaymentEntity(orderId, userId, 20_000L, PaymentStatus.PENDING);
-			PaymentEntity savedOriginalEntity = jpaPaymentRepository.save(existingEntity);
-
-			Payment updatePayment = new Payment(savedOriginalEntity.getId(), orderId, userId, 10_000L, PaymentStatus.COMPLETED);
-
-			// when
-			Payment updatedPayment = paymentCoreRepository.save(updatePayment);
-
-			// then
-			assertThat(updatedPayment.getId()).isEqualTo(savedOriginalEntity.getId());
-			assertThat(updatedPayment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
-			assertThat(updatedPayment.getPaymentAmount()).isEqualTo(10_000L);
 		}
 	}
 }

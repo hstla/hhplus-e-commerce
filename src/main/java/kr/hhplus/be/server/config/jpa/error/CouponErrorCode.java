@@ -17,6 +17,8 @@ public enum CouponErrorCode implements ErrorCode {
 	INVALID_PERCENT_DISCOUNT(HttpStatus.BAD_REQUEST, "Discount value for percent coupon cannot exceed 100."),
 	INVALID_FIXED_DISCOUNT(HttpStatus.BAD_REQUEST, "Discount value for fixed coupon must be greater than 0."),
 	INVALID_COUPON_TYPE(HttpStatus.BAD_REQUEST, "Invalid coupon type provided."),
+	NOT_FOUND_COUPON_STOCK(HttpStatus.NOT_FOUND, "Coupon stock not found."),
+	INVALID_COUPON_OWNERSHIP(HttpStatus.FORBIDDEN, "You are not the owner of this coupon."),
 	;
 
 	private final HttpStatus httpStatus;

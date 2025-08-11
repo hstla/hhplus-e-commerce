@@ -23,15 +23,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.hhplus.be.server.config.jpa.api.user.controller.dto.user.UserRequest;
 import kr.hhplus.be.server.config.jpa.common.CommonResponse;
-import kr.hhplus.be.server.config.jpa.user.domain.infrastructure.JpaUserRepository;
-import kr.hhplus.be.server.config.jpa.user.domain.model.User;
-import kr.hhplus.be.server.config.jpa.user.domain.repository.UserRepository;
+import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
+import kr.hhplus.be.server.config.jpa.user.model.User;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("UserController 통합 테스트")
-class UserControllerIntegrationTest {
+class UserControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -82,7 +82,7 @@ class UserControllerIntegrationTest {
 		@DisplayName("존재하는 유저의 정보를 반환한다")
 		void getUser_success() throws Exception {
 			// given
-			User user = User.signUpUser("userName", "test@email.com", "12345");
+			User user = User.create("userName", "test@email.com", "12345");
 			User saved = userRepository.save(user);
 
 			// when then
@@ -101,7 +101,7 @@ class UserControllerIntegrationTest {
 		@DisplayName("유저 정보를 수정하고 변경값을 반환한다")
 		void updateUser_success() throws Exception {
 			// given
-			User user = User.signUpUser("userName", "test@email.com", "12345");
+			User user = User.create("userName", "test@email.com", "12345");
 			User saved = userRepository.save(user);
 			String updateName = "updateName";
 
