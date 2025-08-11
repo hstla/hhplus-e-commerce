@@ -55,7 +55,7 @@ class ProductOptionTest {
 				.hasMessageContaining(ProductErrorCode.INVALID_OPTION_NAME.getMessage());
 		}
 
-		static Stream<String> invalidNames() {
+		private static Stream<String> invalidNames() {
 			return Stream.of(
 				"",
 				"a".repeat(31)

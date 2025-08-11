@@ -1,77 +1,77 @@
 package kr.hhplus.be.server.config.jpa.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserCommand;
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserResult;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
-import kr.hhplus.be.server.config.jpa.user.model.Point;
+import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.server.config.jpa.user.model.User;
-import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
-@ExtendWith(MockitoExtension.class)
-@DisplayName("UpdateUserUseCase 단위 테스트")
+@SpringBootTest
+@ActiveProfiles("test")
+@DisplayName("UpdateUserUseCase 통합 테스트")
 class UpdateUserUseCaseTest {
 
-	@Mock
-	private UserRepository userRepository;
-	@InjectMocks
-	private UpdateUserUseCase updateUserUseCase;
+    @Autowired
+    private JpaUserRepository jpaUserRepository;
+    @Autowired
+    private UpdateUserUseCase updateUserUseCase;
 
-	@Nested
-	@DisplayName("유저 이름 수정")
-	class SignUpUserTest {
+    private User savedUser;
 
-		@Test
-		@DisplayName("유저 이름 수정에 성공한다")
-		void execute() {
-			// given
-			Long userId = 1L;
-			User findUser = new User(userId, "testName", "test@email.com", "12345", Point.zero());
-			User updatedUSer = new User(userId, "updateName", "test@email.com", "12345", Point.zero());
-			given(userRepository.findById(userId)).willReturn(findUser);
-			UserCommand.Update updateName = UserCommand.Update.of("updateName");
-			given(userRepository.save(any(User.class))).willReturn(updatedUSer);
+    @BeforeEach
+    void setUp() {
+        jpaUserRepository.deleteAll();
+        User user = User.create("testUser", "testuser@mail.com", "password");
+        savedUser = jpaUserRepository.save(user);
+    }
 
-			// When
-			UserResult.UserInfo userInfo = updateUserUseCase.execute(userId, updateName);
+    @Nested
+    @DisplayName("유저 이름 수정")
+    class UpdateUserName {
 
-			// Then
-			assertThat(userInfo.id()).isEqualTo(userId);
-			assertThat(userInfo.email()).isEqualTo("test@email.com");
-			assertThat(userInfo.name()).isEqualTo("updateName");
+        @Test
+        @DisplayName("유저 이름 수정에 성공한다")
+        void updateUser_success() {
+            // given
+            String newName = "newName";
+            UserCommand.Update command = new UserCommand.Update(newName);
 
-			verify(userRepository, times(1)).findById(userId);
-			verify(userRepository, times(1)).save(any(User.class));
-		}
+            // when
+            UserResult.UserInfo userInfo = updateUserUseCase.execute(savedUser.getId(), command);
 
-		@Test
-		@DisplayName("유저 아이디 검증에 실패하여 수정할 수 없다")
-		void execute_fail() {
-			// given
-			Long userId = 1L;
-			UserCommand.Update updateRequest = UserCommand.Update.of("newName");
+            // then
+            User updatedUser = jpaUserRepository.findById(savedUser.getId()).get();
+            assertAll(
+                () -> assertThat(userInfo.name()).isEqualTo(newName),
+				// DB
+                () -> assertThat(updatedUser.getName()).isEqualTo(newName)
+            );
+        }
 
-			when(userRepository.findById(userId)).thenThrow(new RestApiException(UserErrorCode.INACTIVE_USER));
+        @Test
+        @DisplayName("수정하려는 유저가 존재하지 않아 실패한다")
+        void updateUser_fail_userNotFound() {
+            // given
+            Long notExistUserId = 999L;
+            UserCommand.Update command = new UserCommand.Update("newName");
 
-			// when & then
-			assertThatThrownBy(() -> updateUserUseCase.execute(userId, updateRequest))
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(UserErrorCode.INACTIVE_USER.getMessage());
-
-			verify(userRepository, times(1)).findById(userId);
-		}
-	}
+            // when & then
+            RestApiException exception = assertThrows(RestApiException.class, () -> {
+                updateUserUseCase.execute(notExistUserId, command);
+            });
+            assertEquals(UserErrorCode.INACTIVE_USER, exception.getErrorCode());
+        }
+    }
 }

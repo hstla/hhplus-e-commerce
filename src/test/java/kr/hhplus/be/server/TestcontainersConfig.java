@@ -32,11 +32,5 @@ public class TestcontainersConfig {
 		System.setProperty("spring.datasource.username", MYSQL_CONTAINER.getUsername());
 		System.setProperty("spring.datasource.password", MYSQL_CONTAINER.getPassword());
 		System.setProperty("spring.datasource.driver-class-name", "com.mysql.cj.jdbc.Driver");
-
-		// 연결 확인을 위한 로그
-		log.info("=== Testcontainer MySQL Started ===");
-		log.info("JDBC URL: {}", MYSQL_CONTAINER.getJdbcUrl());
-		log.info("Username: {}", MYSQL_CONTAINER.getUsername());
-		log.info("================================");
 	}
 }

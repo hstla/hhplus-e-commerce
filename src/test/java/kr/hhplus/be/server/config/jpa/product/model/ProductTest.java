@@ -55,7 +55,7 @@ class ProductTest {
 				.hasMessage(ProductErrorCode.INVALID_PRODUCT_NAME.getMessage());
 		}
 
-		static Stream<String> invalidNames() {
+		private static Stream<String> invalidNames() {
 			return Stream.of(
 				"",
 				"a".repeat(31)
@@ -76,7 +76,7 @@ class ProductTest {
 				.hasMessage(ProductErrorCode.INVALID_DESCRIPTION.getMessage());
 		}
 
-		static Stream<String> invalidDescription() {
+		private static Stream<String> invalidDescription() {
 			return Stream.of(
 				"",
 				"a".repeat(201)

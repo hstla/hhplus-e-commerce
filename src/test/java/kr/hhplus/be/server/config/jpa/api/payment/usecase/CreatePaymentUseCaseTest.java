@@ -114,7 +114,7 @@ class CreatePaymentUseCaseTest {
 			User userAfterPayment = userRepository.findById(userId).orElseThrow();
 			assertThat(userAfterPayment.getPoint().getAmount()).isEqualTo(0L);
 
-			assertThat(exceptions.size()).isEqualTo(1);
+			assertThat(exceptions).hasSize(1);
 			assertThat(exceptions.get(0)).isInstanceOf(RestApiException.class);
 			assertThat(exceptions.get(0).getMessage()).isEqualTo(UserErrorCode.INSUFFICIENT_USER_POINT.getMessage());
 		}

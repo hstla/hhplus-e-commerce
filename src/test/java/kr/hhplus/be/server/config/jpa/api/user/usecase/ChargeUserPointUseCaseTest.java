@@ -1,93 +1,77 @@
 package kr.hhplus.be.server.config.jpa.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import kr.hhplus.be.server.config.jpa.api.user.usecase.dto.UserPointResult;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
 import kr.hhplus.be.server.config.jpa.error.UserErrorCode;
-import kr.hhplus.be.server.config.jpa.user.model.Point;
+import kr.hhplus.be.server.config.jpa.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.server.config.jpa.user.model.User;
-import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 
-@ExtendWith(MockitoExtension.class)
-@DisplayName("ChargeUserPointUseCase 단위 테스트")
+@SpringBootTest
+@ActiveProfiles("test")
+@DisplayName("ChargeUserPointUseCase 통합 테스트")
 class ChargeUserPointUseCaseTest {
 
-	@Mock
-	private UserRepository userRepository;
-	@InjectMocks
-	private ChargeUserPointUseCase userPointUseCase;
+    @Autowired
+    private JpaUserRepository userRepository;
+    @Autowired
+    private ChargeUserPointUseCase userPointUseCase;
 
-	@Nested
-	@DisplayName("유저 포인트 충전 검증")
-	class ValidateEmailTest {
+    private User savedUser;
 
-		@Test
-		@DisplayName("포인트 충전에 성공한다")
-		void execute() {
-			// given
-			Long userId = 1L;
-			Long chargePoint = 1_000L;
-			User findUser = new User(userId, "testName", "test@email.com", "1234", Point.of(1_000L));
-			given(userRepository.findById(userId)).willReturn(findUser);
-			given(userRepository.save(findUser)).willReturn(findUser);
+    @BeforeEach
+    void setUp() {
+		userRepository.deleteAll();
 
-			// When
-			UserPointResult.UserPoint userPoint = userPointUseCase.execute(userId, chargePoint);
+        User user = User.create("testUser", "testuser@mail.com", "password");
+        savedUser = userRepository.save(user);
+    }
+
+    @Nested
+    @DisplayName("유저 포인트 충전")
+    class ChargePointTest {
+
+        @Test
+        @DisplayName("포인트 충전에 성공한다")
+        void execute() {
+            // given
+            Long chargePoint = 1_000L;
+
+            // When
+            UserPointResult.UserPoint userPoint = userPointUseCase.execute(savedUser.getId(), chargePoint);
 
 			// Then
-			assertThat(userPoint.userId()).isEqualTo(userId);
-			assertThat(userPoint.point()).isEqualTo(2_000L); // 1_000 + 1_000
+			User findUser = userRepository.findById(savedUser.getId()).get();
+			assertAll(
+				() -> assertThat(userPoint.userId()).isEqualTo(savedUser.getId()),
+				() -> assertThat(userPoint.point()).isEqualTo(chargePoint),
+				// DB
+				() -> assertThat(findUser.getId()).isEqualTo(savedUser.getId()),
+				() -> assertThat(findUser.getPoint().getAmount()).isEqualTo(chargePoint)
+			);
+        }
 
-			verify(userRepository, times(1)).findById(userId);
-			verify(userRepository, times(1)).save(any(User.class));
-		}
-
-		@Test
-		@DisplayName("포인트 최소 충전을 넘지 못해서 포인트 충전에 실패한다")
-		void execute_fail_invalidUserPoint() {
-			// Given
-			Long userId = 1L;
-			Long chargePoint = 500L;
-			User findUser = new User(userId, "testName", "test@email.com", "1234", Point.of(1_000L));
-			given(userRepository.findById(userId)).willReturn(findUser);
-
-			// When Then
-			assertThatThrownBy(() -> userPointUseCase.execute(userId, chargePoint))
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(UserErrorCode.INVALID_USER_POINT.getMessage());
-
-			verify(userRepository, times(1)).findById(userId);
-			verify(userRepository, times(0)).save(any(User.class));
-		}
-
-		@ParameterizedTest
-		@ValueSource(longs = {0L, -100L})
-		@DisplayName("충전 포인트가 0이하는 실패한다")
-		void execute_fail_invalidChargeAmount(Long chargePoint) {
-			// Given
-			Long userId = 1L;
-			User findUser = new User(userId, "testName", "test@email.com", "1234", Point.of(1_000L));
-			given(userRepository.findById(userId)).willReturn(findUser);
-
-			// When Then
-			assertThatThrownBy(() -> userPointUseCase.execute(userId, chargePoint))
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(UserErrorCode.INVALID_CHARGE_AMOUNT.getMessage());
-
-			verify(userRepository, times(1)).findById(userId);
-			verify(userRepository, times(0)).save(any(User.class));
-		}
-	}
+        @ParameterizedTest
+		@ValueSource(longs = {999L, 1_000_001L})
+        @DisplayName("포인트 충전 범위 이하거나 초과하여 포인트 충전에 실패한다")
+        void execute_fail_invalidUserPoint(long chargePoint) {
+			// then
+            // When Then
+            assertThatThrownBy(() -> userPointUseCase.execute(savedUser.getId(), chargePoint))
+                .isInstanceOf(RestApiException.class)
+                .hasMessage(UserErrorCode.INVALID_USER_POINT.getMessage());
+        }
+    }
 }
