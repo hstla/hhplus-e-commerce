@@ -15,7 +15,7 @@ public class OrderResult {
 		Long totalPrice,
 		OrderStatus status
 	) {
-		public static Order of(OrderInfo.Info info) {
+		public static Order of(OrderInfo.OrderDetail info) {
 			return new Order(info.id(), info.userId(),
 				info.userCouponId(), info.totalPrice(), info.status());
 		}

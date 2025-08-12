@@ -19,7 +19,7 @@ public class CouponCreateUseCase {
 	private final CouponStockRepository couponStockRepository;
 
 	@Transactional
-	public CouponResult.Info execute(CouponCommand.CouponCreate command) {
+	public CouponResult.CouponDetail execute(CouponCommand.CouponCreate command) {
 
 		Coupon coupon = Coupon.create(
 			command.name(),
@@ -33,6 +33,6 @@ public class CouponCreateUseCase {
 
 		couponStockRepository.save(CouponStock.create(savedCoupon.getId(), command.initialStock()));
 
-		return CouponResult.Info.of(savedCoupon);
+		return CouponResult.CouponDetail.of(savedCoupon);
 	}
 }
