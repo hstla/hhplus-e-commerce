@@ -21,8 +21,7 @@ import kr.hhplus.be.server.config.jpa.order.repository.OrderRepository;
 import kr.hhplus.be.server.config.jpa.order.service.OrderInfo;
 import kr.hhplus.be.server.config.jpa.product.model.ProductOption;
 import kr.hhplus.be.server.config.jpa.api.order.usecase.helper.ProductOptionStockLockManager;
-import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
-import kr.hhplus.be.server.config.jpa.usercoupon.component.UserCouponValidator;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
 import kr.hhplus.be.server.config.jpa.usercoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +30,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CreateOrderUseCase {
 
-	private final UserValidator userValidator;
 	private final OrderPriceCalculator orderPriceCalculator;
+	private final UserRepository userRepository;
 	private final UserCouponRepository userCouponRepository;
 	private final CouponRepository couponRepository;
 	private final OrderRepository orderRepository;
@@ -44,7 +43,7 @@ public class CreateOrderUseCase {
 	@Transactional
 	public OrderResult.Order execute(OrderCommand.Order command) {
 		LocalDateTime now = LocalDateTime.now();
-		userValidator.validateExistingUser(command.userId());
+		userRepository.validateUserExists(command.userId());
 
 		List<ProductOptionSnapshot> snapshots = new ArrayList<>();
 		long originPrice = 0L;
@@ -76,7 +75,7 @@ public class CreateOrderUseCase {
 			OrderProduct orderProduct = OrderProduct.create(command.userId(), snapshot);
 			orderProductRepository.save(orderProduct);
 		}
-		OrderInfo.Info info = OrderInfo.Info.of(savedOrder);
+		OrderInfo.OrderDetail info = OrderInfo.OrderDetail.of(savedOrder);
 		return OrderResult.Order.of(info);
 	}
 }

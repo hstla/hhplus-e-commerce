@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class CouponStock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "coupon_stock_id")
+	@Column(name = "id")
 	private Long id;
 	@Column(name = "coupon_id", nullable = false)
 	private Long couponId;
@@ -33,12 +33,12 @@ public class CouponStock {
 	}
 
 	public boolean decreaseStock() {
-		validateStock();
+		hasRemainStock();
 		this.stock -= 1;
 		return true;
 	}
 
-	private void validateStock() {
+	private void hasRemainStock() {
 		if (this.stock < 1) {
 			throw new RestApiException(CouponErrorCode.OUT_OF_STOCK_COUPON);
 		}

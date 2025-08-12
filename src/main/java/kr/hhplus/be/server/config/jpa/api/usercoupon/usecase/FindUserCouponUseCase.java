@@ -10,6 +10,7 @@ import kr.hhplus.be.server.config.jpa.api.usercoupon.usecase.dto.CouponResult;
 import kr.hhplus.be.server.config.jpa.coupon.model.Coupon;
 import kr.hhplus.be.server.config.jpa.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
 import kr.hhplus.be.server.config.jpa.usercoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,12 @@ import lombok.RequiredArgsConstructor;
 public class FindUserCouponUseCase {
 
 	private final UserCouponRepository userCouponRepository;
+	private final UserRepository userRepository;
 	private final CouponRepository couponRepository;
-	private final UserValidator userValidator;
 
 	@Transactional(readOnly = true)
 	public List<CouponResult.UserCouponInfo> execute(Long userId) {
-		userValidator.validateExistingUser(userId);
+		userRepository.validateUserExists(userId);
 		List<UserCoupon> allByUserId = userCouponRepository.findAllByUserId(userId);
 
 		List<CouponResult.UserCouponInfo> userCouponResults  = new ArrayList<>();

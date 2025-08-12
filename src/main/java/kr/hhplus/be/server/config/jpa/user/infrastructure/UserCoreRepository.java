@@ -35,4 +35,12 @@ public class UserCoreRepository implements UserRepository {
 		return jpaUserRepository.findByIdWithLock(userId)
 			.orElseThrow(() -> new RestApiException(UserErrorCode.INACTIVE_USER));
 	}
+
+	@Override
+	public boolean validateUserExists(Long userId) {
+		if (!jpaUserRepository.existsById(userId)) {
+			throw new RestApiException(UserErrorCode.INACTIVE_USER);
+		}
+		return true;
+	}
 }

@@ -11,7 +11,7 @@ import kr.hhplus.be.server.config.jpa.coupon.model.Coupon;
 import kr.hhplus.be.server.config.jpa.coupon.model.CouponStock;
 import kr.hhplus.be.server.config.jpa.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.config.jpa.coupon.repository.CouponStockRepository;
-import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
+import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import kr.hhplus.be.server.config.jpa.usercoupon.component.UserCouponValidator;
 import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
 import kr.hhplus.be.server.config.jpa.usercoupon.repository.UserCouponRepository;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PublishCouponUseCase {
 
-	private final UserValidator userValidator;
+	private final UserRepository userRepository;
 	private final UserCouponValidator userCouponValidator;
 	private final CouponRepository couponRepository;
 	private final CouponStockRepository couponStockRepository;
@@ -30,7 +30,8 @@ public class PublishCouponUseCase {
 	@Transactional
 	public CouponResult.CouponInfo execute(UserCouponCommand.Publish command) {
 		Long userId = command.userId();
-		userValidator.validateExistingUser(userId);
+		userRepository.validateUserExists(userId);
+
 		LocalDateTime now = LocalDateTime.now();
 		Long couponId = command.couponId();
 
