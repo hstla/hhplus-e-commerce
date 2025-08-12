@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class Payment extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "payment_id")
+	@Column(name = "id")
 	private Long id;
 	@Column(name = "order_id", nullable = false)
 	private Long orderId;
