@@ -1,7 +1,10 @@
 package kr.hhplus.be.server.config.jpa.api.order.usecase;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.ActiveProfiles;
 
 import kr.hhplus.be.server.config.jpa.api.order.usecase.dto.OrderCommand;
@@ -49,10 +53,10 @@ class CreateOrderUseCaseTest {
 
 	private Long userId;
 	private Long productOptionId;
-	private final int initialStock = 2;
+	private final int initialStock = 10;
 	private final int orderQuantity = 2;
-	private final int numberOfThreads = 2;
-	private final int expectedSuccesses = initialStock / orderQuantity;
+	private final int numberOfThreads = 8;
+	private final int maxPossibleSuccesses = initialStock / orderQuantity;
 
 	private void executeConcurrency(int threadCount, Runnable runnable) {
 		ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -114,7 +118,9 @@ class CreateOrderUseCaseTest {
 		void createOrder_concurrent_success() {
 			// given
 			AtomicInteger successCount = new AtomicInteger();
+			AtomicInteger optimisticLockFailCount = new AtomicInteger();
 			AtomicInteger failCount = new AtomicInteger();
+			List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
 
 			// when
 			executeConcurrency(numberOfThreads, () -> {
@@ -123,17 +129,31 @@ class CreateOrderUseCaseTest {
 					OrderCommand.Order command = new OrderCommand.Order(userId, null, List.of(orderProduct));
 					createOrderUseCase.execute(command);
 					successCount.incrementAndGet();
+				} catch (OptimisticLockingFailureException e) {
+					optimisticLockFailCount.incrementAndGet();
+					exceptions.add(e);
+
 				} catch (Exception e) {
 					failCount.incrementAndGet();
+					exceptions.add(e);
 				}
 			});
 
 			// then
-			assertThat(successCount.get()).isEqualTo(expectedSuccesses);
-			assertThat(failCount.get()).isEqualTo(numberOfThreads - expectedSuccesses);
-
 			ProductOption finalOption = productOptionRepository.findById(productOptionId).get();
-			assertThat(finalOption.getStock()).isEqualTo(0);
+			int expectedRemainingStock = initialStock - (successCount.get() * orderQuantity);
+
+			assertAll(
+				() -> assertThat(successCount.get()).isGreaterThan(0),
+				// 2. 낙관적 락 충돌이 발생해야 함 (실제 동시성 테스트가 되었음을 증명)
+				() -> assertThat(optimisticLockFailCount.get()).isGreaterThan(0),
+				// 3. 전체 요청 수 = 성공 + 실패
+				() -> assertThat(successCount.get() + optimisticLockFailCount.get() + failCount.get()).isEqualTo(numberOfThreads),
+				() -> assertThat(successCount.get()).isLessThanOrEqualTo(maxPossibleSuccesses),
+				() -> assertThat(finalOption.getStock()).isEqualTo(expectedRemainingStock),
+				// 6. 재고는 음수가 될 수 없음
+				() -> assertThat(finalOption.getStock()).isGreaterThanOrEqualTo(0)
+			);
 		}
 	}
 }
