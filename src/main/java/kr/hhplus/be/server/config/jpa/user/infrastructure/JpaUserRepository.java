@@ -11,7 +11,6 @@ import jakarta.persistence.LockModeType;
 import kr.hhplus.be.server.config.jpa.user.model.User;
 
 public interface JpaUserRepository extends JpaRepository<User, Long> {
-	Optional<User> findByEmail(String email);
 	boolean existsByEmail(String email);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)

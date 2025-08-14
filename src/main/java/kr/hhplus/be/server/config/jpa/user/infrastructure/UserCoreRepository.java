@@ -37,7 +37,7 @@ public class UserCoreRepository implements UserRepository {
 	}
 
 	@Override
-	public boolean validateUserExists(Long userId) {
+	public boolean assertUserExists(Long userId) {
 		if (!jpaUserRepository.existsById(userId)) {
 			throw new RestApiException(UserErrorCode.INACTIVE_USER);
 		}
