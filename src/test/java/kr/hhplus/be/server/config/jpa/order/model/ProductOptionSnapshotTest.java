@@ -17,7 +17,8 @@ class ProductOptionSnapshotTest {
 		@DisplayName("개별 origin 가격을 계산한다")
 		void calculateOriginPrice_success() {
 			// given
-			ProductOptionSnapshot snapshot = ProductOptionSnapshot.create("test product option", 5, 1_000L);
+			Long productOptionId = 1L;
+			ProductOptionSnapshot snapshot = ProductOptionSnapshot.create(productOptionId, "test product option", 5, 1_000L);
 
 			// when
 			long originPrice = snapshot.calculateOriginPrice();

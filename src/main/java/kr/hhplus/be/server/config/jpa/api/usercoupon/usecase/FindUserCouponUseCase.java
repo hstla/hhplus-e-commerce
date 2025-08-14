@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.hhplus.be.server.config.jpa.api.usercoupon.usecase.dto.CouponResult;
 import kr.hhplus.be.server.config.jpa.coupon.model.Coupon;
 import kr.hhplus.be.server.config.jpa.coupon.repository.CouponRepository;
-import kr.hhplus.be.server.config.jpa.user.component.UserValidator;
 import kr.hhplus.be.server.config.jpa.user.repository.UserRepository;
 import kr.hhplus.be.server.config.jpa.usercoupon.model.UserCoupon;
 import kr.hhplus.be.server.config.jpa.usercoupon.repository.UserCouponRepository;
@@ -25,7 +24,7 @@ public class FindUserCouponUseCase {
 
 	@Transactional(readOnly = true)
 	public List<CouponResult.UserCouponInfo> execute(Long userId) {
-		userRepository.validateUserExists(userId);
+		userRepository.assertUserExists(userId);
 		List<UserCoupon> allByUserId = userCouponRepository.findAllByUserId(userId);
 
 		List<CouponResult.UserCouponInfo> userCouponResults  = new ArrayList<>();

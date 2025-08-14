@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Embeddable
 public class ProductOptionSnapshot {
+	@Column(name = "product_option_id", nullable = false)
+	private Long productOptionId;
 	@Column(name = "product_name", nullable = false, length = 30)
 	private String name;
 	@Column(name = "product_stock", nullable = false)
@@ -18,8 +20,8 @@ public class ProductOptionSnapshot {
 	@Column(name = "product_price", nullable = false)
 	private Long price;
 
-	public static ProductOptionSnapshot create(String name, int stock, Long price) {
-		return new ProductOptionSnapshot(name, stock, price);
+	public static ProductOptionSnapshot create(Long productOptionId, String name, int stock, Long price) {
+		return new ProductOptionSnapshot(productOptionId, name, stock, price);
 	}
 
 	public long calculateOriginPrice() {

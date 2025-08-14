@@ -16,7 +16,4 @@ public interface ProductApiSpec {
 	@Operation(summary = "상품 디테일 조회", description = "상품 아이디를 입려받아 상품 디테일을 반환합니다.")
 	ResponseEntity<CommonResponse<ProductResponse.ProductOptions>> getProductDetails(
 		@Parameter(description = "상품 아이디", required = true) @PathVariable @PositiveOrZero Long productId);
-
-	// @Operation(summary = "인기 상품 조회", description = "인기 상품 5개를 조회합니다.")
-	// ResponseEntity<CommonResponse<List<ProductResponse>>> getProductRank();
 }

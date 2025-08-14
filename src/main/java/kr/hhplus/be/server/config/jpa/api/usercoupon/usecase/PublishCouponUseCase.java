@@ -30,7 +30,7 @@ public class PublishCouponUseCase {
 	@Transactional
 	public CouponResult.CouponInfo execute(UserCouponCommand.Publish command) {
 		Long userId = command.userId();
-		userRepository.validateUserExists(userId);
+		userRepository.assertUserExists(userId);
 
 		LocalDateTime now = LocalDateTime.now();
 		Long couponId = command.couponId();
