@@ -20,6 +20,10 @@ spring:
     properties:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
+  data:
+    redis:
+      redisson:
+        config: classpath:redisson.yml
 
 ---
 spring.config.activate.on-profile: local, test
