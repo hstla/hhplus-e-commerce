@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class OrderProduct extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "order_product_id", nullable = false)
+	@Column(name = "id", nullable = false)
 	private Long id;
 	@Column(name = "order_id", nullable = false)
 	private Long orderId;

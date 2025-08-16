@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 public class Coupon extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "coupon_id")
+	@Column(name = "id")
 	private Long id;
 	@Column(name = "name", length = 30, nullable = false)
 	private String name;

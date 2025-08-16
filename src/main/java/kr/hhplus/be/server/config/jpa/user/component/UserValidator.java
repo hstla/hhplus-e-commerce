@@ -18,8 +18,4 @@ public class UserValidator {
 			throw new RestApiException(UserErrorCode.DUPLICATE_EMAIL);
 		}
 	}
-
-	public void validateExistingUser(Long userId) {
-		userRepository.findById(userId);
-	}
 }

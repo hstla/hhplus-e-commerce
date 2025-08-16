@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.config.jpa.api.payment.usecase;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ class CreatePaymentUseCaseTest {
 
 	private long userId;
 	private final long orderPrice = 20_000L;
-	private final int numberOfThreads = 2;
+	private final int numberOfThreads = 4;
 
 	@BeforeEach
 	void setUp() {
@@ -109,14 +110,14 @@ class CreatePaymentUseCaseTest {
 
 			// then
 			long paymentCount = paymentRepository.count();
-			assertThat(paymentCount).isEqualTo(1);
-
-			User userAfterPayment = userRepository.findById(userId).orElseThrow();
-			assertThat(userAfterPayment.getPoint().getAmount()).isEqualTo(0L);
-
-			assertThat(exceptions).hasSize(1);
-			assertThat(exceptions.get(0)).isInstanceOf(RestApiException.class);
-			assertThat(exceptions.get(0).getMessage()).isEqualTo(UserErrorCode.INSUFFICIENT_USER_POINT.getMessage());
+			User userAfterPayment = userRepository.findById(userId).get();
+			assertAll(
+				() -> assertThat(paymentCount).isEqualTo(1),
+				() -> assertThat(userAfterPayment.getPoint().getAmount()).isEqualTo(0L),
+				() -> assertThat(exceptions).hasSize(numberOfThreads - 1),
+				() -> assertThat(exceptions.get(0)).isInstanceOf(RestApiException.class),
+				() -> assertThat(exceptions.get(0).getMessage()).isEqualTo(UserErrorCode.INSUFFICIENT_USER_POINT.getMessage())
+			);
 		}
 	}
 }

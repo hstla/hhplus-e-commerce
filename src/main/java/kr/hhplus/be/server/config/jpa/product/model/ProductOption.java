@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import kr.hhplus.be.server.config.jpa.common.BaseEntity;
 import kr.hhplus.be.server.config.jpa.error.ProductErrorCode;
 import kr.hhplus.be.server.config.jpa.error.RestApiException;
@@ -27,13 +26,10 @@ public class ProductOption extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "product_option_id")
+	@Column(name = "id")
 	private Long id;
 	@JoinColumn(name = "product_id", nullable = false)
 	private Long productId;
-	@Version
-	@Column(name = "version")
-	private Long version;
 	@Column(name = "name", nullable = false, length = MAX_NAME_LENGTH)
 	private String name;
 	@Column(name = "price", nullable = false)
@@ -43,7 +39,7 @@ public class ProductOption extends BaseEntity {
 
 	public static ProductOption create(Long productId, String optionName, Long price, int stockQuantity) {
 		validateName(optionName);
-		return new ProductOption(null, productId, 0L, optionName, price, stockQuantity);
+		return new ProductOption(null, productId, optionName, price, stockQuantity);
 	}
 
 	private static void validateName(String name) {
@@ -61,5 +57,9 @@ public class ProductOption extends BaseEntity {
 		if (this.stock < quantity) {
 			throw new RestApiException(ProductErrorCode.OUT_OF_STOCK);
 		}
+	}
+
+	public void increaseStock(int quantity) {
+		this.stock += quantity;
 	}
 }

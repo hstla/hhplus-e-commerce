@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import kr.hhplus.be.server.TestcontainersConfig;
 import kr.hhplus.be.server.config.jpa.order.model.Order;
 import kr.hhplus.be.server.config.jpa.order.model.OrderProduct;
-import kr.hhplus.be.server.config.jpa.order.model.OrderStatus;
 import kr.hhplus.be.server.config.jpa.order.model.ProductOptionSnapshot;
 
 @DataJpaTest
@@ -60,12 +58,13 @@ class OrderProductCoreRepositoryTest {
 		private final String name = "snapshotName";
 		private final int quantity = 5;
 		private final Long unitPrice = 3000L;
+		private final Long productOptionId = 1L;
 
 		@Test
 		@DisplayName("OrderProduct 저장에 성공한다")
 		void save_success() {
 			// given
-			OrderProduct orderProduct = OrderProduct.create(testOrderId, ProductOptionSnapshot.create(name, quantity, unitPrice));
+			OrderProduct orderProduct = OrderProduct.create(testOrderId, ProductOptionSnapshot.create(productOptionId, name, quantity, unitPrice));
 
 			// when
 			OrderProduct saved = orderProductCoreRepository.save(orderProduct);

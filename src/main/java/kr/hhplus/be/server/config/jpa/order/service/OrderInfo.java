@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderInfo {
 
-	public record Info(
+	public record OrderDetail(
 		Long id,
 		Long totalPrice,
 		OrderStatus status,
 		Long userId,
 		Long userCouponId
 	) {
-		public static Info of(Order order) {
-			return new Info(order.getId(), order.getTotalPrice(), order.getStatus(), order.getUserId(), order.getUserCouponId());
+		public static OrderDetail of(Order order) {
+			return new OrderDetail(order.getId(), order.getTotalPrice(), order.getStatus(), order.getUserId(), order.getUserCouponId());
 		}
 	}
 

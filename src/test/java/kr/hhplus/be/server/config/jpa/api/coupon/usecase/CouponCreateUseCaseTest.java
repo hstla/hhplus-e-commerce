@@ -50,7 +50,7 @@ class CouponCreateUseCaseTest {
 			CouponCommand.CouponCreate couponCreate = CouponCommand.CouponCreate.of(name, CouponType.FIXED, 1_000L, 10, expireAt);
 
 			// when
-			CouponResult.Info couponInfo = couponCreateUseCase.execute(couponCreate);
+			CouponResult.CouponDetail couponInfo = couponCreateUseCase.execute(couponCreate);
 			Coupon coupon = couponRepository.findById(couponInfo.couponId()).get();
 
 			// then
