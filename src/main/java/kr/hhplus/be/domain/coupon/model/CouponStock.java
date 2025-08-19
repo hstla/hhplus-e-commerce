@@ -33,12 +33,12 @@ public class CouponStock {
 	}
 
 	public boolean decreaseStock() {
-		hasRemainStock();
+		checkRemainStock();
 		this.stock -= 1;
 		return true;
 	}
 
-	private void hasRemainStock() {
+	private void checkRemainStock() {
 		if (this.stock < 1) {
 			throw new RestApiException(CouponErrorCode.OUT_OF_STOCK_COUPON);
 		}
