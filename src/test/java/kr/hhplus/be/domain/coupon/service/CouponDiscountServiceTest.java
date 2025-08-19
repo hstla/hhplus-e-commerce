@@ -1,6 +1,6 @@
 package kr.hhplus.be.domain.coupon.service;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -61,9 +61,11 @@ class CouponDiscountServiceTest {
 			long discountedAmount = couponService.calculateDiscount(userCoupon, coupon, originPrice, now);
 
 			// then
-			assertThat(discountedAmount).isEqualTo(coupon.getDiscountValue());
-			assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.USED);
-			assertThat(userCoupon.getUsedAt()).isEqualTo(now);
+			assertSoftly(soft -> {
+				soft.assertThat(discountedAmount).isEqualTo(coupon.getDiscountValue());
+				soft.assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.USED);
+				soft.assertThat(userCoupon.getUsedAt()).isEqualTo(now);
+			});
 		}
 
 		@Test
@@ -81,9 +83,11 @@ class CouponDiscountServiceTest {
 			long discountedAmount = couponService.calculateDiscount(userCoupon, coupon, totalAmount, now);
 
 			// then
-			assertThat(discountedAmount).isEqualTo(totalAmount * coupon.getDiscountValue() / 100);
-			assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.USED);
-			assertThat(userCoupon.getUsedAt()).isEqualTo(now);
+			assertSoftly(soft -> {
+				soft.assertThat(discountedAmount).isEqualTo(totalAmount * coupon.getDiscountValue() / 100);
+				soft.assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.USED);
+				soft.assertThat(userCoupon.getUsedAt()).isEqualTo(now);
+			});
 		}
 	}
 }

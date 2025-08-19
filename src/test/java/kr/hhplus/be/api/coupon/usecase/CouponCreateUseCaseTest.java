@@ -1,6 +1,7 @@
 package kr.hhplus.be.api.coupon.usecase;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 
@@ -10,9 +11,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.coupon.usecase.dto.CouponCommand;
 import kr.hhplus.be.api.coupon.usecase.dto.CouponResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponRepository;
 import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponStockRepository;
 import kr.hhplus.be.domain.coupon.model.Coupon;
@@ -56,8 +57,10 @@ class CouponCreateUseCaseTest extends IntegrationTestConfig {
 			assertThat(couponInfo.expireAt()).isEqualTo(expireAt);
 
 			// db에서 확인
-			assertThat(coupon.getId()).isEqualTo(couponInfo.couponId());
-			assertThat(coupon.getName()).isEqualTo(name);
+			assertSoftly(soft -> {
+				soft.assertThat(coupon.getId()).isEqualTo(couponInfo.couponId());
+				soft.assertThat(coupon.getName()).isEqualTo(name);
+			});
 		}
 	}
 }

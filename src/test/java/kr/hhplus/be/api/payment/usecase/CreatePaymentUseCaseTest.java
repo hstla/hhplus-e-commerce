@@ -1,7 +1,6 @@
 package kr.hhplus.be.api.payment.usecase;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -108,13 +107,14 @@ class CreatePaymentUseCaseTest extends IntegrationTestConfig {
 			// then
 			long paymentCount = paymentRepository.count();
 			User userAfterPayment = userRepository.findById(userId).get();
-			assertAll(
-				() -> assertThat(paymentCount).isEqualTo(1),
-				() -> assertThat(userAfterPayment.getPoint().getAmount()).isEqualTo(0L),
-				() -> assertThat(exceptions).hasSize(numberOfThreads - 1),
-				() -> assertThat(exceptions.get(0)).isInstanceOf(RestApiException.class),
-				() -> assertThat(exceptions.get(0).getMessage()).isEqualTo(UserErrorCode.INSUFFICIENT_USER_POINT.getMessage())
-			);
+
+			assertSoftly(soft -> {
+				soft.assertThat(paymentCount).isEqualTo(1);
+				soft.assertThat(userAfterPayment.getPoint().getAmount()).isEqualTo(0L);
+				soft.assertThat(exceptions).hasSize(numberOfThreads - 1);
+				soft.assertThat(exceptions.get(0)).isInstanceOf(RestApiException.class);
+				soft.assertThat(exceptions.get(0).getMessage()).isEqualTo(UserErrorCode.INSUFFICIENT_USER_POINT.getMessage());
+			});
 		}
 	}
 }

@@ -1,6 +1,6 @@
 package kr.hhplus.be.api.usercoupon.usecase;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponCommand;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponRepository;
 import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponStockRepository;
 import kr.hhplus.be.domain.coupon.model.Coupon;
@@ -99,11 +99,12 @@ class PublishCouponUseCaseTest extends IntegrationTestConfig {
 			// then
 			long issuedCount = userCouponRepository.count();
 			CouponStock stock = couponStockRepository.findById(couponStockId).get();
-
-			assertThat(issuedCount).isEqualTo(5);
-			assertThat(stock.getStock()).isEqualTo(0);
-			assertThat(exceptions).hasSize(5);
-			assertThat(exceptions.get(0).getMessage()).isEqualTo(CouponErrorCode.OUT_OF_STOCK_COUPON.getMessage());
+			assertSoftly(soft -> {
+				soft.assertThat(issuedCount).isEqualTo(5);
+				soft.assertThat(stock.getStock()).isEqualTo(0);
+				soft.assertThat(exceptions).hasSize(5);
+				soft.assertThat(exceptions.get(0).getMessage()).isEqualTo(CouponErrorCode.OUT_OF_STOCK_COUPON.getMessage());
+			});
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package kr.hhplus.be.domain.coupon.model;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 
@@ -27,17 +28,18 @@ class CouponTest {
 		@DisplayName("쿠폰이 정상 생성된다.")
 		void create_success() {
 			// given
-			long couponStockId = 1L;
 			LocalDateTime expireAt = LocalDateTime.now().plusDays(1);
 
 			// when
 			Coupon coupon = Coupon.create("5000원 할인", CouponType.FIXED, 5_000L, 10, expireAt);
 
 			// then
-			assertThat(coupon.getId()).isNull();
-			assertThat(coupon.getName()).isEqualTo("5000원 할인");
-			assertThat(coupon.getDiscountValue()).isEqualTo(5000L);
-			assertThat(coupon.getInitialStock()).isEqualTo(10);
+			assertSoftly(soft -> {
+				soft.assertThat(coupon.getId()).isNull();
+				soft.assertThat(coupon.getName()).isEqualTo("5000원 할인");
+				soft.assertThat(coupon.getDiscountValue()).isEqualTo(5000L);
+				soft.assertThat(coupon.getInitialStock()).isEqualTo(10);
+			});
 		}
 
 		@ParameterizedTest

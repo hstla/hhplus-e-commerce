@@ -1,7 +1,6 @@
 package kr.hhplus.be.domain.order.infrastructure;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 
@@ -50,14 +49,14 @@ class OrderCoreRepositoryTest  extends RepositoryTestConfig {
 			Order savedOrder = orderCoreRepository.save(newOrder);
 
 			// then
-			assertAll(
-				() -> assertThat(savedOrder.getId()).isNotNull(),
-				() -> assertThat(savedOrder.getUserId()).isEqualTo(userId),
-				() -> assertThat(savedOrder.getUserCouponId()).isEqualTo(userCouponId),
-				() -> assertThat(savedOrder.getTotalPrice()).isEqualTo(totalPrice),
-				() -> assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CREATED),
-				() -> assertThat(savedOrder.getOrderAt()).isEqualToIgnoringNanos(orderAt)
-			);
+			assertSoftly(soft -> {
+				soft.assertThat(savedOrder.getId()).isNotNull();
+				soft.assertThat(savedOrder.getUserId()).isEqualTo(userId);
+				soft.assertThat(savedOrder.getUserCouponId()).isEqualTo(userCouponId);
+				soft.assertThat(savedOrder.getTotalPrice()).isEqualTo(totalPrice);
+				soft.assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CREATED);
+				soft.assertThat(savedOrder.getOrderAt()).isEqualToIgnoringNanos(orderAt);
+			});
 		}
 	}
 }

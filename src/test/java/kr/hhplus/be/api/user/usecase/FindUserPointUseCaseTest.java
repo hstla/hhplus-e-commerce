@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.user.usecase.dto.UserPointResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.domain.user.model.User;
 import kr.hhplus.be.global.error.RestApiException;
@@ -49,13 +49,13 @@ class FindUserPointUseCaseTest extends IntegrationTestConfig {
 			User findUser = userRepository.findById(findUserId).get();
 
 			// Then
-			assertAll(
-				() ->assertThat(userPoint.userId()).isEqualTo(findUserId),
-				() -> assertThat(userPoint.point()).isEqualTo(0L),
+			assertSoftly(soft -> {
+				soft.assertThat(userPoint.userId()).isEqualTo(findUserId);
+				soft.assertThat(userPoint.point()).isEqualTo(0L);
 				// DB
-				() ->assertThat(findUser.getId()).isEqualTo(findUserId),
-				() -> assertThat(findUser.getPoint().getAmount()).isEqualTo(0L)
-			);
+				soft.assertThat(findUser.getId()).isEqualTo(findUserId);
+				soft.assertThat(findUser.getPoint().getAmount()).isEqualTo(0L);
+			});
         }
 
         @Test

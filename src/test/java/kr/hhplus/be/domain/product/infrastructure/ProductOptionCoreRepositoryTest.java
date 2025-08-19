@@ -1,6 +1,7 @@
 package kr.hhplus.be.domain.product.infrastructure;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.util.List;
 
@@ -62,9 +63,11 @@ class ProductOptionCoreRepositoryTest extends RepositoryTestConfig {
 			List<ProductOption> foundProductOptions = productOptionCoreRepository.findAllByProductId(testProductId);
 
 			// then
-			assertThat(foundProductOptions).hasSize(2);
-			assertThat(foundProductOptions).extracting(ProductOption::getProductId).containsOnly(testProductId);
-			assertThat(foundProductOptions).extracting(ProductOption::getName).containsExactlyInAnyOrder("Small", "Large");
+			assertSoftly(soft -> {
+				soft.assertThat(foundProductOptions).hasSize(2);
+				soft.assertThat(foundProductOptions).extracting(ProductOption::getProductId).containsOnly(testProductId);
+				soft.assertThat(foundProductOptions).extracting(ProductOption::getName).containsExactlyInAnyOrder("Small", "Large");
+			});
 		}
 
 		@Test

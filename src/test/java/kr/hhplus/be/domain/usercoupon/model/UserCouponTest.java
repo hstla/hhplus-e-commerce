@@ -1,6 +1,7 @@
 package kr.hhplus.be.domain.usercoupon.model;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 
@@ -33,11 +34,13 @@ class UserCouponTest {
 			UserCoupon userCoupon = UserCoupon.publish(userId, couponId, now);
 
 			// then
-			assertThat(userCoupon.getUserId()).isEqualTo(userId);
-			assertThat(userCoupon.getCouponId()).isEqualTo(couponId);
-			assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.ISSUED);
-			assertThat(userCoupon.getIssuedAt()).isEqualTo(now);
-			assertThat(userCoupon.getUsedAt()).isNull();
+			assertSoftly(soft -> {
+				soft.assertThat(userCoupon.getUserId()).isEqualTo(userId);
+				soft.assertThat(userCoupon.getCouponId()).isEqualTo(couponId);
+				soft.assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.ISSUED);
+				soft.assertThat(userCoupon.getIssuedAt()).isEqualTo(now);
+				soft.assertThat(userCoupon.getUsedAt()).isNull();
+			});
 		}
 	}
 
@@ -56,8 +59,10 @@ class UserCouponTest {
 			userCoupon.use(usedAt);
 
 			// then
-			assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.USED);
-			assertThat(userCoupon.getUsedAt()).isEqualTo(usedAt);
+			assertSoftly(soft -> {
+				soft.assertThat(userCoupon.getStatus()).isEqualTo(UserCouponStatus.USED);
+				soft.assertThat(userCoupon.getUsedAt()).isEqualTo(usedAt);
+			});
 		}
 
 		@Test

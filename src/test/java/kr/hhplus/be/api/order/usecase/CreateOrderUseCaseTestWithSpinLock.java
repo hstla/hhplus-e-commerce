@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.order.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.order.usecase.dto.OrderCommand;
 import kr.hhplus.be.api.order.usecase.dto.OrderResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductOptionRepository;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductRepository;
 import kr.hhplus.be.domain.product.model.Product;
@@ -73,17 +73,23 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 		@Test
 		@DisplayName("정상 주문 시 재고가 감소해야 한다")
 		void createOrder_success() {
+			// given
 			OrderCommand.Order command = new OrderCommand.Order(
 				userId,
 				null,
 				List.of(new OrderCommand.OrderProduct(testOption1.getId(), 3))
 			);
 
+			// when
 			OrderResult.Order result = createOrderUseCase.execute(command);
 
-			assertThat(result).isNotNull();
+			// then
 			ProductOption option = productOptionRepository.findById(testOption1.getId()).orElseThrow();
-			assertThat(option.getStock()).isEqualTo(7);
+
+			assertSoftly(soft -> {
+				soft.assertThat(result).isNotNull();
+				soft.assertThat(option.getStock()).isEqualTo(7);
+			});
 		}
 	}
 
@@ -94,41 +100,47 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 		@Test
 		@DisplayName("재고 부족으로 실패 시 재고가 원복되어야 한다")
 		void stockDecreaseFailure_shouldRollback() {
+			// given
 			OrderCommand.Order command = new OrderCommand.Order(
 				userId,
 				null,
 				List.of(new OrderCommand.OrderProduct(testOption1.getId(), 5), new OrderCommand.OrderProduct(testOption1.getId(), 21))
 			);
 
-			assertThatThrownBy(() -> createOrderUseCase.execute(command))
-				.isInstanceOf(RuntimeException.class);
+			// when
+			assertThatThrownBy(() -> createOrderUseCase.execute(command)).isInstanceOf(RuntimeException.class);
 
+			// then
 			ProductOption option1 = productOptionRepository.findById(testOption1.getId()).orElseThrow();
 			ProductOption option2 = productOptionRepository.findById(testOption2.getId()).orElseThrow();
-			assertAll(
-				() -> assertThat(option1.getStock()).isEqualTo(10),
-				() -> assertThat(option2.getStock()).isEqualTo(20)
-			);
+
+			assertSoftly(soft -> {
+				soft.assertThat(option1.getStock()).isEqualTo(10);
+				soft.assertThat(option2.getStock()).isEqualTo(20);
+			});
 		}
 
 		@Test
 		@DisplayName("오더/쿠폰 처리 실패 시 재고가 원복되어야 한다")
 		void orderTransactionFailure_shouldRollback() {
+			// given
 			OrderCommand.Order command = new OrderCommand.Order(
 				userId,
 				999L,
 				List.of(OrderCommand.OrderProduct.of(testOption1.getId(), 3), OrderCommand.OrderProduct.of(testOption2.getId(), 15))
 			);
 
+			// when
 			assertThatThrownBy(() -> createOrderUseCase.execute(command))
 				.isInstanceOf(RuntimeException.class);
 
+			// then
 			ProductOption option1 = productOptionRepository.findById(testOption1.getId()).orElseThrow();
 			ProductOption option2 = productOptionRepository.findById(testOption2.getId()).orElseThrow();
-			assertAll(
-				() -> assertThat(option1.getStock()).isEqualTo(10),
-				() -> assertThat(option2.getStock()).isEqualTo(20)
-			);
+			assertSoftly(soft -> {
+				soft.assertThat(option1.getStock()).isEqualTo(10);
+				soft.assertThat(option2.getStock()).isEqualTo(20);
+			});
 		}
 	}
 
@@ -170,12 +182,12 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 			int failureCount = exceptions.size();
 			int successCount = threadCount - failureCount;
 
-			assertAll(
-				() ->assertThat(option.getStock()).isEqualTo(0),
-				() -> assertThat(successCount).isEqualTo(10),
-				() -> assertThat(failureCount).isEqualTo(10),
-				() -> exceptions.forEach(e -> assertThat(e.getMessage()).contains(ProductErrorCode.OUT_OF_STOCK.getMessage()))
-			);
+			assertSoftly(soft -> {
+				soft.assertThat(option.getStock()).isEqualTo(0);
+				soft.assertThat(successCount).isEqualTo(10);
+				soft.assertThat(failureCount).isEqualTo(10);
+				exceptions.forEach(e -> assertThat(e.getMessage()).contains(ProductErrorCode.OUT_OF_STOCK.getMessage()));
+			});
 		}
 	}
 }

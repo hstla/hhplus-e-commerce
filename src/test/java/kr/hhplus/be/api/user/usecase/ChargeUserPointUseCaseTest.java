@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,8 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.user.usecase.dto.UserPointResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.domain.user.model.User;
 import kr.hhplus.be.global.error.RestApiException;
@@ -51,13 +51,13 @@ class ChargeUserPointUseCaseTest extends IntegrationTestConfig {
 
 			// Then
 			User findUser = userRepository.findById(savedUser.getId()).get();
-			assertAll(
-				() -> assertThat(userPoint.userId()).isEqualTo(savedUser.getId()),
-				() -> assertThat(userPoint.point()).isEqualTo(chargePoint),
+			assertSoftly(soft -> {
+				soft.assertThat(userPoint.userId()).isEqualTo(savedUser.getId());
+				soft.assertThat(userPoint.point()).isEqualTo(chargePoint);
 				// DB
-				() -> assertThat(findUser.getId()).isEqualTo(savedUser.getId()),
-				() -> assertThat(findUser.getPoint().getAmount()).isEqualTo(chargePoint)
-			);
+				soft.assertThat(findUser.getId()).isEqualTo(savedUser.getId());
+				soft.assertThat(findUser.getPoint().getAmount()).isEqualTo(chargePoint);
+			});
         }
 
         @ParameterizedTest

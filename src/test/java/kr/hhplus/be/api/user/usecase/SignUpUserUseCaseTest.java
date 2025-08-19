@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.user.usecase.dto.UserCommand;
 import kr.hhplus.be.api.user.usecase.dto.UserResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.domain.user.model.User;
 import kr.hhplus.be.global.error.RestApiException;
@@ -45,16 +45,16 @@ class SignUpUserUseCaseTest extends IntegrationTestConfig {
 
             // then
             User savedUser = jpaUserRepository.findById(userInfo.id()).get();
-            assertAll(
-                () -> assertThat(userInfo.id()).isNotNull(),
-                () -> assertThat(userInfo.name()).isEqualTo(command.name()),
-                () -> assertThat(userInfo.email()).isEqualTo(command.email()),
+			assertSoftly(soft -> {
+				soft.assertThat(userInfo.id()).isNotNull();
+				soft.assertThat(userInfo.name()).isEqualTo(command.name());
+				soft.assertThat(userInfo.email()).isEqualTo(command.email());
 				// DB
-                () -> assertNotNull(savedUser),
-                () -> assertThat(savedUser.getId()).isEqualTo(userInfo.id()),
-                () -> assertThat(savedUser.getName()).isEqualTo(command.name()),
-                () -> assertThat(savedUser.getEmail()).isEqualTo(command.email())
-            );
+				soft.assertThat(savedUser).isNotNull();
+				soft.assertThat(savedUser.getId()).isEqualTo(userInfo.id());
+				soft.assertThat(savedUser.getName()).isEqualTo(command.name());
+				soft.assertThat(savedUser.getEmail()).isEqualTo(command.email());
+			});
         }
 
         @Test

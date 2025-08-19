@@ -1,7 +1,6 @@
 package kr.hhplus.be.api.product.query.repository;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
-import kr.hhplus.be.config.RepositoryTestConfig;
 import kr.hhplus.be.api.product.query.QueryTestDataSetUp;
-import kr.hhplus.be.api.product.query.dto.ProductRankDto;
+import kr.hhplus.be.api.product.query.dto.ProductRankResponse;
+import kr.hhplus.be.config.RepositoryTestConfig;
 import kr.hhplus.be.domain.order.infrastructure.JpaOrderProductRepository;
 import kr.hhplus.be.domain.order.infrastructure.JpaOrderRepository;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductOptionRepository;
@@ -59,16 +58,16 @@ class ProductRankQueryRepositoryTest extends RepositoryTestConfig implements Que
 		LocalDateTime start = baseTime.minusDays(3).toLocalDate().atTime(0, 0, 0);
 
 		// when
-		List<ProductRankDto> top5 = productRankQueryRepository.findTop5ByPeriod(start, end, PageRequest.of(0, 5));
+		List<ProductRankResponse> top5 = productRankQueryRepository.findTop5ByPeriod(start, end, PageRequest.of(0, 5));
 
 		// then
 		log.info("top5: {}", top5);
-		assertAll(
-			() -> assertThat(top5).hasSize(2),
-			() -> assertThat(top5.get(0).productId()).isEqualTo(product1.getId()),
-			() -> assertThat(top5.get(0).totalSold()).isEqualTo(6L),
-			() -> assertThat(top5.get(1).productId()).isEqualTo(product2.getId()),
-			() -> assertThat(top5.get(1).totalSold()).isEqualTo(5L)
-		);
+		assertSoftly(soft -> {
+			soft.assertThat(top5).hasSize(2);
+			soft.assertThat(top5.get(0).productId()).isEqualTo(product1.getId());
+			soft.assertThat(top5.get(0).totalSold()).isEqualTo(6L);
+			soft.assertThat(top5.get(1).productId()).isEqualTo(product2.getId());
+			soft.assertThat(top5.get(1).totalSold()).isEqualTo(5L);
+		});
 	}
 }
