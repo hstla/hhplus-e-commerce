@@ -15,7 +15,6 @@ import kr.hhplus.be.api.coupon.usecase.dto.CouponCommand;
 import kr.hhplus.be.api.coupon.usecase.dto.CouponResult;
 import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponRepository;
-import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponStockRepository;
 import kr.hhplus.be.domain.coupon.model.Coupon;
 import kr.hhplus.be.domain.coupon.model.CouponType;
 
@@ -26,12 +25,9 @@ class CouponCreateUseCaseTest extends IntegrationTestConfig {
 	private CouponCreateUseCase couponCreateUseCase;
 	@Autowired
 	private JpaCouponRepository couponRepository;
-	@Autowired
-	private JpaCouponStockRepository couponStockRepository;
 
 	@BeforeEach
 	void setUp() throws Exception {
-		couponStockRepository.deleteAll();
 		couponRepository.deleteAll();
 	}
 

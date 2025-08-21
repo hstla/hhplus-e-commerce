@@ -61,36 +61,4 @@ class CouponTest {
 				.hasMessage(CouponErrorCode.INVALID_FIXED_DISCOUNT.getMessage());
 		}
 	}
-
-	@Nested
-	@DisplayName("decreaseStock 메서드")
-	class decreaseStockTest {
-
-		@Test
-		@DisplayName("쿠폰 재고가 있어 정상적으로 감소한다")
-		void decreaseStock_success() {
-			// given
-			long couponId = 100L;
-			CouponStock couponStock = CouponStock.create(couponId,10);
-
-			// when
-			boolean isStock = couponStock.decreaseStock();
-
-			// then
-			assertThat(isStock).isTrue();
-		}
-
-		@Test
-		@DisplayName("쿠폰 재고가 없어서 예외를 발생한다")
-		void decreaseStock_fail() {
-			// given
-			long couponId = 100L;
-			CouponStock couponStock = CouponStock.create(couponId, 0);
-
-			// when then
-			assertThatThrownBy(couponStock::decreaseStock)
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(CouponErrorCode.OUT_OF_STOCK_COUPON.getMessage());
-		}
-	}
 }
