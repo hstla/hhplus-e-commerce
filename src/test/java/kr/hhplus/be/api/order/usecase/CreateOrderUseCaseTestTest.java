@@ -34,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @DisplayName("CreateOrderUseCase 동시성 통합 테스트")
-public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
+public class CreateOrderUseCaseTestTest extends IntegrationTestConfig {
 
 	@Autowired
 	private CreateOrderUseCase createOrderUseCase;
@@ -51,12 +51,16 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 	private Long productId;
 	private ProductOption testOption1;
 	private ProductOption testOption2;
+	private String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd"));
 
 	@BeforeEach
 	void setUp() {
 		productOptionRepository.deleteAll();
 		productRepository.deleteAll();
 		userRepository.deleteAll();
+
+		String key = "hhplus:cache:product:rank:" + today;
+		redisTemplate.delete(key);
 
 		// 유저 생성
 		User user = User.create("testUser", "test@email.com", "password12345");
@@ -111,13 +115,13 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 			createOrderUseCase.execute(command);
 
 			// then
-			String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			String key = "hhplus:cache:product:rank:" + today + "::" + testOption1.getId();
+			String key = "hhplus:cache:product:sales:" + today;
+			Double score = redisTemplate.opsForZSet().score(key, productId);
 
-			Long count = redisTemplate.opsForValue().get(key);
-
-			assertThat(count).isNotNull();
-			assertThat(count).isEqualTo(3);
+			assertSoftly(soft -> {
+				soft.assertThat(score).isNotNull();
+				soft.assertThat(score).isEqualTo(3);
+			});
 		}
 	}
 

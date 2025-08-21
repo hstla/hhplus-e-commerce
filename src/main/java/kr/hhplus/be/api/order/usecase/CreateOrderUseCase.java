@@ -1,11 +1,15 @@
 package kr.hhplus.be.api.order.usecase;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -44,6 +48,10 @@ public class CreateOrderUseCase {
 	private final ProductOptionStockSpinLockManager productOptionStockSpinLockManager;
 	private final CouponDiscountService couponDiscountService;
 	private final TransactionTemplate transactionTemplate;
+	private final RedisTemplate<String, Long> redisTemplate;
+
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yy-MM-dd");
+	Map<Long, Integer> productOrderCounts = new LinkedHashMap<>();
 
 	public OrderResult.Order execute(OrderCommand.Order command) {
 		LocalDateTime now = LocalDateTime.now();
@@ -90,7 +98,13 @@ public class CreateOrderUseCase {
 				for (ProductOptionSnapshot snapshot : snapshots) {
 					OrderProduct orderProduct = OrderProduct.create(command.userId(), snapshot);
 					orderProductRepository.save(orderProduct);
+
+					ProductOption option = lockedOptions.get(snapshot.getProductOptionId());
+					Long productId = option.getProductId();
+					productOrderCounts.merge(productId, snapshot.getStock(), Integer::sum);
 				}
+				updateProductRankingCache(productOrderCounts);
+
 				return OrderResult.Order.of(OrderInfo.OrderDetail.of(savedOrder));
 			});
 		} catch (Exception e) {
@@ -99,5 +113,15 @@ public class CreateOrderUseCase {
 			productOptionStockSpinLockManager.compensateStocks(optionQuantities);
 			throw e;
 		}
+	}
+
+	private void updateProductRankingCache(Map<Long, Integer> productOrderCounts) {
+		String todayKey = "hhplus:cache:product:sales:" + LocalDateTime.now().format(FORMATTER);
+
+		for (Map.Entry<Long, Integer> entry : productOrderCounts.entrySet()) {
+			redisTemplate.opsForZSet().incrementScore(todayKey, entry.getKey(), entry.getValue());
+		}
+		// TTL 3일 설정
+		redisTemplate.expireAt(todayKey, LocalDate.now().plusDays(3).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 	}
 }

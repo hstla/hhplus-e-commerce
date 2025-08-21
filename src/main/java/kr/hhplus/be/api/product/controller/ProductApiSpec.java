@@ -1,5 +1,7 @@
 package kr.hhplus.be.api.product.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -16,4 +18,8 @@ public interface ProductApiSpec {
 	@Operation(summary = "상품 디테일 조회", description = "상품 아이디를 입려받아 상품 디테일을 반환합니다.")
 	ResponseEntity<CommonResponse<ProductResponse.ProductOptions>> getProductDetails(
 		@Parameter(description = "상품 아이디", required = true) @PathVariable @PositiveOrZero Long productId);
+
+	@Operation(summary = "상품 랭킹 조회", description = "3일간 인기상품 5가지를 조회합니다")
+	ResponseEntity<CommonResponse<List<ProductResponse.ProductRank>>> getProductRank5();
+
 }

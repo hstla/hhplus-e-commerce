@@ -10,6 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProductResponse {
 
+	public record ProductRank(
+		Long productId,
+		String productName,
+		String productDescription,
+		ProductCategory productCategory,
+		Long totalSold,
+		int rank
+	) {
+		public static ProductRank of (Long productId, String productName, String productDescription, ProductCategory productCategory, Long totalSold, int rank) {
+			return new ProductRank(productId, productName, productDescription, productCategory, totalSold, rank);
+		}
+	}
+
 	public record ProductOptions(
 		Long productId,
 		String productName,
