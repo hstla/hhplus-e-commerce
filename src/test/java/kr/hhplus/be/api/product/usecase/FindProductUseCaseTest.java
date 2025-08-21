@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.product.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.util.List;
 

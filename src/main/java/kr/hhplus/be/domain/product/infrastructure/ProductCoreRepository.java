@@ -2,10 +2,10 @@ package kr.hhplus.be.domain.product.infrastructure;
 
 import org.springframework.stereotype.Repository;
 
-import kr.hhplus.be.global.error.ProductErrorCode;
-import kr.hhplus.be.global.error.RestApiException;
 import kr.hhplus.be.domain.product.model.Product;
 import kr.hhplus.be.domain.product.repository.ProductRepository;
+import kr.hhplus.be.global.error.ProductErrorCode;
+import kr.hhplus.be.global.error.RestApiException;
 import lombok.RequiredArgsConstructor;
 
 @Repository

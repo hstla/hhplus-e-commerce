@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import kr.hhplus.be.global.error.CouponErrorCode;
-import kr.hhplus.be.global.error.RestApiException;
 import kr.hhplus.be.domain.usercoupon.model.UserCoupon;
 import kr.hhplus.be.domain.usercoupon.repository.UserCouponRepository;
+import kr.hhplus.be.global.error.CouponErrorCode;
+import kr.hhplus.be.global.error.RestApiException;
 import lombok.RequiredArgsConstructor;
 
 @Repository
