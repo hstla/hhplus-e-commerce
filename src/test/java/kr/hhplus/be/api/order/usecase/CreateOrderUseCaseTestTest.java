@@ -3,6 +3,8 @@ package kr.hhplus.be.api.order.usecase;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import kr.hhplus.be.api.order.usecase.dto.OrderCommand;
 import kr.hhplus.be.api.order.usecase.dto.OrderResult;
@@ -41,6 +44,8 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 	private JpaProductRepository productRepository;
 	@Autowired
 	private JpaUserRepository userRepository;
+	@Autowired
+	private RedisTemplate<String, Long> redisTemplate;
 
 	private Long userId;
 	private Long productId;
@@ -90,6 +95,29 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 				soft.assertThat(result).isNotNull();
 				soft.assertThat(option.getStock()).isEqualTo(7);
 			});
+		}
+
+		@Test
+		@DisplayName("정상 주문 시 Redis에 상품 카운트가 증가해야 한다")
+		void createOrder_shouldUpdateRedisRanking() {
+			// given
+			OrderCommand.Order command = new OrderCommand.Order(
+				userId,
+				null,
+				List.of(new OrderCommand.OrderProduct(testOption1.getId(), 3))
+			);
+
+			// when
+			createOrderUseCase.execute(command);
+
+			// then
+			String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			String key = "hhplus:cache:product:rank:" + today + "::" + testOption1.getId();
+
+			Long count = redisTemplate.opsForValue().get(key);
+
+			assertThat(count).isNotNull();
+			assertThat(count).isEqualTo(3);
 		}
 	}
 

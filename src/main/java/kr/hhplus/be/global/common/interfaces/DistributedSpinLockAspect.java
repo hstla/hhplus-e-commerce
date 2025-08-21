@@ -33,7 +33,7 @@ public class DistributedSpinLockAspect {
 	private final RedissonClient redissonClient;
 	private final ExpressionParser parser = new SpelExpressionParser();
 
-	private static final String REDISSON_LOCK_PREFIX = "LOCK:";
+	private static final String REDISSON_LOCK_PREFIX = "hhplus:lock:";
 
 	@Around("@annotation(distributedSpinLock)")
 	public Object around(ProceedingJoinPoint joinPoint, DistributedSpinLock distributedSpinLock) throws Throwable {
