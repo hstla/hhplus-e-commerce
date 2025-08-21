@@ -19,6 +19,11 @@ public class CacheConfiguration {
 	private final ObjectMapper objectMapper;
 
 	@Bean
+	public RedisTemplate<String, Integer> integerRedisTemplate() {
+		return createTRJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
+	}
+
+	@Bean
 	public RedisTemplate<String, Long> longRedisTemplate() {
 		return createTRJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
 	}

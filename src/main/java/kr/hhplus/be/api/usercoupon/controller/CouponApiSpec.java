@@ -18,7 +18,7 @@ import kr.hhplus.be.global.common.CommonResponse;
 public interface CouponApiSpec {
 
 	@Operation(summary = "선착순 쿠폰 발급", description = "선착순으로 쿠폰발급을 하고 해당 쿠폰을 반환합니다.")
-	ResponseEntity<CommonResponse<CouponResponse.Coupon>> publishCoupon(
+	ResponseEntity<Void> publishCoupon(
 		@Parameter(description = "사용자, 쿠폰 아이디", required = true) @RequestBody @Valid UserCouponRequest.Publish couponPublishRequest
 	);
 

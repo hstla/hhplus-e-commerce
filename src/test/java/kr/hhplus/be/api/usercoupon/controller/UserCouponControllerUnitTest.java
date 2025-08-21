@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.hhplus.be.api.usercoupon.controller.dto.UserCouponRequest;
 import kr.hhplus.be.api.usercoupon.usecase.FindUserCouponUseCase;
-import kr.hhplus.be.api.usercoupon.usecase.PublishCouponUseCase;
+import kr.hhplus.be.api.usercoupon.usecase.QueuePublishCouponUseCase;
 import kr.hhplus.be.api.usercoupon.usecase.dto.CouponResult;
 import kr.hhplus.be.domain.coupon.model.CouponType;
 import kr.hhplus.be.domain.usercoupon.model.UserCouponStatus;
@@ -41,9 +41,9 @@ class UserCouponControllerUnitTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 	@MockitoBean
-	private PublishCouponUseCase publishCouponUseCase;
-	@MockitoBean
 	private FindUserCouponUseCase findUserCouponUseCase;
+	@MockitoBean
+	private QueuePublishCouponUseCase queuePublishCouponUseCase;
 
 	private final Long testUserId = 1L;
 	private final Long testCouponId1 = 101L;
@@ -57,17 +57,13 @@ class UserCouponControllerUnitTest {
 		void publishCoupon_success() throws Exception {
 			// given
 			UserCouponRequest.Publish request = UserCouponRequest.Publish.of(testUserId, testCouponId1);
-			var response = new CouponResult.CouponInfo(1L, "2000원 할인 쿠폰", CouponType.FIXED,2000L, LocalDateTime.now().plusDays(1));
-
-			given(publishCouponUseCase.execute(any())).willReturn(response);
 
 			// when & then
 			mockMvc.perform(post("/api/coupons/publish")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.data.couponName").value("2000원 할인 쿠폰"))
-				.andExpect(jsonPath("$.data.discountValue").value(2_000L));
+				.andDo(print())
+				.andExpect(status().isAccepted());
 		}
 
 		@ParameterizedTest
