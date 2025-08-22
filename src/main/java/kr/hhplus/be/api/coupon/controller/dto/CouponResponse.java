@@ -1,8 +1,8 @@
-package kr.hhplus.be.api.usercoupon.controller.dto;
+package kr.hhplus.be.api.coupon.controller.dto;
 
 import java.time.LocalDateTime;
 
-import kr.hhplus.be.api.usercoupon.usecase.dto.CouponResult;
+import kr.hhplus.be.api.coupon.usecase.dto.CouponResult;
 import kr.hhplus.be.domain.coupon.model.CouponType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,10 +17,10 @@ public class CouponResponse {
 		Long discountValue,
 		LocalDateTime expireAt
 	) {
-		public static Coupon of(CouponResult.CouponInfo result) {
+		public static Coupon of(CouponResult.CouponDetail result) {
 			return new Coupon(
 				result.couponId(),
-				result.couponName(),
+				result.name(),
 				result.couponType(),
 				result.discountValue(),
 				result.expireAt()

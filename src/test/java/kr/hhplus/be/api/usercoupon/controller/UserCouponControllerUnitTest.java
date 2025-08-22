@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.hhplus.be.api.usercoupon.controller.dto.UserCouponRequest;
 import kr.hhplus.be.api.usercoupon.usecase.FindUserCouponUseCase;
 import kr.hhplus.be.api.usercoupon.usecase.QueuePublishCouponUseCase;
-import kr.hhplus.be.api.usercoupon.usecase.dto.CouponResult;
+import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponResult;
 import kr.hhplus.be.domain.coupon.model.CouponType;
 import kr.hhplus.be.domain.usercoupon.model.UserCouponStatus;
 
@@ -97,9 +97,9 @@ class UserCouponControllerUnitTest {
 		@DisplayName("쿠폰 조회 성공")
 		void getUserCoupon_success() throws Exception {
 			// given
-			CouponResult.UserCouponInfo coupon1 = new CouponResult.UserCouponInfo(11L, UserCouponStatus.ISSUED, null, 12L, "1000원 할인 쿠폰"
+			UserCouponResult.UserCouponInfo coupon1 = new UserCouponResult.UserCouponInfo(11L, UserCouponStatus.ISSUED, null, 12L, "1000원 할인 쿠폰"
 				,CouponType.FIXED,  1000L, LocalDateTime.now().plusDays(1));
-			CouponResult.UserCouponInfo coupon2 = new CouponResult.UserCouponInfo(11L, UserCouponStatus.ISSUED, null, 12L, "2000원 할인 쿠폰"
+			UserCouponResult.UserCouponInfo coupon2 = new UserCouponResult.UserCouponInfo(11L, UserCouponStatus.ISSUED, null, 12L, "2000원 할인 쿠폰"
 				,CouponType.FIXED,  2000L, LocalDateTime.now().plusDays(1));
 
 			given(findUserCouponUseCase.execute(any())).willReturn(List.of(coupon1, coupon2));

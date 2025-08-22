@@ -12,7 +12,7 @@ import kr.hhplus.be.api.usercoupon.controller.dto.UserCouponRequest;
 import kr.hhplus.be.api.usercoupon.controller.dto.UserCouponResponse;
 import kr.hhplus.be.api.usercoupon.usecase.FindUserCouponUseCase;
 import kr.hhplus.be.api.usercoupon.usecase.QueuePublishCouponUseCase;
-import kr.hhplus.be.api.usercoupon.usecase.dto.CouponResult;
+import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponResult;
 import kr.hhplus.be.global.common.CommonResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ public class UserCouponController implements CouponApiSpec{
 	@Override
 	@GetMapping("/{userId}")
 	public ResponseEntity<CommonResponse<UserCouponResponse.UserCoupons>> getUserCoupon(Long userId) {
-		List<CouponResult.UserCouponInfo> userCoupons = findUserCouponUseCase.execute(userId);
+		List<UserCouponResult.UserCouponInfo> userCoupons = findUserCouponUseCase.execute(userId);
 		return ResponseEntity.ok(CommonResponse.success(UserCouponResponse.UserCoupons.of(userId, userCoupons)));
 	}
 }
