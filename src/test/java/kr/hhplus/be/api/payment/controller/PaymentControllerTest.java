@@ -31,10 +31,8 @@ class PaymentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @MockitoBean
     private CreatePaymentUseCase createPaymentUseCase;
 

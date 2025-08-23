@@ -1,6 +1,7 @@
 package kr.hhplus.be.domain.product.model;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.util.stream.Stream;
 
@@ -36,19 +37,20 @@ class ProductOptionTest {
 			ProductOption result = ProductOption.create(productId, optionName, price, stock);
 
 			// then
-			assertThat(result).isNotNull();
-			assertThat(result.getProductId()).isEqualTo(productId);
-			assertThat(result.getName()).isEqualTo(optionName);
-			assertThat(result.getPrice()).isEqualTo(price);
-			assertThat(result.getStock()).isEqualTo(stock);
+			assertSoftly(soft -> {
+				soft.assertThat(result).isNotNull();
+				soft.assertThat(result.getProductId()).isEqualTo(productId);
+				soft.assertThat(result.getName()).isEqualTo(optionName);
+				soft.assertThat(result.getPrice()).isEqualTo(price);
+				soft.assertThat(result.getStock()).isEqualTo(stock);
+			});
 		}
 
 		@ParameterizedTest
 		@MethodSource("invalidNames")
 		@DisplayName("옵션명이 길이가 허용 범위를 초과하면 예외가 발생한다")
 		void create_fail_invalid_option_name(String name) {
-			// given
-			// when & then
+			// given & when & then
 			assertThatThrownBy(() ->
 				ProductOption.create(1L, name, 1000L, 10)
 			).isInstanceOf(RestApiException.class)
@@ -89,9 +91,8 @@ class ProductOptionTest {
 			int orderQty = 3;
 
 			// when & then
-			assertThatThrownBy(() ->
-				option.orderDecreaseStock(orderQty)
-			).isInstanceOf(RestApiException.class)
+			assertThatThrownBy(() -> option.orderDecreaseStock(orderQty))
+				.isInstanceOf(RestApiException.class)
 				.hasMessageContaining(ProductErrorCode.OUT_OF_STOCK.getMessage());
 		}
 	}

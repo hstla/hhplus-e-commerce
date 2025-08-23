@@ -1,8 +1,10 @@
 package kr.hhplus.be.api.order.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,10 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.order.usecase.dto.OrderCommand;
 import kr.hhplus.be.api.order.usecase.dto.OrderResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductOptionRepository;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductRepository;
 import kr.hhplus.be.domain.product.model.Product;
@@ -31,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @DisplayName("CreateOrderUseCase 동시성 통합 테스트")
-public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
+public class CreateOrderUseCaseTestTest extends IntegrationTestConfig {
 
 	@Autowired
 	private CreateOrderUseCase createOrderUseCase;
@@ -41,17 +44,23 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 	private JpaProductRepository productRepository;
 	@Autowired
 	private JpaUserRepository userRepository;
+	@Autowired
+	private RedisTemplate<String, Long> redisTemplate;
 
 	private Long userId;
 	private Long productId;
 	private ProductOption testOption1;
 	private ProductOption testOption2;
+	private String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd"));
 
 	@BeforeEach
 	void setUp() {
 		productOptionRepository.deleteAll();
 		productRepository.deleteAll();
 		userRepository.deleteAll();
+
+		String key = "hhplus:cache:product:rank:" + today;
+		redisTemplate.delete(key);
 
 		// 유저 생성
 		User user = User.create("testUser", "test@email.com", "password12345");
@@ -73,17 +82,46 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 		@Test
 		@DisplayName("정상 주문 시 재고가 감소해야 한다")
 		void createOrder_success() {
+			// given
 			OrderCommand.Order command = new OrderCommand.Order(
 				userId,
 				null,
 				List.of(new OrderCommand.OrderProduct(testOption1.getId(), 3))
 			);
 
+			// when
 			OrderResult.Order result = createOrderUseCase.execute(command);
 
-			assertThat(result).isNotNull();
+			// then
 			ProductOption option = productOptionRepository.findById(testOption1.getId()).orElseThrow();
-			assertThat(option.getStock()).isEqualTo(7);
+
+			assertSoftly(soft -> {
+				soft.assertThat(result).isNotNull();
+				soft.assertThat(option.getStock()).isEqualTo(7);
+			});
+		}
+
+		@Test
+		@DisplayName("정상 주문 시 Redis에 상품 카운트가 증가해야 한다")
+		void createOrder_shouldUpdateRedisRanking() {
+			// given
+			OrderCommand.Order command = new OrderCommand.Order(
+				userId,
+				null,
+				List.of(new OrderCommand.OrderProduct(testOption1.getId(), 3))
+			);
+
+			// when
+			createOrderUseCase.execute(command);
+
+			// then
+			String key = "hhplus:cache:product:sales:" + today;
+			Double score = redisTemplate.opsForZSet().score(key, productId);
+
+			assertSoftly(soft -> {
+				soft.assertThat(score).isNotNull();
+				soft.assertThat(score).isEqualTo(3);
+			});
 		}
 	}
 
@@ -94,41 +132,47 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 		@Test
 		@DisplayName("재고 부족으로 실패 시 재고가 원복되어야 한다")
 		void stockDecreaseFailure_shouldRollback() {
+			// given
 			OrderCommand.Order command = new OrderCommand.Order(
 				userId,
 				null,
 				List.of(new OrderCommand.OrderProduct(testOption1.getId(), 5), new OrderCommand.OrderProduct(testOption1.getId(), 21))
 			);
 
-			assertThatThrownBy(() -> createOrderUseCase.execute(command))
-				.isInstanceOf(RuntimeException.class);
+			// when
+			assertThatThrownBy(() -> createOrderUseCase.execute(command)).isInstanceOf(RuntimeException.class);
 
+			// then
 			ProductOption option1 = productOptionRepository.findById(testOption1.getId()).orElseThrow();
 			ProductOption option2 = productOptionRepository.findById(testOption2.getId()).orElseThrow();
-			assertAll(
-				() -> assertThat(option1.getStock()).isEqualTo(10),
-				() -> assertThat(option2.getStock()).isEqualTo(20)
-			);
+
+			assertSoftly(soft -> {
+				soft.assertThat(option1.getStock()).isEqualTo(10);
+				soft.assertThat(option2.getStock()).isEqualTo(20);
+			});
 		}
 
 		@Test
 		@DisplayName("오더/쿠폰 처리 실패 시 재고가 원복되어야 한다")
 		void orderTransactionFailure_shouldRollback() {
+			// given
 			OrderCommand.Order command = new OrderCommand.Order(
 				userId,
 				999L,
 				List.of(OrderCommand.OrderProduct.of(testOption1.getId(), 3), OrderCommand.OrderProduct.of(testOption2.getId(), 15))
 			);
 
+			// when
 			assertThatThrownBy(() -> createOrderUseCase.execute(command))
 				.isInstanceOf(RuntimeException.class);
 
+			// then
 			ProductOption option1 = productOptionRepository.findById(testOption1.getId()).orElseThrow();
 			ProductOption option2 = productOptionRepository.findById(testOption2.getId()).orElseThrow();
-			assertAll(
-				() -> assertThat(option1.getStock()).isEqualTo(10),
-				() -> assertThat(option2.getStock()).isEqualTo(20)
-			);
+			assertSoftly(soft -> {
+				soft.assertThat(option1.getStock()).isEqualTo(10);
+				soft.assertThat(option2.getStock()).isEqualTo(20);
+			});
 		}
 	}
 
@@ -170,12 +214,12 @@ public class CreateOrderUseCaseTestWithSpinLock extends IntegrationTestConfig {
 			int failureCount = exceptions.size();
 			int successCount = threadCount - failureCount;
 
-			assertAll(
-				() ->assertThat(option.getStock()).isEqualTo(0),
-				() -> assertThat(successCount).isEqualTo(10),
-				() -> assertThat(failureCount).isEqualTo(10),
-				() -> exceptions.forEach(e -> assertThat(e.getMessage()).contains(ProductErrorCode.OUT_OF_STOCK.getMessage()))
-			);
+			assertSoftly(soft -> {
+				soft.assertThat(option.getStock()).isEqualTo(0);
+				soft.assertThat(successCount).isEqualTo(10);
+				soft.assertThat(failureCount).isEqualTo(10);
+				exceptions.forEach(e -> assertThat(e.getMessage()).contains(ProductErrorCode.OUT_OF_STOCK.getMessage()));
+			});
 		}
 	}
 }

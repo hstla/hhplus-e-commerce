@@ -1,18 +1,18 @@
 package kr.hhplus.be.api.product.usecase;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.product.usecase.dto.ProductResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductOptionRepository;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductRepository;
 import kr.hhplus.be.domain.product.model.Product;
@@ -57,12 +57,12 @@ class FindProductUseCaseTest extends IntegrationTestConfig {
             ProductResult.ProductOptionInfo result = findProductUseCase.findProductOptionsById(savedProduct.getId());
 
             // then
-            assertAll(
-                () -> assertNotNull(result),
-                () -> assertEquals(savedProduct.getId(), result.productId()),
-                () -> assertEquals("Test Product", result.productName()),
-                () -> assertEquals(2, result.options().size())
-            );
+			assertSoftly(soft -> {
+				soft.assertThat(result).isNotNull();
+				soft.assertThat(savedProduct.getId()).isEqualTo(result.productId());
+				soft.assertThat(result.productName()).isEqualTo("Test Product");
+				soft.assertThat(result.options().size()).isEqualTo(2);
+			});
         }
 
         @Test
@@ -72,7 +72,7 @@ class FindProductUseCaseTest extends IntegrationTestConfig {
             Long notExistProductId = 999L;
 
             // when & then
-			Assertions.assertThatThrownBy(() -> findProductUseCase.findProductOptionsById(notExistProductId))
+			assertThatThrownBy(() -> findProductUseCase.findProductOptionsById(notExistProductId))
 					.isInstanceOf(RestApiException.class)
 					.hasMessage(ProductErrorCode.INACTIVE_PRODUCT.getMessage());
         }

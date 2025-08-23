@@ -1,7 +1,6 @@
 package kr.hhplus.be.domain.order.infrastructure;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 
@@ -64,12 +63,12 @@ class OrderProductCoreRepositoryTest extends RepositoryTestConfig {
 			OrderProduct saved = orderProductCoreRepository.save(orderProduct);
 
 			// then
-			assertAll(
-				() -> assertThat(saved.getOrderId()).isEqualTo(testOrderId),
-				() -> assertThat(saved.getProductOptionVO().getName()).isEqualTo(name),
-				() -> assertThat(saved.getProductOptionVO().getStock()).isEqualTo(quantity),
-				() -> assertThat(saved.getProductOptionVO().getPrice()).isEqualTo(unitPrice)
-			);
+			assertSoftly(soft -> {
+				soft.assertThat(saved.getOrderId()).isEqualTo(testOrderId);
+				soft.assertThat(saved.getProductOptionVO().getName()).isEqualTo(name);
+				soft.assertThat(saved.getProductOptionVO().getStock()).isEqualTo(quantity);
+				soft.assertThat(saved.getProductOptionVO().getPrice()).isEqualTo(unitPrice);
+			});
 		}
 	}
 }

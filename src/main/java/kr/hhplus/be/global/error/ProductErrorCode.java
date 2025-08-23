@@ -15,7 +15,7 @@ public enum ProductErrorCode implements ErrorCode {
 	INVALID_PRICE(HttpStatus.BAD_REQUEST, "Price must be 0 or more"),
 	INVALID_STOCK(HttpStatus.BAD_REQUEST, "Stock quantity must be 0 or more"),
 	INVALID_PRODUCT_NAME(HttpStatus.BAD_REQUEST, "Product name must not be blank"),
-	INVALID_DESCRIPTION(HttpStatus.BAD_REQUEST, "Product description must not be blank"),
+	INVALID_DESCRIPTION(HttpStatus.BAD_REQUEST, "Product description length is invalid"),
 	;
 
 	private final HttpStatus httpStatus;

@@ -1,6 +1,7 @@
 package kr.hhplus.be.domain.user.model;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,12 +29,14 @@ class UserTest {
 			User user = User.create("testName", "test@email.com", "password");
 
 			// when then
-			assertThat(user).isNotNull();
-			assertThat(user.getId()).isNull(); // db에서 id를 생성하므로
-			assertThat(user.getName()).isEqualTo("testName");
-			assertThat(user.getEmail()).isEqualTo("test@email.com");
-			assertThat(user.getPassword()).isEqualTo("password");
-			assertThat(user.getPoint().getAmount()).isZero();
+			assertSoftly(soft -> {
+				soft.assertThat(user).isNotNull();
+				soft.assertThat(user.getId()).isNull(); // db에서 id를 생성하므로
+				soft.assertThat(user.getName()).isEqualTo("testName");
+				soft.assertThat(user.getEmail()).isEqualTo("test@email.com");
+				soft.assertThat(user.getPassword()).isEqualTo("password");
+				soft.assertThat(user.getPoint().getAmount()).isZero();
+			});
 		}
 
 		@ParameterizedTest

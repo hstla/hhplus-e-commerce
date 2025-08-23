@@ -1,6 +1,7 @@
 package kr.hhplus.be.domain.usercoupon.infrastructure;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -70,9 +71,11 @@ class UserCouponCoreRepositoryTest extends RepositoryTestConfig {
 			List<UserCoupon> foundUserCoupons = userCouponCoreRepository.findAllByUserId(userId1);
 
 			// then
-			assertThat(foundUserCoupons).hasSize(2);
-			assertThat(foundUserCoupons).extracting(UserCoupon::getUserId).containsOnly(userId1);
-			assertThat(foundUserCoupons).extracting(UserCoupon::getCouponId).containsExactlyInAnyOrder(testCouponId, otherCouponId);
+			assertSoftly(soft -> {
+				soft.assertThat(foundUserCoupons).hasSize(2);
+				soft.assertThat(foundUserCoupons).extracting(UserCoupon::getUserId).containsOnly(userId1);
+				soft.assertThat(foundUserCoupons).extracting(UserCoupon::getCouponId).containsExactlyInAnyOrder(testCouponId, otherCouponId);
+			});
 		}
 
 		@Test

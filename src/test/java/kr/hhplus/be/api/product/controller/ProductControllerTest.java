@@ -19,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import kr.hhplus.be.api.product.usecase.FindProductUseCase;
+import kr.hhplus.be.api.product.usecase.RankProductUseCase;
 import kr.hhplus.be.api.product.usecase.dto.ProductResult;
 import kr.hhplus.be.domain.product.model.ProductCategory;
 
@@ -31,6 +32,8 @@ class ProductControllerTest {
 
     @MockitoBean
     private FindProductUseCase findProductUseCase;
+	@MockitoBean
+	private RankProductUseCase rankProductUseCase;
 
     @Nested
     @DisplayName("GET /api/products/{productId} - 상품 상세 조회")

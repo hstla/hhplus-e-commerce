@@ -3,7 +3,7 @@ package kr.hhplus.be.api.usercoupon.controller.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import kr.hhplus.be.api.usercoupon.usecase.dto.CouponResult;
+import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponResult;
 import kr.hhplus.be.domain.coupon.model.CouponType;
 import kr.hhplus.be.domain.usercoupon.model.UserCouponStatus;
 import lombok.AccessLevel;
@@ -16,7 +16,7 @@ public class UserCouponResponse {
 		Long userId,
 		List<UserCoupon> couponResponseList
 	) {
-		public static UserCoupons of(Long userId, List<CouponResult.UserCouponInfo> result) {
+		public static UserCoupons of(Long userId, List<UserCouponResult.UserCouponInfo> result) {
 			List<UserCoupon> mapped = result.stream()
 				.map(UserCoupon::of)
 				.toList();
@@ -36,7 +36,7 @@ public class UserCouponResponse {
 		Long discountValue,
 		LocalDateTime expireAt
 	) {
-		public static UserCoupon of(CouponResult.UserCouponInfo result) {
+		public static UserCoupon of(UserCouponResult.UserCouponInfo result) {
 			return new UserCoupon(
 				result.userCouponId(),
 				result.couponStatus(),

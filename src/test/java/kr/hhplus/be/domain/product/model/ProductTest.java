@@ -1,6 +1,7 @@
 package kr.hhplus.be.domain.product.model;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.util.stream.Stream;
 
@@ -35,10 +36,12 @@ class ProductTest {
 			Product product = Product.create(name, category, description);
 
 			// then
-			assertThat(product).isNotNull();
-			assertThat(product.getName()).isEqualTo(name);
-			assertThat(product.getCategory()).isEqualTo(category);
-			assertThat(product.getDescription()).isEqualTo(description);
+			assertSoftly(soft -> {
+				soft.assertThat(product).isNotNull();
+				soft.assertThat(product.getName()).isEqualTo(name);
+				soft.assertThat(product.getCategory()).isEqualTo(category);
+				soft.assertThat(product.getDescription()).isEqualTo(description);
+			});
 		}
 
 		@ParameterizedTest

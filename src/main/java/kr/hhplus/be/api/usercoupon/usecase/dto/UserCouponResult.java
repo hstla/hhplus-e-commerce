@@ -10,7 +10,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CouponResult {
+public class UserCouponResult {
 
 	public record CouponInfo(
 		Long couponId,

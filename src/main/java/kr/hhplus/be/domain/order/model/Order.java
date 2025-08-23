@@ -32,7 +32,7 @@ public class Order extends BaseEntity {
 	private Long userId;
 	@Column(name = "user_coupon_id")
 	private Long userCouponId;
-	@Column(name = "origianl_price", nullable = false)
+	@Column(name = "original_price", nullable = false)
 	private Long originalPrice;
 	@Column(name = "discount_price", nullable = false)
 	private Long discountPrice;

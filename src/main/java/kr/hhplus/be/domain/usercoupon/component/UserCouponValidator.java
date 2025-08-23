@@ -2,9 +2,9 @@ package kr.hhplus.be.domain.usercoupon.component;
 
 import org.springframework.stereotype.Component;
 
+import kr.hhplus.be.domain.usercoupon.repository.UserCouponRepository;
 import kr.hhplus.be.global.error.CouponErrorCode;
 import kr.hhplus.be.global.error.RestApiException;
-import kr.hhplus.be.domain.usercoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component

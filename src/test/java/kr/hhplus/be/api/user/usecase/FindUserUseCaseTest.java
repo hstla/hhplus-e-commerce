@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.user.usecase.dto.UserResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.domain.user.model.User;
 import kr.hhplus.be.global.error.RestApiException;
@@ -45,15 +45,15 @@ class FindUserUseCaseTest extends IntegrationTestConfig {
 
 			// then
 			User findUser = jpaUserRepository.findById(savedUser.getId()).get();
-			assertAll(
-                () -> assertThat(savedUser.getId()).isEqualTo(userInfo.id()),
-                () -> assertThat(savedUser.getName()).isEqualTo(userInfo.name()),
-                () -> assertThat(savedUser.getEmail()).isEqualTo(userInfo.email()),
+			assertSoftly(soft -> {
+				soft.assertThat(savedUser.getId()).isEqualTo(userInfo.id());
+				soft.assertThat(savedUser.getName()).isEqualTo(userInfo.name());
+				soft.assertThat(savedUser.getEmail()).isEqualTo(userInfo.email());
 				// DB
-                () -> assertThat(findUser.getId()).isEqualTo(userInfo.id()),
-				() -> assertThat(findUser.getName()).isEqualTo(userInfo.name()),
-				() -> assertThat(findUser.getEmail()).isEqualTo(userInfo.email())
-            );
+				soft.assertThat(findUser.getId()).isEqualTo(userInfo.id());
+				soft.assertThat(findUser.getName()).isEqualTo(userInfo.name());
+				soft.assertThat(findUser.getEmail()).isEqualTo(userInfo.email());
+			});
         }
 
         @Test

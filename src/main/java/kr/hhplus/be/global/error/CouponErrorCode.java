@@ -19,6 +19,7 @@ public enum CouponErrorCode implements ErrorCode {
 	INVALID_COUPON_TYPE(HttpStatus.BAD_REQUEST, "Invalid coupon type provided."),
 	NOT_FOUND_COUPON_STOCK(HttpStatus.NOT_FOUND, "Coupon stock not found."),
 	INVALID_COUPON_OWNERSHIP(HttpStatus.FORBIDDEN, "You are not the owner of this coupon."),
+	TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "Too many requests. Please try again later."),
 	;
 
 	private final HttpStatus httpStatus;

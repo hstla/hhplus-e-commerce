@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.user.usecase;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.api.user.usecase.dto.UserCommand;
 import kr.hhplus.be.api.user.usecase.dto.UserResult;
+import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.domain.user.model.User;
 import kr.hhplus.be.global.error.RestApiException;
@@ -50,11 +50,11 @@ class UpdateUserUseCaseTest extends IntegrationTestConfig {
 
             // then
             User updatedUser = jpaUserRepository.findById(savedUser.getId()).get();
-            assertAll(
-                () -> assertThat(userInfo.name()).isEqualTo(newName),
+			assertSoftly(soft -> {
+				soft.assertThat(userInfo.name()).isEqualTo(newName);
 				// DB
-                () -> assertThat(updatedUser.getName()).isEqualTo(newName)
-            );
+				soft.assertThat(updatedUser.getName()).isEqualTo(newName);
+			});
         }
 
         @Test
@@ -65,10 +65,9 @@ class UpdateUserUseCaseTest extends IntegrationTestConfig {
             UserCommand.Update command = new UserCommand.Update("newName");
 
             // when & then
-            RestApiException exception = assertThrows(RestApiException.class, () -> {
-                updateUserUseCase.execute(notExistUserId, command);
-            });
-            assertEquals(UserErrorCode.INACTIVE_USER, exception.getErrorCode());
+			assertThatThrownBy(() -> updateUserUseCase.execute(notExistUserId, command))
+				.isInstanceOf(RestApiException.class)
+				.hasMessage(UserErrorCode.INACTIVE_USER.getMessage());
         }
     }
 }

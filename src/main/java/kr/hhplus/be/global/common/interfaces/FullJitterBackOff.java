@@ -1,4 +1,4 @@
-package kr.hhplus.be.global.common;
+package kr.hhplus.be.global.common.interfaces;
 
 import java.util.concurrent.ThreadLocalRandom;
 

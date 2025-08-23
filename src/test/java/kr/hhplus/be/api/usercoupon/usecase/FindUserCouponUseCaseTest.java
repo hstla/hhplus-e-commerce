@@ -1,6 +1,7 @@
 package kr.hhplus.be.api.usercoupon.usecase;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,8 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponResult;
 import kr.hhplus.be.config.IntegrationTestConfig;
-import kr.hhplus.be.api.usercoupon.usecase.dto.CouponResult;
 import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponRepository;
 import kr.hhplus.be.domain.coupon.model.Coupon;
 import kr.hhplus.be.domain.coupon.model.CouponType;
@@ -57,16 +58,18 @@ class FindUserCouponUseCaseTest extends IntegrationTestConfig {
 	@DisplayName("사용자의 쿠폰 목록을 정상적으로 조회한다")
 	void find_user_coupons_success() {
 		// given when
-		List<CouponResult.UserCouponInfo> result = findUserCouponUseCase.execute(userId);
+		List<UserCouponResult.UserCouponInfo> result = findUserCouponUseCase.execute(userId);
 
 		// then
-		assertThat(result).hasSize(2);
-		assertThat(result)
-			.extracting(CouponResult.UserCouponInfo::couponType, CouponResult.UserCouponInfo::couponName)
-			.containsExactlyInAnyOrder(
-				tuple(CouponType.FIXED, "1000원 할인 쿠폰"),
-				tuple(CouponType.PERCENT, "20% 할인 쿠폰")
-			);
+		assertSoftly(soft -> {
+			soft.assertThat(result).hasSize(2);
+			assertThat(result)
+				.extracting(UserCouponResult.UserCouponInfo::couponType, UserCouponResult.UserCouponInfo::couponName)
+				.containsExactlyInAnyOrder(
+					tuple(CouponType.FIXED, "1000원 할인 쿠폰"),
+					tuple(CouponType.PERCENT, "20% 할인 쿠폰")
+				);
+		});
 	}
 
 	@Test
@@ -76,7 +79,7 @@ class FindUserCouponUseCaseTest extends IntegrationTestConfig {
 		Long otherUserId = jpaUserRepository.save(User.create("userName2", "test1@email.com", "password")).getId();
 
 		// when
-		List<CouponResult.UserCouponInfo> result = findUserCouponUseCase.execute(otherUserId);
+		List<UserCouponResult.UserCouponInfo> result = findUserCouponUseCase.execute(otherUserId);
 
 		// then
 		assertThat(result).isEmpty();

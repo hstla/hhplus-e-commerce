@@ -1,6 +1,6 @@
 package kr.hhplus.be.domain.payment.infrastructure;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,10 +42,12 @@ class PaymentCoreRepositoryTest extends RepositoryTestConfig {
 			Payment savedPayment = paymentCoreRepository.save(newPayment);
 
 			// then
-			assertThat(savedPayment).isNotNull();
-			assertThat(savedPayment.getId()).isNotNull();
-			assertThat(savedPayment.getOrderId()).isEqualTo(orderId);
-			assertThat(savedPayment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
+			assertSoftly(soft -> {
+				soft.assertThat(savedPayment).isNotNull();
+				soft.assertThat(savedPayment.getId()).isNotNull();
+				soft.assertThat(savedPayment.getOrderId()).isEqualTo(orderId);
+				soft.assertThat(savedPayment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
+			});
 		}
 	}
 }
