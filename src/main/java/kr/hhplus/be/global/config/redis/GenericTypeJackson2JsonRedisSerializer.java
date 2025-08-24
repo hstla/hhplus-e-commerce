@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class TRJackson2JsonRedisSerializer<T> implements RedisSerializer<T> {
+public class GenericTypeJackson2JsonRedisSerializer<T> implements RedisSerializer<T> {
 
 	private final ObjectMapper objectMapper;
 	private final TypeReference<T> typeRef;

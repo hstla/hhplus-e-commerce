@@ -15,7 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.hhplus.be.global.config.redis.RedisCache;
-import kr.hhplus.be.global.config.redis.TRJackson2JsonRedisSerializer;
+import kr.hhplus.be.global.config.redis.GenericTypeJackson2JsonRedisSerializer;
 
 @Configuration
 @EnableCaching
@@ -26,7 +26,7 @@ public class CacheConfig {
 		Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
 		for (RedisCache cache : RedisCache.values()) {
-			TRJackson2JsonRedisSerializer<?> serializer = new TRJackson2JsonRedisSerializer<>(objectMapper, cache.getTypeRef());
+			GenericTypeJackson2JsonRedisSerializer<?> serializer = new GenericTypeJackson2JsonRedisSerializer<>(objectMapper, cache.getTypeRef());
 			RedisCacheConfiguration conf = RedisCacheConfiguration.defaultCacheConfig()
 				.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
 				.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))

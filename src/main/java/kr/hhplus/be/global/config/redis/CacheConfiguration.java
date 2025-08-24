@@ -35,7 +35,7 @@ public class CacheConfiguration {
 		RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(redisConnectionFactory);
 		redisTemplate.setKeySerializer(new StringRedisSerializer());
-		redisTemplate.setValueSerializer(new TRJackson2JsonRedisSerializer<>(objectMapper, typeRef));
+		redisTemplate.setValueSerializer(new GenericTypeJackson2JsonRedisSerializer<>(objectMapper, typeRef));
 		return redisTemplate;
 	}
 }
