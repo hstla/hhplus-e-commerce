@@ -44,6 +44,18 @@ public class Order extends BaseEntity {
 	@Column(name = "order_at", nullable = false)
 	private LocalDateTime orderAt;
 
+	public static Order createPending(Long userId, Long userCouponId, LocalDateTime orderAt) {
+		return Order.builder()
+			.userId(userId)
+			.userCouponId(userCouponId)
+			.originalPrice(0L)
+			.discountPrice(0L)
+			.totalPrice(0L)
+			.orderAt(orderAt)
+			.status(OrderStatus.PENDING)
+			.build();
+	}
+
 	public static Order create(Long userId, Long userCouponId, Long originalPrice, Long discountPrice, Long totalPrice, LocalDateTime orderAt) {
 		return Order.builder()
 			.userId(userId)
@@ -52,11 +64,22 @@ public class Order extends BaseEntity {
 			.discountPrice(discountPrice)
 			.totalPrice(totalPrice)
 			.orderAt(orderAt)
-			.status(OrderStatus.CREATED)
+			.status(OrderStatus.AWAITING_PAYMENT)
 			.build();
 	}
 
-	public void markAsPaid() {
-		this.status = OrderStatus.PAID;
+	public void markAsCompleted() {
+		this.status = OrderStatus.COMPLETED;
+	}
+
+	public void markAsFailed() {
+		this.status = OrderStatus.FAILED;
+	}
+
+	public void markAsAwaitingPayment(Long originalPrice, Long discountPrice, long totalPrice) {
+		this.originalPrice = originalPrice;
+		this.discountPrice = discountPrice;
+		this.totalPrice = totalPrice;
+		this.status = OrderStatus.AWAITING_PAYMENT;
 	}
 }

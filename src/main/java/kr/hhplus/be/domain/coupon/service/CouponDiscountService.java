@@ -17,8 +17,7 @@ public class CouponDiscountService {
 
 	private final Map<CouponType, DiscountPolicy> discountPolicies;
 
-	public long calculateDiscount(UserCoupon userCoupon, Coupon findCoupon, long originPrice, LocalDateTime now) {
-		userCoupon.use(now);
+	public long calculateDiscount(Coupon findCoupon, long originPrice) {
 		DiscountPolicy discountPolicy = discountPolicies.get(findCoupon.getDiscountType());
 		return discountPolicy.calculateDiscount(originPrice, findCoupon.getDiscountValue());
 	}

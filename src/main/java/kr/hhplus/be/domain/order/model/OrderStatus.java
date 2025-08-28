@@ -4,11 +4,12 @@ import lombok.Getter;
 
 @Getter
 public enum OrderStatus {
-	CREATED("주문 생성됨(결제 전)"),
-	PAID("결제 완료"),
+	PENDING("주문 접수됨 (처리 대기중)"),
+	AWAITING_PAYMENT("결제 대기중"),
+	COMPLETED("주문 완료"),
+	FAILED("주문 실패"),
 	CANCELLED("주문 취소"),
-	FAILED("결제 실패"),
-	REFUNDED("환불 완료");
+	;
 
 	private final String description;
 

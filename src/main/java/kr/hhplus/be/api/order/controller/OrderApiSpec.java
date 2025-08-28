@@ -1,6 +1,7 @@
 package kr.hhplus.be.api.order.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,9 @@ import kr.hhplus.be.global.common.CommonResponse;
 
 @Tag(name="주문", description = "주문 관련 API")
 public interface OrderApiSpec {
+
+	@Operation(summary = "주문 조회", description = "주문의 상태, 정보 등을 조회합니다.")
+	ResponseEntity<CommonResponse<OrderResponse.Order>> getOrder(@PathVariable Long orderId);
 
 	@Operation(summary = "주문 생성", description = "상품, 상품 옵션, 유저 정보를 받아 주문을 생성합니다.")
 	ResponseEntity<CommonResponse<OrderResponse.Order>> createOrder(

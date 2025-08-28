@@ -9,13 +9,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import kr.hhplus.be.api.order.usecase.dto.OrderCommand;
 import kr.hhplus.be.api.order.usecase.dto.OrderResult;
-import kr.hhplus.be.api.order.usecase.helper.ProductOptionStockSpinLockManager;
+import kr.hhplus.be.api.product.usecase.helper.ProductOptionStockSpinLockManager;
 import kr.hhplus.be.domain.coupon.model.Coupon;
 import kr.hhplus.be.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.domain.coupon.service.CouponDiscountService;
@@ -86,7 +87,8 @@ public class CreateOrderUseCase {
 					Coupon findCoupon = couponRepository.findById(userCoupon.getCouponId());
 					findCoupon.validateNotExpired(now);
 
-					discountPrice = couponDiscountService.calculateDiscount(userCoupon, findCoupon, totalOriginPrice, now);
+					discountPrice = couponDiscountService.calculateDiscount(findCoupon, totalOriginPrice);
+					userCoupon.use(now);
 					userCouponRepository.save(userCoupon);
 				}
 
@@ -103,6 +105,7 @@ public class CreateOrderUseCase {
 					Long productId = option.getProductId();
 					productOrderCounts.merge(productId, snapshot.getStock(), Integer::sum);
 				}
+				// todo 결제 완료 알림톡 발송 및 레디스에 저장하는 건 이벤트로 바꾸기
 				updateProductRankingCache(productOrderCounts);
 
 				return OrderResult.Order.of(OrderInfo.OrderDetail.of(savedOrder));
@@ -114,6 +117,15 @@ public class CreateOrderUseCase {
 			throw e;
 		}
 	}
+
+	/**
+	 * 분산 락 트랜잭션(재고감소)
+	 * 트랜잭션(
+	 * userCoupon 쿠폰 있는지 없는지 확인하고 사용표시
+	 * order 생성 - 본인 프로젝트
+	 *)
+	 * 이후 레디스 랭킹 추가 및 외부 api 생성 후 요청함. 이벤트
+	 */
 
 	private void updateProductRankingCache(Map<Long, Integer> productOrderCounts) {
 		String todayKey = "hhplus:cache:product:sales:" + LocalDateTime.now().format(FORMATTER);
