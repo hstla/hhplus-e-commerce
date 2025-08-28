@@ -22,7 +22,7 @@ public class CreatePaymentUseCase {
 	@Transactional
 	public PaymentResult.Pay execute(PaymentCommand.Pay command) {
 		Order findOrder = orderRepository.findById(command.orderId());
-		findOrder.markAsPaid();
+		findOrder.markAsCompleted();
 		Order savedOrder = orderRepository.save(findOrder);
 
 		userService.deductPointWithLock(command.userId(), savedOrder.getTotalPrice());

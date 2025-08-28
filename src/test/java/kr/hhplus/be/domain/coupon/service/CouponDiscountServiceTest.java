@@ -58,7 +58,8 @@ class CouponDiscountServiceTest {
 			Coupon coupon = new Coupon(200L, "Fixed Coupon", CouponType.FIXED, 2_000L, 10, now.plusDays(1));
 
 			// when
-			long discountedAmount = couponService.calculateDiscount(userCoupon, coupon, originPrice, now);
+			long discountedAmount = couponService.calculateDiscount(coupon, originPrice);
+			userCoupon.use(now);
 
 			// then
 			assertSoftly(soft -> {
@@ -80,7 +81,8 @@ class CouponDiscountServiceTest {
 			Coupon coupon = new Coupon(201L, "Percent Coupon", CouponType.PERCENT, 20L, 10, usedAt);
 
 			// when
-			long discountedAmount = couponService.calculateDiscount(userCoupon, coupon, totalAmount, now);
+			long discountedAmount = couponService.calculateDiscount(coupon, totalAmount);
+			userCoupon.use(now);
 
 			// then
 			assertSoftly(soft -> {
