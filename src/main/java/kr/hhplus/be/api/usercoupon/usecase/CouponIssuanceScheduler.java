@@ -55,7 +55,7 @@ public class CouponIssuanceScheduler {
 			if (remainingStock != null && remainingStock >= 0) {
 				log.info("발급 성공 - userId: {}, couponId: {}, 남은 재고: {}", userId, couponId, remainingStock);
 				try {
-					String taskJson = objectMapper.writeValueAsString(DbSyncTask.of(Long.parseLong(userId), Long.parseLong(couponId)));
+					String taskJson = objectMapper.writeValueAsString(UserCouponSyncTask.of(Long.parseLong(userId), Long.parseLong(couponId)));
 					redisTemplate.opsForList().leftPush(DB_WRITE_QUEUE, taskJson);
 				} catch (Exception e) {
 					log.error("DB 저장 작업 생성 실패: {}", e.getMessage());

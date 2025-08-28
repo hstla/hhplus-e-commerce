@@ -16,7 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DbSyncScheduler {
+public class UserCouponSyncScheduler {
 
 	private final RedisTemplate<String, String> redisTemplate;
 	private final UserCouponRepository userCouponRepository;
@@ -35,7 +35,7 @@ public class DbSyncScheduler {
 		for (String taskJson : tasks) {
 			try {
 				// 2. JSON 작업을 DTO로 변환
-				DbSyncTask task = objectMapper.readValue(taskJson, DbSyncTask.class);
+				UserCouponSyncTask task = objectMapper.readValue(taskJson, UserCouponSyncTask.class);
 				Long userId = task.userId();
 				Long couponId = task.couponId();
 

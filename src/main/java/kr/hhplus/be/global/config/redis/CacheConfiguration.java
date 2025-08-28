@@ -20,15 +20,15 @@ public class CacheConfiguration {
 
 	@Bean
 	public RedisTemplate<String, Integer> integerRedisTemplate() {
-		return createTRJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
+		return createGenericTypeJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
 	}
 
 	@Bean
 	public RedisTemplate<String, Long> longRedisTemplate() {
-		return createTRJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
+		return createGenericTypeJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
 	}
 
-	private <V> RedisTemplate<String, V> createTRJackson2JsonRedisTemplate(
+	private <V> RedisTemplate<String, V> createGenericTypeJackson2JsonRedisTemplate(
 		ObjectMapper objectMapper,
 		TypeReference<V> typeRef
 	) {
