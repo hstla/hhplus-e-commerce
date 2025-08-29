@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.domain.product.model.ProductOption;
 import kr.hhplus.be.domain.product.repository.ProductOptionRepository;
-import kr.hhplus.be.global.common.interfaces.DistributedSpinLock;
+import kr.hhplus.be.global.common.aop.DistributedSpinLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

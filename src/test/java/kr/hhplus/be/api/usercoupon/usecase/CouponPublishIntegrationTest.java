@@ -1,5 +1,6 @@
 package kr.hhplus.be.api.usercoupon.usecase;
 
+import static kr.hhplus.be.global.common.redis.RedisKeyName.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,6 @@ import kr.hhplus.be.domain.coupon.model.CouponType;
 import kr.hhplus.be.domain.user.infrastructure.JpaUserRepository;
 import kr.hhplus.be.domain.user.model.User;
 import kr.hhplus.be.domain.usercoupon.infrastructure.JpaUserCouponRepository;
-import kr.hhplus.be.global.config.redis.RedisCacheName;
 
 @DisplayName("CouponPublishIntegrationTest 통합 테스트")
 public class CouponPublishIntegrationTest extends IntegrationTestConfig {
@@ -59,9 +59,9 @@ public class CouponPublishIntegrationTest extends IntegrationTestConfig {
 
 		testCoupon = couponRepository.save(new Coupon(null, "Test Coupon", CouponType.FIXED, 1000L, COUPON_STOCK, LocalDateTime.now().plusDays(1)));
 
-		redisTemplate.opsForSet().add(RedisCacheName.VALID_COUPONS, String.valueOf(testCoupon.getId()));
+		redisTemplate.opsForSet().add(COUPON_VALID_SET.toKey(), String.valueOf(testCoupon.getId()));
 
-		String stockKey = RedisCacheName.COUPON_STOCK_PREFIX + testCoupon.getId();
+		String stockKey = COUPON_STOCK_CACHE.toKey(testCoupon.getId());
 		redisTemplate.opsForValue().set(stockKey, String.valueOf(COUPON_STOCK));
 	}
 
@@ -90,15 +90,15 @@ public class CouponPublishIntegrationTest extends IntegrationTestConfig {
 		// 3. Assert: 최종 상태 검증
 		long issuedCount = userCouponRepository.count();
 		// Redis 검증
-		String stockKey = RedisCacheName.COUPON_STOCK_PREFIX + testCoupon.getId();
+		String stockKey = COUPON_STOCK_CACHE.toKey(testCoupon.getId());
 		String stock = redisTemplate.opsForValue().get(stockKey);
 
-		Boolean isCouponValid = redisTemplate.opsForSet().isMember(RedisCacheName.VALID_COUPONS, String.valueOf(testCoupon.getId()));
+		Boolean isCouponValid = redisTemplate.opsForSet().isMember(COUPON_VALID_SET.toKey(), String.valueOf(testCoupon.getId()));
 
-		String queueKey = RedisCacheName.COUPON_QUEUE_PREFIX + testCoupon.getId();
+		String queueKey = COUPON_ISSUE_QUEUE.toKey(testCoupon.getId());
 		Long queueSize = redisTemplate.opsForZSet().size(queueKey);
 
-		Long dbQueueSize = redisTemplate.opsForList().size(RedisCacheName.DB_WRITE_QUEUE);
+		Long dbQueueSize = redisTemplate.opsForList().size(COUPON_DB_SYNC_QUEUE.toKey());
 
 		assertSoftly(soft -> {
 			soft.assertThat(issuedCount).isEqualTo(COUPON_STOCK);

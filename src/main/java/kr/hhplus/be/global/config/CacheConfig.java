@@ -14,7 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import kr.hhplus.be.global.config.redis.RedisCache;
+import kr.hhplus.be.global.common.redis.RedisCache;
 import kr.hhplus.be.global.config.redis.GenericTypeJackson2JsonRedisSerializer;
 
 @Configuration

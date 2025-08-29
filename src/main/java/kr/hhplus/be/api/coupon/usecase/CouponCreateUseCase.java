@@ -1,6 +1,6 @@
 package kr.hhplus.be.api.coupon.usecase;
 
-import static kr.hhplus.be.global.config.redis.RedisCacheName.*;
+import static kr.hhplus.be.global.common.redis.RedisKeyName.*;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class CouponCreateUseCase {
 		String couponIdStr = String.valueOf(couponId);
 		String stockStr = String.valueOf(stock);
 
-		redisTemplate.opsForSet().add(VALID_COUPONS, couponIdStr);
-		redisTemplate.opsForValue().set(COUPON_STOCK_PREFIX + couponIdStr, stockStr);
+		redisTemplate.opsForSet().add(COUPON_VALID_SET.toKey(), couponIdStr);
+		redisTemplate.opsForValue().set(COUPON_STOCK_CACHE.toKey(couponId), stockStr);
 	}
 }

@@ -1,4 +1,4 @@
-package kr.hhplus.be.global.common.interfaces;
+package kr.hhplus.be.global.common.aop;
 
 import java.util.ArrayList;
 import java.util.Collection;
