@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.order.usecase.event;
 
-import kr.hhplus.be.api.shared.event.CouponUsedEvent;
-import kr.hhplus.be.api.shared.event.dto.PricedOrderItemInfo;
+import kr.hhplus.be.domain.shared.event.CouponUsedEvent;
+import kr.hhplus.be.domain.shared.event.dto.PricedOrderItemInfo;
 import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.order.infrastructure.JpaOrderProductRepository;
 import kr.hhplus.be.domain.order.infrastructure.JpaOrderRepository;

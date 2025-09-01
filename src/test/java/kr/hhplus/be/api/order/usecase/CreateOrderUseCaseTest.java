@@ -24,11 +24,11 @@ import kr.hhplus.be.global.error.RestApiException;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-@DisplayName("PublisherOrderUseCase 통합 테스트")
-class PublisherOrderUseCaseTest extends IntegrationTestConfig {
+@DisplayName("CreateOrderUseCase 통합 테스트")
+class CreateOrderUseCaseTest extends IntegrationTestConfig {
 
 	@Autowired
-	private PublisherOrderUseCase publisherOrderUseCase;
+	private CreateOrderUseCase createOrderUseCase;
 	@Autowired
 	private JpaOrderRepository orderRepository;
 	@Autowired
@@ -58,7 +58,7 @@ class PublisherOrderUseCaseTest extends IntegrationTestConfig {
 			OrderCommand.Order command = OrderCommand.Order.of(user.getId(), 0L, orderProducts);
 
 			// when
-			OrderResult.Order execute = publisherOrderUseCase.execute(command);
+			OrderResult.Order execute = createOrderUseCase.execute(command);
 
 			// then
 			Order findOrder = orderRepository.findById(execute.id()).get();
@@ -84,7 +84,7 @@ class PublisherOrderUseCaseTest extends IntegrationTestConfig {
 			OrderCommand.Order command = OrderCommand.Order.of(999L, 0L, orderProducts);
 
 			// when then
-			assertThatThrownBy(() -> publisherOrderUseCase.execute(command))
+			assertThatThrownBy(() -> createOrderUseCase.execute(command))
 				.isInstanceOf(RestApiException.class)
 				.hasMessageContaining("User is inactive");
 

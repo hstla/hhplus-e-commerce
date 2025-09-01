@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import kr.hhplus.be.api.shared.event.CouponUseFailedEvent;
-import kr.hhplus.be.api.shared.event.CouponUsedEvent;
-import kr.hhplus.be.api.shared.event.StockDecreasedEvent;
 import kr.hhplus.be.domain.coupon.model.Coupon;
 import kr.hhplus.be.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.domain.coupon.service.CouponDiscountService;
+import kr.hhplus.be.domain.shared.event.CouponUseFailedEvent;
+import kr.hhplus.be.domain.shared.event.CouponUsedEvent;
+import kr.hhplus.be.domain.shared.event.StockDecreasedEvent;
 import kr.hhplus.be.domain.usercoupon.model.UserCoupon;
 import kr.hhplus.be.domain.usercoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;

@@ -2,6 +2,8 @@ package kr.hhplus.be.domain.usercoupon.infrastructure;
 
 import static kr.hhplus.be.global.common.redis.RedisKeyName.*;
 
+import java.util.List;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class UserCouponRedisRepositoryImpl implements UserCouponRedisRepository {
 
    	private final RedisTemplate<String, Long> longRedisTemplate;
+   	private final RedisTemplate<String, UserCouponSyncTask> userCouponRedisTemplate;
 
 	@Override
 	public boolean isRateLimited(Long userId, Long couponId) {
@@ -40,5 +43,20 @@ public class UserCouponRedisRepositoryImpl implements UserCouponRedisRepository 
 		String queueKey = RedisKeyName.COUPON_ISSUE_QUEUE.toKey(couponId);
 		long timestamp = System.currentTimeMillis();
 		longRedisTemplate.opsForZSet().add(queueKey, userId, timestamp);
+	}
+
+	@Override
+	public void pushDbSyncTask(UserCouponSyncTask userCouponSyncTask) {
+		userCouponRedisTemplate.opsForList().leftPush(COUPON_DB_SYNC_QUEUE.toKey(), userCouponSyncTask);
+	}
+
+	@Override
+	public List<UserCouponSyncTask> popDbSyncTask(int i) {
+		return userCouponRedisTemplate.opsForList().rightPop(COUPON_DB_SYNC_QUEUE.toKey(), i);
+	}
+
+	@Override
+	public void pushDeadLetterQueue(UserCouponSyncTask task) {
+		userCouponRedisTemplate.opsForList().leftPush(COUPON_DB_DEAD_LETTER_QUEUE.toKey(), task);
 	}
 }

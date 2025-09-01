@@ -1,8 +1,8 @@
-package kr.hhplus.be.api.shared.event;
+package kr.hhplus.be.domain.shared.event;
 
 import java.util.List;
 
-import kr.hhplus.be.api.shared.event.dto.PricedOrderItemInfo;
+import kr.hhplus.be.domain.shared.event.dto.PricedOrderItemInfo;
 
 public record CouponUseFailedEvent(
 	Long orderId,

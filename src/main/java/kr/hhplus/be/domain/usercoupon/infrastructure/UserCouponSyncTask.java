@@ -1,4 +1,4 @@
-package kr.hhplus.be.api.usercoupon.usecase;
+package kr.hhplus.be.domain.usercoupon.infrastructure;
 
 import java.time.LocalDateTime;
 

@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import kr.hhplus.be.api.product.usecase.helper.ProductOptionStockSpinLockManager;
-import kr.hhplus.be.api.shared.event.CouponUseFailedEvent;
-import kr.hhplus.be.api.shared.event.dto.PricedOrderItemInfo;
+import kr.hhplus.be.domain.shared.event.CouponUseFailedEvent;
+import kr.hhplus.be.domain.shared.event.dto.PricedOrderItemInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

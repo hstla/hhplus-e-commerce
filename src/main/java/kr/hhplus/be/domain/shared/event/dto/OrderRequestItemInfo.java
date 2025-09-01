@@ -1,4 +1,4 @@
-package kr.hhplus.be.api.shared.event.dto;
+package kr.hhplus.be.domain.shared.event.dto;
 
 public record OrderRequestItemInfo(
 	Long productOptionId,

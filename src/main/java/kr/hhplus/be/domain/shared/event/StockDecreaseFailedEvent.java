@@ -1,4 +1,4 @@
-package kr.hhplus.be.api.shared.event;
+package kr.hhplus.be.domain.shared.event;
 
 public record StockDecreaseFailedEvent(
 	Long orderId

@@ -1,10 +1,7 @@
 package kr.hhplus.be.api.usercoupon.usecase.event;
 
-import kr.hhplus.be.api.shared.event.StockDecreasedEvent;
+import kr.hhplus.be.domain.shared.event.StockDecreasedEvent;
 import kr.hhplus.be.config.IntegrationTestConfig;
-import kr.hhplus.be.domain.coupon.compnent.discount.DiscountPolicy;
-import kr.hhplus.be.domain.coupon.compnent.discount.FixedDiscountPolicy;
-import kr.hhplus.be.domain.coupon.compnent.discount.PercentDiscountPolicy;
 import kr.hhplus.be.domain.coupon.infrastructure.JpaCouponRepository;
 import kr.hhplus.be.domain.coupon.model.Coupon;
 import kr.hhplus.be.domain.coupon.model.CouponType;
@@ -17,20 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.testcontainers.shaded.org.bouncycastle.asn1.x500.style.RFC4519Style.*;
 
 @DisplayName("UseUserCouponListener 통합 테스트")
 class UseUserCouponListenerTest extends IntegrationTestConfig {

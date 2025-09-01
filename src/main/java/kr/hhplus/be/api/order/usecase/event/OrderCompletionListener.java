@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import kr.hhplus.be.api.shared.event.CouponUsedEvent;
-import kr.hhplus.be.api.shared.event.OrderCompletedEvent;
-import kr.hhplus.be.api.shared.event.dto.PricedOrderItemInfo;
 import kr.hhplus.be.domain.order.component.OrderPriceCalculator;
 import kr.hhplus.be.domain.order.model.Order;
 import kr.hhplus.be.domain.order.model.OrderProduct;
 import kr.hhplus.be.domain.order.model.ProductOptionSnapshot;
 import kr.hhplus.be.domain.order.repository.OrderProductRepository;
 import kr.hhplus.be.domain.order.repository.OrderRepository;
+import kr.hhplus.be.domain.shared.event.CouponUsedEvent;
+import kr.hhplus.be.domain.shared.event.OrderCompletedEvent;
+import kr.hhplus.be.domain.shared.event.dto.PricedOrderItemInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

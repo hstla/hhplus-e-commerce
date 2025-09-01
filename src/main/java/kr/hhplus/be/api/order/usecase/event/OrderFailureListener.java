@@ -3,15 +3,14 @@ package kr.hhplus.be.api.order.usecase.event;
 import static org.springframework.transaction.annotation.Propagation.*;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import kr.hhplus.be.api.shared.event.CouponUseFailedEvent;
-import kr.hhplus.be.api.shared.event.StockDecreaseFailedEvent;
 import kr.hhplus.be.domain.order.model.Order;
 import kr.hhplus.be.domain.order.model.OrderStatus;
 import kr.hhplus.be.domain.order.repository.OrderRepository;
+import kr.hhplus.be.domain.shared.event.CouponUseFailedEvent;
+import kr.hhplus.be.domain.shared.event.StockDecreaseFailedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

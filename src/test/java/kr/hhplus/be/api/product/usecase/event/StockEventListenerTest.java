@@ -1,7 +1,7 @@
 package kr.hhplus.be.api.product.usecase.event;
 
-import kr.hhplus.be.api.shared.event.OrderCreatedEvent;
-import kr.hhplus.be.api.shared.event.dto.OrderRequestItemInfo;
+import kr.hhplus.be.domain.shared.event.OrderCreatedEvent;
+import kr.hhplus.be.domain.shared.event.dto.OrderRequestItemInfo;
 import kr.hhplus.be.config.IntegrationTestConfig;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductOptionRepository;
 import kr.hhplus.be.domain.product.infrastructure.JpaProductRepository;

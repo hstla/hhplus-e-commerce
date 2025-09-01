@@ -1,4 +1,5 @@
 package kr.hhplus.be.api.product.usecase.event;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,14 +9,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import kr.hhplus.be.api.shared.event.OrderCreatedEvent;
-import kr.hhplus.be.api.shared.event.dto.OrderRequestItemInfo;
 import kr.hhplus.be.api.product.usecase.helper.ProductOptionStockSpinLockManager;
-import kr.hhplus.be.api.shared.event.dto.PricedOrderItemInfo;
-import kr.hhplus.be.api.shared.event.StockDecreaseFailedEvent;
-import kr.hhplus.be.api.shared.event.StockDecreasedEvent;
 import kr.hhplus.be.domain.product.model.ProductOption;
 import kr.hhplus.be.domain.product.repository.ProductOptionRepository;
+import kr.hhplus.be.domain.shared.event.OrderCreatedEvent;
+import kr.hhplus.be.domain.shared.event.StockDecreaseFailedEvent;
+import kr.hhplus.be.domain.shared.event.StockDecreasedEvent;
+import kr.hhplus.be.domain.shared.event.dto.OrderRequestItemInfo;
+import kr.hhplus.be.domain.shared.event.dto.PricedOrderItemInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

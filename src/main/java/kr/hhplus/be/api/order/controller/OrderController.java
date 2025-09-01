@@ -13,7 +13,6 @@ import kr.hhplus.be.api.order.controller.dto.OrderRequest;
 import kr.hhplus.be.api.order.controller.dto.OrderResponse;
 import kr.hhplus.be.api.order.usecase.CreateOrderUseCase;
 import kr.hhplus.be.api.order.usecase.GetOrderUseCase;
-import kr.hhplus.be.api.order.usecase.PublisherOrderUseCase;
 import kr.hhplus.be.api.order.usecase.dto.OrderResult;
 import kr.hhplus.be.global.common.CommonResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderController implements OrderApiSpec {
 
-	// private final CreateOrderUseCase orderUseCase;
-	private final PublisherOrderUseCase orderUseCase;
+	private final CreateOrderUseCase orderUseCase;
 	private final GetOrderUseCase getOrderUseCase;
 
 	@Override

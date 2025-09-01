@@ -9,16 +9,17 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RedisKeyName {
 	// ===== Static Keys =====
-	PRODUCT_RANK_CACHE("product:rank", null),
 	COUPON_VALID_SET("coupon:valid_set", null),
 	COUPON_DB_SYNC_QUEUE("coupon:db_sync_queue", null),
 	COUPON_DB_DEAD_LETTER_QUEUE("coupon:db_dead_letter_queue", null),
+	PRODUCT_SALES_RANKING_3DAYS("product:sales:3days", Duration.ofDays(1)),
 
 	// ===== Dynamic Keys =====
 	COUPON_ISSUE_REQUEST_LIMIT("coupon:issue_limit:user:%d:coupon:%d", Duration.ofMinutes(3)),
 	COUPON_ISSUED_USER_BITMAP("coupon:issued:user_bitmap:%d", null),
 	COUPON_ISSUE_QUEUE("coupon:issue_queue:%d", null),
 	COUPON_STOCK_CACHE("coupon:stock:%d", null),
+	PRODUCT_TODAY_SALES_RANKING("product:sales:%s", Duration.ofDays(3)),
 	;
 
 	private static final String PREFIX = "hhplus:cache:";

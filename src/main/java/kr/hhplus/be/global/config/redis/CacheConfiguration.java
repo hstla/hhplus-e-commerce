@@ -9,6 +9,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import kr.hhplus.be.domain.usercoupon.infrastructure.UserCouponSyncTask;
 import lombok.RequiredArgsConstructor;
 
 @Configuration(proxyBeanMethods = false)
@@ -17,6 +18,11 @@ public class CacheConfiguration {
 
 	private final RedisConnectionFactory redisConnectionFactory;
 	private final ObjectMapper objectMapper;
+
+	@Bean
+	public RedisTemplate<String, UserCouponSyncTask> userCouponSyncTaskRedisTemplate() {
+		return createGenericTypeJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
+	}
 
 	@Bean
 	public RedisTemplate<String, Integer> integerRedisTemplate() {
