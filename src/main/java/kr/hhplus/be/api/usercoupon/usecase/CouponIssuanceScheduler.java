@@ -1,16 +1,16 @@
 package kr.hhplus.be.api.usercoupon.usecase;
 
-import static kr.hhplus.be.global.config.redis.RedisCacheName.*;
+import static kr.hhplus.be.global.common.redis.RedisKeyName.*;
 
 import java.util.Set;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import kr.hhplus.be.domain.coupon.repository.CouponRedisRepository;
+import kr.hhplus.be.domain.usercoupon.infrastructure.UserCouponSyncTask;
+import kr.hhplus.be.domain.usercoupon.repository.UserCouponRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,51 +19,51 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CouponIssuanceScheduler {
 
-	private final RedisTemplate<String, String> redisTemplate;
-	private final ObjectMapper objectMapper;
+	private final CouponRedisRepository couponRedisRepository;
+	private final UserCouponRedisRepository userCouponRedisRepository;
+
 
 	// 스케줄러1
 	@Scheduled(fixedDelay = 100)
 	public void processCouponIssuance() {
-		Set<String> validCouponIds = redisTemplate.opsForSet().members(VALID_COUPONS);
+		Set<Long> validCouponIds = couponRedisRepository.getValidCouponIds();
 
 		if (validCouponIds == null || validCouponIds.isEmpty()) {
 			return;
 		}
 
-		for (String couponId : validCouponIds) {
+		for (Long couponId : validCouponIds) {
 			processQueueForCoupon(couponId);
 		}
 	}
 
-	private void processQueueForCoupon(String couponId) {
-		String queueKey = COUPON_QUEUE_PREFIX + couponId;
-		String stockKey = COUPON_STOCK_PREFIX + couponId;
+	private void processQueueForCoupon(Long couponId) {
+		String queueKey = COUPON_ISSUE_QUEUE.toKey(couponId);
+		String stockKey = COUPON_STOCK_CACHE.toKey(couponId);
 
 		// 3. 한 번에 100명씩 대기열에서 꺼낸다
-		Set<ZSetOperations.TypedTuple<String>> userTuples = redisTemplate.opsForZSet().popMin(queueKey, 100);
+		Set<ZSetOperations.TypedTuple<Long>> userTuples = couponRedisRepository.popCouponIssueQueue(queueKey, 100);
 
 		if (userTuples == null || userTuples.isEmpty()) {
 			return;
 		}
 
-		for (ZSetOperations.TypedTuple<String> userTuple : userTuples) {
-			String userId = userTuple.getValue();
-
-			Long remainingStock = redisTemplate.opsForValue().increment(stockKey, -1L);
+		for (ZSetOperations.TypedTuple<Long> userTuple : userTuples) {
+			Long userId = userTuple.getValue();
+			Long remainingStock = couponRedisRepository.decrementStock(stockKey);
 
 			if (remainingStock != null && remainingStock >= 0) {
-				log.info("발급 성공 - userId: {}, couponId: {}, 남은 재고: {}", userId, couponId, remainingStock);
 				try {
-					String taskJson = objectMapper.writeValueAsString(DbSyncTask.of(Long.parseLong(userId), Long.parseLong(couponId)));
-					redisTemplate.opsForList().leftPush(DB_WRITE_QUEUE, taskJson);
+					userCouponRedisRepository.pushDbSyncTask(UserCouponSyncTask.of(userId, couponId));
 				} catch (Exception e) {
 					log.error("DB 저장 작업 생성 실패: {}", e.getMessage());
-					redisTemplate.opsForValue().increment(stockKey, 1L);
+					couponRedisRepository.incrementStock(stockKey, 1L);
 				}
 
 				if (remainingStock == 0) {
-					redisTemplate.opsForSet().remove(VALID_COUPONS, couponId);
+					couponRedisRepository.removeValidCoupon(couponId);
+					couponRedisRepository.removeCouponStock(couponId);
+
 					log.info("쿠폰 소진 완료: couponId {}", couponId);
 				}
 
@@ -71,7 +71,7 @@ public class CouponIssuanceScheduler {
 				// 5-2. 발급 실패 (재고 없음): 루프를 중단하고 다음 쿠폰으로 넘어간다.
 				log.warn("재고 없음 - userId: {}, couponId: {}", userId, couponId);
 				// 방금 DECR로 음수가 된 재고를 다시 0으로 맞춰준다.
-				redisTemplate.opsForValue().increment(stockKey, 1L);
+				couponRedisRepository.incrementStock(stockKey, 1L);
 				break;
 			}
 		}

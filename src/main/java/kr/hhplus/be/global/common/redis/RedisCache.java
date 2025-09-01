@@ -1,4 +1,4 @@
-package kr.hhplus.be.global.config.redis;
+package kr.hhplus.be.global.common.redis;
 
 import java.time.Duration;
 

@@ -53,7 +53,7 @@ class OrderControllerTest {
             // given
             OrderRequest.Order request = new OrderRequest.Order(1L, null, 
                 List.of(new OrderRequest.OrderProduct(1L, 1)));
-            OrderResult.Order result = new OrderResult.Order(1L, 1L, null, 10_000L, OrderStatus.CREATED);
+            OrderResult.Order result = new OrderResult.Order(1L, 1L, null, 10_000L, OrderStatus.AWAITING_PAYMENT);
             given(createOrderUseCase.execute(any())).willReturn(result);
 
             // when & then

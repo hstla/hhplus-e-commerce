@@ -1,4 +1,4 @@
-package kr.hhplus.be.global.common.interfaces;
+package kr.hhplus.be.global.common.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

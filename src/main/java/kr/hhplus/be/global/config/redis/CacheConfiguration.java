@@ -9,6 +9,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import kr.hhplus.be.domain.usercoupon.infrastructure.UserCouponSyncTask;
 import lombok.RequiredArgsConstructor;
 
 @Configuration(proxyBeanMethods = false)
@@ -19,23 +20,28 @@ public class CacheConfiguration {
 	private final ObjectMapper objectMapper;
 
 	@Bean
+	public RedisTemplate<String, UserCouponSyncTask> userCouponSyncTaskRedisTemplate() {
+		return createGenericTypeJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
+	}
+
+	@Bean
 	public RedisTemplate<String, Integer> integerRedisTemplate() {
-		return createTRJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
+		return createGenericTypeJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
 	}
 
 	@Bean
 	public RedisTemplate<String, Long> longRedisTemplate() {
-		return createTRJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
+		return createGenericTypeJackson2JsonRedisTemplate(objectMapper, new TypeReference<>() {});
 	}
 
-	private <V> RedisTemplate<String, V> createTRJackson2JsonRedisTemplate(
+	private <V> RedisTemplate<String, V> createGenericTypeJackson2JsonRedisTemplate(
 		ObjectMapper objectMapper,
 		TypeReference<V> typeRef
 	) {
 		RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(redisConnectionFactory);
 		redisTemplate.setKeySerializer(new StringRedisSerializer());
-		redisTemplate.setValueSerializer(new TRJackson2JsonRedisSerializer<>(objectMapper, typeRef));
+		redisTemplate.setValueSerializer(new GenericTypeJackson2JsonRedisSerializer<>(objectMapper, typeRef));
 		return redisTemplate;
 	}
 }

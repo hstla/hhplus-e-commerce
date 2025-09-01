@@ -54,7 +54,7 @@ class OrderCoreRepositoryTest  extends RepositoryTestConfig {
 				soft.assertThat(savedOrder.getUserId()).isEqualTo(userId);
 				soft.assertThat(savedOrder.getUserCouponId()).isEqualTo(userCouponId);
 				soft.assertThat(savedOrder.getTotalPrice()).isEqualTo(totalPrice);
-				soft.assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CREATED);
+				soft.assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.AWAITING_PAYMENT);
 				soft.assertThat(savedOrder.getOrderAt()).isEqualToIgnoringNanos(orderAt);
 			});
 		}
