@@ -63,6 +63,5 @@ public class ProductRankingRedisRepositoryImpl implements ProductRankingRedisRep
 		if (result != null && result > 0) {
 			longRedisTemplate.expire(targetKey, ttl);
 		}
-		delete(targetKey);
 	}
 }
