@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class QueuePublishCouponUseCase {
+public class PublishCouponUseCase {
 
 	private final UserRepository userRepository;
 	private final UserCouponRedisRepository userCouponRedisRepository;

@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   mysql:
     image: mysql:8.0
@@ -15,166 +16,55 @@ services:
     networks:
       - app-network
 
-  redis-7001:
+  redis:
     image: redis:latest
-    container_name: redis-7001
+    container_name: redis
     ports:
-      - "7001:7001"
-      - "17001:17001"
-    command: >
-      redis-server --port 7001
-                   --bind 0.0.0.0
-                   --cluster-enabled yes
-                   --cluster-config-file nodes-7001.conf
-                   --cluster-node-timeout 5000
-                   --appendonly yes
-                   --cluster-announce-ip 172.20.0.2
-                   --cluster-announce-port 7001
-                   --cluster-announce-bus-port 17001
-                   --protected-mode no
+      - "6379:6379"
     volumes:
-      - ./data/redis-7001:/data
+      - ./data/redis:/data
     networks:
-      redis-cluster:
-        ipv4_address: 172.20.0.2
-      app-network:
+      - app-network
 
-  redis-7002:
-    image: redis:latest
-    container_name: redis-7002
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka
     ports:
-      - "7002:7002"
-      - "17002:17002"
-    command: >
-      redis-server --port 7002
-                   --bind 0.0.0.0
-                   --cluster-enabled yes
-                   --cluster-config-file nodes-7002.conf
-                   --cluster-node-timeout 5000
-                   --appendonly yes
-                   --cluster-announce-ip 172.20.0.3
-                   --cluster-announce-port 7002
-                   --cluster-announce-bus-port 17002
-                   --protected-mode no
-    volumes:
-      - ./data/redis-7002:/data
-    networks:
-      redis-cluster:
-        ipv4_address: 172.20.0.3
-      app-network:
+      - '9092:9092'
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:29092,EXTERNAL://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092,EXTERNAL://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
 
-  redis-7003:
-    image: redis:latest
-    container_name: redis-7003
-    ports:
-      - "7003:7003"
-      - "17003:17003"
-    command: >
-      redis-server --port 7003
-                   --bind 0.0.0.0
-                   --cluster-enabled yes
-                   --cluster-config-file nodes-7003.conf
-                   --cluster-node-timeout 5000
-                   --appendonly yes
-                   --cluster-announce-ip 172.20.0.4
-                   --cluster-announce-port 7003
-                   --cluster-announce-bus-port 17003
-                   --protected-mode no
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
     volumes:
-      - ./data/redis-7003:/data
+      - ./data/kafka:/bitnami/kafka
     networks:
-      redis-cluster:
-        ipv4_address: 172.20.0.4
-      app-network:
+      - app-network
 
-  redis-7004:
-    image: redis:latest
-    container_name: redis-7004
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
     ports:
-      - "7004:7004"
-      - "17004:17004"
-    command: >
-      redis-server --port 7004
-                   --bind 0.0.0.0
-                   --cluster-enabled yes
-                   --cluster-config-file nodes-7004.conf
-                   --cluster-node-timeout 5000
-                   --appendonly yes
-                   --cluster-announce-ip 172.20.0.5
-                   --cluster-announce-port 7004
-                   --cluster-announce-bus-port 17004
-                   --protected-mode no
-    volumes:
-      - ./data/redis-7004:/data
+      - "8090:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local-kafka
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
     networks:
-      redis-cluster:
-        ipv4_address: 172.20.0.5
-      app-network:
+      - app-network
+    depends_on:
+      - kafka
 
-  redis-7005:
-    image: redis:latest
-    container_name: redis-7005
-    ports:
-      - "7005:7005"
-      - "17005:17005"
-    command: >
-      redis-server --port 7005
-                   --bind 0.0.0.0
-                   --cluster-enabled yes
-                   --cluster-config-file nodes-7005.conf
-                   --cluster-node-timeout 5000
-                   --appendonly yes
-                   --cluster-announce-ip 172.20.0.6
-                   --cluster-announce-port 7005
-                   --cluster-announce-bus-port 17005
-                   --protected-mode no
-    volumes:
-      - ./data/redis-7005:/data
-    networks:
-      redis-cluster:
-        ipv4_address: 172.20.0.6
-      app-network:
-
-  redis-7006:
-    image: redis:latest
-    container_name: redis-7006
-    ports:
-      - "7006:7006"
-      - "17006:17006"
-    command: >
-      redis-server --port 7006
-                   --bind 0.0.0.0
-                   --cluster-enabled yes
-                   --cluster-config-file nodes-7006.conf
-                   --cluster-node-timeout 5000
-                   --appendonly yes
-                   --cluster-announce-ip 172.20.0.7
-                   --cluster-announce-port 7006
-                   --cluster-announce-bus-port 17006
-                   --protected-mode no
-    volumes:
-      - ./data/redis-7006:/data
-    networks:
-      redis-cluster:
-        ipv4_address: 172.20.0.7
-      app-network:
 networks:
   app-network:
     driver: bridge
 
-  redis-cluster:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-
-# cluster 초기화 설정
-#docker exec -it redis-7001 \
-#redis-cli --cluster create \
-#host.docker.internal:7001 \
-#host.docker.internal:7002 \
-#host.docker.internal:7003 \
-#host.docker.internal:7004 \
-#host.docker.internal:7005 \
-#host.docker.internal:7006 \
-#--cluster-replicas 1
