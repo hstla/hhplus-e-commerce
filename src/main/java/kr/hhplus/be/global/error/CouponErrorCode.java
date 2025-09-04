@@ -20,6 +20,7 @@ public enum CouponErrorCode implements ErrorCode {
 	NOT_FOUND_COUPON_STOCK(HttpStatus.NOT_FOUND, "Coupon stock not found."),
 	INVALID_COUPON_OWNERSHIP(HttpStatus.FORBIDDEN, "You are not the owner of this coupon."),
 	TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "Too many requests. Please try again later."),
+	KAFKA_PRODUCE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to publish the event. Please try again later."),
 	;
 
 	private final HttpStatus httpStatus;

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.hhplus.be.api.usercoupon.controller.dto.UserCouponRequest;
 import kr.hhplus.be.api.usercoupon.usecase.FindUserCouponUseCase;
-import kr.hhplus.be.api.usercoupon.usecase.QueuePublishCouponUseCase;
+import kr.hhplus.be.api.usercoupon.usecase.IssueCouponUseCase;
 import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponResult;
 import kr.hhplus.be.domain.coupon.model.CouponType;
 import kr.hhplus.be.domain.usercoupon.model.UserCouponStatus;
@@ -43,7 +43,7 @@ class UserCouponControllerUnitTest {
 	@MockitoBean
 	private FindUserCouponUseCase findUserCouponUseCase;
 	@MockitoBean
-	private QueuePublishCouponUseCase queuePublishCouponUseCase;
+	private IssueCouponUseCase issueCouponUseCase;
 
 	private final Long testUserId = 1L;
 	private final Long testCouponId1 = 101L;

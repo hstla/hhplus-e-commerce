@@ -30,7 +30,7 @@ import kr.hhplus.be.domain.usercoupon.infrastructure.JpaUserCouponRepository;
 public class CouponPublishIntegrationTest extends IntegrationTestConfig {
 
 	@Autowired
-	private QueuePublishCouponUseCase queueCouponUseCase;
+	private IssueCouponUseCase queueCouponUseCase;
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
 	@Autowired
