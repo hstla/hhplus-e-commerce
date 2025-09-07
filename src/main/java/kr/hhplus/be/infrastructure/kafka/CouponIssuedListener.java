@@ -1,5 +1,7 @@
 package kr.hhplus.be.infrastructure.kafka;
 
+import static kr.hhplus.be.global.common.kafka.KafkaConstants.*;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +23,7 @@ public class CouponIssuedListener {
 	private final CouponRedisRepository couponRedisRepository;
 	private final UserCouponRedisRepository userCouponRedisRepository;
 
-	@KafkaListener(topics = "coupon-issued", groupId = "coupon-db-sync-group")
+	@KafkaListener(topics = TOPIC_COUPON_ISSUED, groupId = "coupon-db-sync-group")
 	public void handleCouponIssuedEvent(CouponIssuedEvent event) {
 		try {
 			Long userId = event.userId();

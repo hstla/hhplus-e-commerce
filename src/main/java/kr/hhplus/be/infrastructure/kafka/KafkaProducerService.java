@@ -1,5 +1,7 @@
 package kr.hhplus.be.infrastructure.kafka;
 
+import static kr.hhplus.be.global.common.kafka.KafkaConstants.*;
+
 import java.time.LocalDateTime;
 
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KafkaProducerService {
 
-	private static final String TOPIC_COUPON_ISSUED = "coupon-issued";
 	private final KafkaTemplate<String, CouponIssuedEvent> kafkaTemplate;
 
 	public void sendCouponIssuedEvent(Long userId, Long couponId) {
