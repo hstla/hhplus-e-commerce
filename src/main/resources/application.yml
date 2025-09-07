@@ -24,6 +24,21 @@ spring:
     redis:
       redisson:
         config: classpath:redisson.yml
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+        # 메시지 키는 보통 문자열을 사용합니다.
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        # 메시지 값은 JSON 형태로 보내기 위해 JsonSerializer를 사용합니다.
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      # 동일한 그룹 ID를 가진 컨슈머들은 하나의 토픽을 나눠서 처리합니다.
+      group-id: hhplus-group
+      # 컨슈머가 처음 실행될 때 읽을 오프셋을 설정합니다. (earliest: 가장 오래된 메시지부터)
+      auto-offset-reset: earliest
+      # JSON 메시지를 객체로 역직렬화하기 위한 설정
+      properties:
+        spring.json.trusted.packages: "*"
 
 ---
 spring.config.activate.on-profile: local, test
