@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import kr.hhplus.be.api.usercoupon.controller.dto.UserCouponRequest;
 import kr.hhplus.be.api.usercoupon.controller.dto.UserCouponResponse;
 import kr.hhplus.be.api.usercoupon.usecase.FindUserCouponUseCase;
-import kr.hhplus.be.api.usercoupon.usecase.QueuePublishCouponUseCase;
+import kr.hhplus.be.api.usercoupon.usecase.IssueCouponUseCase;
 import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponResult;
 import kr.hhplus.be.global.common.CommonResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +21,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserCouponController implements CouponApiSpec{
 
-	// private final PublishCouponUseCase publishCouponUseCase;
-	private final QueuePublishCouponUseCase queuePublishCouponUseCase;
+	private final IssueCouponUseCase issueCouponUseCase;
 	private final FindUserCouponUseCase findUserCouponUseCase;
 
 	@Override
 	@PostMapping("/publish")
 	public ResponseEntity<Void> publishCoupon(UserCouponRequest.Publish couponPublishRequest) {
-		queuePublishCouponUseCase.execute(couponPublishRequest.toCommand());
-		return ResponseEntity.accepted().build();
+		issueCouponUseCase.execute(couponPublishRequest.toCommand());
+		return ResponseEntity.ok().build();
 	}
 
 	@Override

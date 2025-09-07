@@ -1,21 +1,27 @@
 package kr.hhplus.be.api.usercoupon.usecase;
 
+import static kr.hhplus.be.global.common.redis.RedisKeyName.*;
+
 import org.springframework.stereotype.Component;
 
 import kr.hhplus.be.api.usercoupon.usecase.dto.UserCouponCommand;
+import kr.hhplus.be.domain.coupon.repository.CouponRedisRepository;
 import kr.hhplus.be.domain.user.repository.UserRepository;
 import kr.hhplus.be.domain.usercoupon.repository.UserCouponRedisRepository;
 import kr.hhplus.be.global.error.CouponErrorCode;
 import kr.hhplus.be.global.error.RestApiException;
 import kr.hhplus.be.global.error.UserErrorCode;
+import kr.hhplus.be.infrastructure.kafka.KafkaProducerService;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class PublishCouponUseCase {
+public class IssueCouponUseCase {
 
 	private final UserRepository userRepository;
 	private final UserCouponRedisRepository userCouponRedisRepository;
+	private final CouponRedisRepository couponRedisRepository;
+	private final KafkaProducerService kafkaProducerService;
 
 	public void execute(UserCouponCommand.Publish command) {
 		Long userId = command.userId();
@@ -40,7 +46,26 @@ public class PublishCouponUseCase {
 			throw new RestApiException(CouponErrorCode.DUPLICATED_COUPON);
 		}
 
-		// 4. 모든 검증 통과 후, 대기열에 추가
-		userCouponRedisRepository.addCouponIssueQueue(userId, couponId);
+		// 4. 즉시 쿠폰 재고 차감.
+		String stockKey = COUPON_STOCK_CACHE.toKey(couponId);
+		Long remainingStock = couponRedisRepository.decrementStock(stockKey);
+
+		if (remainingStock != null && remainingStock >= 0) {
+			// 5. 성공 시, Kafka에 이벤트 발행 (후속 처리를 위임)
+			try {
+				kafkaProducerService.sendCouponIssuedEvent(userId, couponId);
+			} catch (Exception e) {
+				// Kafka 발행 실패 시, 차감했던 재고를 다시 복구 (보상 트랜잭션)
+				couponRedisRepository.incrementStock(stockKey, 1L);
+				throw new RestApiException(CouponErrorCode.KAFKA_PRODUCE_FAILED);
+			}
+		} else {
+			// 6. 재고 소진 시, 롤백 및 실패 응답
+			// decrementStock으로 음수가 된 재고를 다시 0으로 맞춰줍니다.
+			if (remainingStock != null) {
+				couponRedisRepository.incrementStock(stockKey, 1L);
+			}
+			throw new RestApiException(CouponErrorCode.OUT_OF_STOCK_COUPON);
+		}
 	}
 }
