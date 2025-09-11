@@ -74,10 +74,11 @@ public class RankProductUseCase {
 		int rank = 1;
 		for (ZSetOperations.TypedTuple<Long> tuple : raw) {
 			Long productId = tuple.getValue();
-			long soldQty   = tuple.getScore() != null ? tuple.getScore().longValue() : 0L;
+			long soldQty = tuple.getScore() != null ? tuple.getScore().longValue() : 0L;
 
 			Product product = productRepository.findById(productId);
-			ProductResponse.ProductRank dto = ProductResponse.ProductRank.of(productId, product.getName(), product.getDescription(), product.getCategory(), soldQty, rank);
+			ProductResponse.ProductRank dto = ProductResponse.ProductRank.of(productId, product.getName(),
+				product.getDescription(), product.getCategory(), soldQty, rank);
 
 			result.add(dto);
 			rank++;

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import kr.hhplus.be.domain.coupon.model.Coupon;
@@ -31,8 +32,9 @@ public class UseUserCouponListener {
 	private final CouponDiscountService couponDiscountService;
 
 	@Transactional(propagation = REQUIRES_NEW)
-	@TransactionalEventListener
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public long handleOrderCreated(StockDecreasedEvent event) {
+		log.info("CouponUsedEvent 실행: {}", event.orderId());
 		long discountPrice = 0L;
 		LocalDateTime now = LocalDateTime.now();
 
@@ -59,6 +61,7 @@ public class UseUserCouponListener {
 					event.pricedOrderItems()));
 
 		} catch (Exception e) {
+			log.warn("쿠폰 사용 실패: {}", e);
 			eventPublisher.publishEvent(new CouponUseFailedEvent(event.orderId(), event.pricedOrderItems()));
 		}
 		return discountPrice;

@@ -35,18 +35,18 @@ public class CouponRedisRepositoryImpl implements CouponRedisRepository {
 	}
 
 	@Override
-	public Set<ZSetOperations.TypedTuple<Long>> popCouponIssueQueue(String couponId, int count) {
+	public Set<ZSetOperations.TypedTuple<Long>> popCouponIssueQueue(Long couponId, int count) {
 		return longRedisTemplate.opsForZSet().popMin(COUPON_ISSUE_QUEUE.toKey(couponId), count);
 	}
 
 	@Override
-	public Long decrementStock(String stockKey) {
-		return longRedisTemplate.opsForValue().increment(stockKey, -1L);
+	public Long decrementStock(Long couponId) {
+		return longRedisTemplate.opsForValue().increment(COUPON_STOCK_CACHE.toKey(couponId), -1L);
 	}
 
 	@Override
-	public void incrementStock(String stockKey, long value) {
-		longRedisTemplate.opsForValue().increment(COUPON_STOCK_CACHE.toKey(stockKey), value);
+	public void incrementStock(Long couponId, long value) {
+		longRedisTemplate.opsForValue().increment(COUPON_STOCK_CACHE.toKey(couponId), value);
 	}
 
 	@Override
