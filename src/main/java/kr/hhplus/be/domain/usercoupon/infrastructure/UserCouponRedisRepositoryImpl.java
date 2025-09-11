@@ -20,8 +20,8 @@ public class UserCouponRedisRepositoryImpl implements UserCouponRedisRepository 
 
 	@Override
 	public boolean isRateLimited(Long userId, Long couponId) {
-		String key = RedisKeyName.COUPON_ISSUE_REQUEST_LIMIT.toKey(userId, couponId);
-		Boolean isNewKey = longRedisTemplate.opsForValue().setIfAbsent(key, 1L, RedisKeyName.COUPON_ISSUE_REQUEST_LIMIT.getTtl());
+		String key = COUPON_ISSUE_REQUEST_LIMIT.toKey(userId, couponId);
+		Boolean isNewKey = longRedisTemplate.opsForValue().setIfAbsent(key, 1L, COUPON_ISSUE_REQUEST_LIMIT.getTtl());
 		return Boolean.FALSE.equals(isNewKey);
 	}
 
@@ -33,14 +33,14 @@ public class UserCouponRedisRepositoryImpl implements UserCouponRedisRepository 
 
 	@Override
 	public boolean isDuplicateIssue(Long userId, Long couponId) {
-		String key = RedisKeyName.COUPON_ISSUED_USER_BITMAP.toKey(couponId);
+		String key = COUPON_ISSUED_USER_BITMAP.toKey(couponId);
 		Boolean hasIssued = longRedisTemplate.opsForValue().getBit(key, userId);
 		return Boolean.TRUE.equals(hasIssued);
 	}
 
 	@Override
 	public void addCouponIssueQueue(Long userId, Long couponId) {
-		String queueKey = RedisKeyName.COUPON_ISSUE_QUEUE.toKey(couponId);
+		String queueKey = COUPON_ISSUE_QUEUE.toKey(couponId);
 		long timestamp = System.currentTimeMillis();
 		longRedisTemplate.opsForZSet().add(queueKey, userId, timestamp);
 	}

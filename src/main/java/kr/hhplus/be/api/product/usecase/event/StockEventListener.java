@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import kr.hhplus.be.api.product.usecase.helper.ProductOptionStockSpinLockManager;
@@ -29,8 +32,10 @@ public class StockEventListener {
 	private final ProductOptionRepository productOptionRepository;
 	private final ApplicationEventPublisher eventPublisher;
 
-	@TransactionalEventListener
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleOrderCreated(OrderCreatedEvent event) {
+		log.info("상품 재고 감소 로직 시작");
 		Map<Long, Integer> optionQuantities = event.orderItems().stream()
 			.collect(Collectors.toMap(
 				OrderRequestItemInfo::productOptionId,
@@ -67,6 +72,7 @@ public class StockEventListener {
 			));
 
 		} catch (Exception e) {
+			log.warn("상품 재고 감소 실패: {}", e);
 			eventPublisher.publishEvent(new StockDecreaseFailedEvent(event.orderId()));
 		}
 	}
