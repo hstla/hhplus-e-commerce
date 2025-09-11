@@ -38,8 +38,8 @@ public class CouponIssuanceScheduler {
 	}
 
 	private void processQueueForCoupon(Long couponId) {
-		String queueKey = COUPON_ISSUE_QUEUE.toKey(couponId);
-		String stockKey = COUPON_STOCK_CACHE.toKey(couponId);
+		Long queueKey = Long.getLong(COUPON_ISSUE_QUEUE.toKey(couponId));
+		Long stockKey = Long.getLong(COUPON_STOCK_CACHE.toKey(couponId));
 
 		// 3. 한 번에 100명씩 대기열에서 꺼낸다
 		Set<ZSetOperations.TypedTuple<Long>> userTuples = couponRedisRepository.popCouponIssueQueue(queueKey, 100);

@@ -1,13 +1,13 @@
 package kr.hhplus.be.api.order.usecase.event;
 
-import static org.springframework.transaction.annotation.Propagation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import kr.hhplus.be.domain.order.component.OrderPriceCalculator;
@@ -32,33 +32,40 @@ public class OrderCompletionListener {
 	private final OrderPriceCalculator orderPriceCalculator;
 	private final ApplicationEventPublisher eventPublisher;
 
-	@Transactional(propagation = REQUIRES_NEW)
-	@TransactionalEventListener
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void orderCompleteEvent(CouponUsedEvent event) {
-		Order order = orderRepository.findById(event.orderId());
+		try {
+			log.info("주문 성공 이벤트 시작, {}", event);
 
-		long totalPrice = orderPriceCalculator.calculateTotalPrice(
-			event.totalOriginalPrice(),
-			event.discountPrice()
-		);
+			Order order = orderRepository.findById(event.orderId());
 
-		order.markAsAwaitingPayment(
-			event.totalOriginalPrice(),
-			event.discountPrice(),
-			totalPrice
-		);
-		orderRepository.save(order);
+			long totalPrice = orderPriceCalculator.calculateTotalPrice(
+				event.totalOriginalPrice(),
+				event.discountPrice()
+			);
 
-		Map<Long, Integer> productOrderCounts = new HashMap<>();
+			order.markAsAwaitingPayment(
+				event.totalOriginalPrice(),
+				event.discountPrice(),
+				totalPrice
+			);
+			orderRepository.save(order);
 
-		for (PricedOrderItemInfo itemInfo : event.pricedOrderItems()) {
-			OrderProduct orderProduct = OrderProduct.create(order.getId(), ProductOptionSnapshot.create(
-				itemInfo.productOptionId(), itemInfo.name(), itemInfo.quantity(), itemInfo.price()));
-			orderProductRepository.save(orderProduct);
+			Map<Long, Integer> productOrderCounts = new HashMap<>();
 
-			productOrderCounts.merge(itemInfo.productId(), itemInfo.quantity(), Integer::sum);
+			for (PricedOrderItemInfo itemInfo : event.pricedOrderItems()) {
+				OrderProduct orderProduct = OrderProduct.create(order.getId(), ProductOptionSnapshot.create(
+					itemInfo.productOptionId(), itemInfo.name(), itemInfo.quantity(), itemInfo.price()));
+				orderProductRepository.save(orderProduct);
+
+				productOrderCounts.merge(itemInfo.productId(), itemInfo.quantity(), Integer::sum);
+			}
+
+			eventPublisher.publishEvent(new OrderCompletedEvent(event.orderId(), productOrderCounts));
+
+		} catch (Exception e) {
+			log.warn("주문 완료 실패: orderId={}", event.orderId(), e);
 		}
-
-		eventPublisher.publishEvent(new OrderCompletedEvent(event.orderId(), productOrderCounts));
 	}
 }
