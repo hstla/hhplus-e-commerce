@@ -5,6 +5,9 @@ import static kr.hhplus.be.global.common.kafka.KafkaConstants.*;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import kr.hhplus.be.domain.coupon.repository.CouponRedisRepository;
 import kr.hhplus.be.domain.shared.kafka.CouponIssuedEvent;
 import kr.hhplus.be.domain.usercoupon.infrastructure.UserCouponSyncTask;

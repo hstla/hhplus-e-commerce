@@ -1,0 +1,29 @@
+version: '3.8'
+
+networks:
+  e-commerce-java_app-network:
+    external: true
+
+services:
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+    networks:
+      - e-commerce-java_app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - e-commerce-java_app-network
+    depends_on:
+      - influxdb
