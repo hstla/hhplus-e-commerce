@@ -7,4 +7,5 @@ import lombok.NoArgsConstructor;
 public final class KafkaConstants {
 
 	public static final String TOPIC_COUPON_ISSUED = "coupon-issued";
+	public static final String TOPIC_COUPON_ISSUED_SUCCESS = "coupon-issued-success";
 }

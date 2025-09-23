@@ -31,6 +31,7 @@ public class DistributedSpinLockAspect {
 	@Around("@annotation(distributedSpinLock)")
 	public Object around(ProceedingJoinPoint joinPoint, DistributedSpinLock distributedSpinLock) throws Throwable {
 		List<String> lockKeys = lockKeyResolver.resolveLockKeys(joinPoint, distributedSpinLock.keys());
+		log.info("분산락 시도 - 키: {}", lockKeys);
 
 		// 단일락 and 멀티락 처리
 		if (lockKeys.size() == 1) {
@@ -105,7 +106,6 @@ public class DistributedSpinLockAspect {
 					} finally {
 						if (multiLock.isHeldByCurrentThread()) {
 							multiLock.unlock();
-							log.debug("멀티 스핀락 해제 완료: {}", sortedKeys);
 						}
 					}
 				}

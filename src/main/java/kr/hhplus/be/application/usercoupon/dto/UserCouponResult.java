@@ -1,0 +1,68 @@
+package kr.hhplus.be.application.usercoupon.dto;
+
+import java.time.LocalDateTime;
+
+import kr.hhplus.be.domain.coupon.model.Coupon;
+import kr.hhplus.be.domain.coupon.model.CouponType;
+import kr.hhplus.be.domain.usercoupon.model.UserCoupon;
+import kr.hhplus.be.domain.usercoupon.model.UserCouponStatus;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class UserCouponResult {
+
+	public record CouponInfo(
+		Long couponId,
+		String couponName,
+		CouponType couponType,
+		Long discountValue,
+		LocalDateTime expireAt
+	) {
+		public static CouponInfo of(Coupon coupon) {
+			return new CouponInfo(
+				coupon.getId(),
+				coupon.getName(),
+				coupon.getDiscountType(),
+				coupon.getDiscountValue(),
+				coupon.getExpireAt()
+			);
+		}
+	}
+
+	public record UserCouponInfo(
+		// userCoupon fields
+		Long userCouponId,
+		UserCouponStatus couponStatus,
+		LocalDateTime usedAt,
+		// coupon fields
+		Long couponId,
+		String couponName,
+		CouponType couponType,
+		Long discountValue,
+		LocalDateTime expireAt
+	) {
+		public static UserCouponInfo of(UserCoupon userCoupon, Coupon coupon) {
+			return new UserCouponInfo(
+				userCoupon.getId(),
+				userCoupon.getStatus(),
+				userCoupon.getUsedAt(),
+				coupon.getId(),
+				coupon.getName(),
+				coupon.getDiscountType(),
+				coupon.getDiscountValue(),
+				coupon.getExpireAt()
+			);
+		}
+	}
+
+	public record UserCouponConfirmation (
+		String status,
+		String message,
+		LocalDateTime issuedAt
+	) {
+		public  static UserCouponConfirmation of(String status, String message,  LocalDateTime issuedAt) {
+			return new UserCouponConfirmation(status, message, issuedAt);
+		}
+	}
+}

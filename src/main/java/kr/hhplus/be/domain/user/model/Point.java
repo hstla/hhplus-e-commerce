@@ -33,9 +33,6 @@ public class Point {
 	}
 
 	public Point charge(Long chargeAmount) {
-		if (chargeAmount <= 0) {
-			throw new RestApiException(UserErrorCode.INVALID_CHARGE_AMOUNT);
-		}
 		if (chargeAmount < MIN_CHARGE_AMOUNT ||  chargeAmount > MAX_CHARGE_AMOUNT) {
 			throw new RestApiException(UserErrorCode.INVALID_USER_POINT);
 		}
@@ -43,9 +40,6 @@ public class Point {
 	}
 
 	public Point use(Long useAmount) {
-		if (useAmount < 0) {
-			throw new RestApiException(UserErrorCode.INVALID_PAY_AMOUNT);
-		}
 		if (isLessThan(useAmount)) {
 			throw new RestApiException(UserErrorCode.INSUFFICIENT_USER_POINT);
 		}

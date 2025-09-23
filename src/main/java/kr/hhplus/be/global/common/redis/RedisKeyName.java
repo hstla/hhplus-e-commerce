@@ -15,11 +15,12 @@ public enum RedisKeyName {
 	PRODUCT_SALES_RANKING_3DAYS("product:sales:3days", Duration.ofDays(1)),
 
 	// ===== Dynamic Keys =====
-	COUPON_ISSUE_REQUEST_LIMIT("coupon:issue_limit:user:%d:coupon:%d", Duration.ofMinutes(3)),
-	COUPON_ISSUED_USER_BITMAP("coupon:issued:user_bitmap:%d", null),
-	COUPON_ISSUE_QUEUE("coupon:issue_queue:%d", null),
-	COUPON_STOCK_CACHE("coupon:stock:%d", null),
-	PRODUCT_TODAY_SALES_RANKING("product:sales:%s", Duration.ofDays(3)),
+	COUPON_ISSUE_REQUEST_LIMIT("coupon:issue:rate-limit:user:%d:coupon:%d", Duration.ofMinutes(3)),
+	COUPON_ISSUED_USER_BITMAP("coupon:%d:issued-users", null),
+	COUPON_ISSUE_QUEUE("coupon:%d:issue-queue", null),
+	COUPON_STOCK_CACHE("coupon:%d:stock", null),
+	PRODUCT_TODAY_SALES_RANKING("ranking:product:sales:daily:%s", Duration.ofDays(3)),
+	COUPON_ISSUE_TASK_STATUS("coupon:task:issue:%s", Duration.ofMinutes(3)),
 	;
 
 	private static final String PREFIX = "hhplus:cache:";

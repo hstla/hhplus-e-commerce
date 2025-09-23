@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "coupon")
+@Slf4j
 public class Coupon extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,10 +50,8 @@ public class Coupon extends BaseEntity {
 		return new Coupon(null, name, discountType, discountValue, initialStock, expireAt);
 	}
 
-	public void validateNotExpired(LocalDateTime nowDateTime) {
-		if (this.expireAt.isBefore(nowDateTime)) {
-			throw new RestApiException(CouponErrorCode.EXPIRED_COUPON);
-		}
+	public boolean validateNotExpired(LocalDateTime nowDateTime) {
+		return !this.expireAt.isBefore(nowDateTime);
 	}
 
 	private static void validateDiscountValue(CouponType discountType, Long discountValue) {

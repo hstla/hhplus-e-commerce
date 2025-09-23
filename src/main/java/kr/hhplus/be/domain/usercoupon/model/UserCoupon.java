@@ -52,12 +52,12 @@ public class UserCoupon extends BaseEntity {
 	}
 
 	public void use(LocalDateTime useDateTime) {
-		validateUsability();
+		ensureUsable();
 		this.status = UserCouponStatus.USED;
 		this.usedAt = useDateTime;
 	}
 
-	public void validateUsability() {
+	private void ensureUsable() {
 		if (this.status != UserCouponStatus.ISSUED) {
 			throw new RestApiException(CouponErrorCode.INVALID_COUPON_TYPE);
 		}

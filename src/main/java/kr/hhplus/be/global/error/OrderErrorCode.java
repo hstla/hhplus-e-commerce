@@ -14,6 +14,7 @@ public enum OrderErrorCode implements ErrorCode {
 	INVALID_ORDER_QUANTITY(HttpStatus.BAD_REQUEST, "Product quantity must be at least 1"),
 	OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "Requested product option does not exist"),
 	OPTION_NOT_PURCHASABLE(HttpStatus.BAD_REQUEST, "Requested product option is not available for purchase"),
+	CANNOT_PAY_ORDER(HttpStatus.BAD_REQUEST, "Only orders in AWAITING_PAYMENT status can be paid"),
 	;
 
 	private final HttpStatus httpStatus;
