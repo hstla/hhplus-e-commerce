@@ -8,17 +8,18 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import kr.hhplus.be.domain.common.event.CouponIssuedEvent;
+import kr.hhplus.be.domain.common.event.CouponIssuedEventProducer;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CouponIssuedEventProducerImpl implements kr.hhplus.be.domain.common.event.CouponIssuedEventProducer {
+public class KafkaCouponIssuedEventProducer implements CouponIssuedEventProducer {
 
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 
 	@Override
-	public void sendCouponIssuedEvent(Long userId, Long couponId) {
-		CouponIssuedEvent event = new CouponIssuedEvent(userId, couponId, LocalDateTime.now());
+	public void sendCouponIssuedEvent(String taskId, Long userId, Long couponId,  LocalDateTime now) {
+		CouponIssuedEvent event = new CouponIssuedEvent(taskId, userId, couponId, now);
 		kafkaTemplate.send(TOPIC_COUPON_ISSUED, String.valueOf(couponId), event);
 	}
 }
