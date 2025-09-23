@@ -128,11 +128,11 @@ class UserCouponTest {
 			LocalDateTime now = LocalDateTime.now();
 			UserCoupon userCoupon = UserCoupon.publish(userId, couponId, now);
 
-			// when then
-			assertThatThrownBy(() -> userCoupon.validateOwnerShip(otherUserId))
-				.isInstanceOf(RestApiException.class)
-				.hasMessage(CouponErrorCode.INVALID_COUPON_OWNERSHIP.getMessage());
+			// when
+			boolean validated = userCoupon.validateOwnerShip(otherUserId);
 
+			// then
+			assertThat(validated).isFalse();
 		}
 	}
 }

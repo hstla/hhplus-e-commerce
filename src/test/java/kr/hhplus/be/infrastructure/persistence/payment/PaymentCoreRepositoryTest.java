@@ -1,4 +1,4 @@
-package kr.hhplus.be.domain.payment.infrastructure;
+package kr.hhplus.be.infrastructure.persistence.payment;
 
 import static org.assertj.core.api.SoftAssertions.*;
 
@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Import;
 import kr.hhplus.be.config.RepositoryTestConfig;
 import kr.hhplus.be.domain.payment.model.Payment;
 import kr.hhplus.be.domain.payment.model.PaymentStatus;
-import kr.hhplus.be.infrastructure.persistence.payment.JpaPaymentRepository;
-import kr.hhplus.be.infrastructure.persistence.payment.PaymentCoreRepository;
 
 @Import({PaymentCoreRepository.class})
 @DisplayName("PaymentCoreRepository 단위 테스트")

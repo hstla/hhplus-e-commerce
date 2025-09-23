@@ -1,4 +1,4 @@
-package kr.hhplus.be.domain.order.infrastructure;
+package kr.hhplus.be.infrastructure.persistence.order;
 
 import static org.assertj.core.api.SoftAssertions.*;
 
@@ -15,9 +15,6 @@ import kr.hhplus.be.config.RepositoryTestConfig;
 import kr.hhplus.be.domain.order.model.Order;
 import kr.hhplus.be.domain.order.model.OrderProduct;
 import kr.hhplus.be.domain.order.model.ProductOptionSnapshot;
-import kr.hhplus.be.infrastructure.persistence.order.JpaOrderProductRepository;
-import kr.hhplus.be.infrastructure.persistence.order.JpaOrderRepository;
-import kr.hhplus.be.infrastructure.persistence.order.OrderProductCoreRepository;
 
 @Import({OrderProductCoreRepository.class})
 @DisplayName("OrderProductCoreRepository 테스트")

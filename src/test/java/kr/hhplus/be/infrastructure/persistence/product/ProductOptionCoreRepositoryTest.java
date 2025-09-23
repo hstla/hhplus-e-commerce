@@ -1,4 +1,4 @@
-package kr.hhplus.be.domain.product.infrastructure;
+package kr.hhplus.be.infrastructure.persistence.product;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -16,9 +16,6 @@ import kr.hhplus.be.config.RepositoryTestConfig;
 import kr.hhplus.be.domain.product.model.Product;
 import kr.hhplus.be.domain.product.model.ProductCategory;
 import kr.hhplus.be.domain.product.model.ProductOption;
-import kr.hhplus.be.infrastructure.persistence.product.JpaProductOptionRepository;
-import kr.hhplus.be.infrastructure.persistence.product.JpaProductRepository;
-import kr.hhplus.be.infrastructure.persistence.product.ProductOptionCoreRepository;
 
 @Import({ProductOptionCoreRepository.class})
 @DisplayName("ProductOptionCoreRepository 테스트")

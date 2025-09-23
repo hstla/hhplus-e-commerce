@@ -1,4 +1,4 @@
-package kr.hhplus.be.domain.user.infrastructure;
+package kr.hhplus.be.infrastructure.persistence.user;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -11,8 +11,6 @@ import org.springframework.context.annotation.Import;
 
 import kr.hhplus.be.config.RepositoryTestConfig;
 import kr.hhplus.be.domain.user.model.User;
-import kr.hhplus.be.infrastructure.persistence.user.JpaUserRepository;
-import kr.hhplus.be.infrastructure.persistence.user.UserCoreRepository;
 
 @Import({UserCoreRepository.class})
 @DisplayName("UserCoreRepository 테스트")

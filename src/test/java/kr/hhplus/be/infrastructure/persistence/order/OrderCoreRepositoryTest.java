@@ -1,4 +1,4 @@
-package kr.hhplus.be.domain.order.infrastructure;
+package kr.hhplus.be.infrastructure.persistence.order;
 
 import static org.assertj.core.api.SoftAssertions.*;
 
@@ -14,12 +14,10 @@ import org.springframework.context.annotation.Import;
 import kr.hhplus.be.config.RepositoryTestConfig;
 import kr.hhplus.be.domain.order.model.Order;
 import kr.hhplus.be.domain.order.model.OrderStatus;
-import kr.hhplus.be.infrastructure.persistence.order.JpaOrderRepository;
-import kr.hhplus.be.infrastructure.persistence.order.OrderCoreRepository;
 
 @Import({OrderCoreRepository.class})
 @DisplayName("OrderCoreRepository 테스트")
-class OrderCoreRepositoryTest  extends RepositoryTestConfig {
+class OrderCoreRepositoryTest extends RepositoryTestConfig {
 
 	@Autowired
 	private JpaOrderRepository jpaOrderRepository;
