@@ -76,6 +76,10 @@ public class Order extends BaseEntity {
 		this.status = OrderStatus.FAILED;
 	}
 
+	public boolean validatePayable() {
+		return this.status == OrderStatus.AWAITING_PAYMENT;
+	}
+
 	public void markAsAwaitingPayment(Long originalPrice, Long discountPrice, long totalPrice) {
 		this.originalPrice = originalPrice;
 		this.discountPrice = discountPrice;

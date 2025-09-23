@@ -67,9 +67,6 @@ public class UserCoupon extends BaseEntity {
 	}
 
 	public boolean validateOwnerShip(Long inputUserId) {
-		if (!userId.equals(inputUserId)) {
-			throw new RestApiException(CouponErrorCode.INVALID_COUPON_OWNERSHIP);
-		}
-		return true;
+		return userId.equals(inputUserId);
 	}
 }

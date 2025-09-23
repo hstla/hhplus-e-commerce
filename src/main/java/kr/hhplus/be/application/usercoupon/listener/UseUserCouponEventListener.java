@@ -18,13 +18,15 @@ import kr.hhplus.be.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.domain.coupon.service.CouponDiscountService;
 import kr.hhplus.be.domain.usercoupon.model.UserCoupon;
 import kr.hhplus.be.domain.usercoupon.repository.UserCouponRepository;
+import kr.hhplus.be.global.error.CouponErrorCode;
+import kr.hhplus.be.global.error.RestApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UseUserCouponListener {
+public class UseUserCouponEventListener {
 
 	private final ApplicationEventPublisher eventPublisher;
 	private final UserCouponRepository userCouponRepository;
@@ -34,7 +36,7 @@ public class UseUserCouponListener {
 	@Transactional(propagation = REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public long handleOrderCreated(StockDecreasedEvent event) {
-		log.info("CouponUsedEvent 실행: {}", event.orderId());
+		log.info("쿠폰 사용 로직 시작: {}", event.orderId());
 		long discountPrice = 0L;
 		LocalDateTime now = LocalDateTime.now();
 
@@ -47,10 +49,14 @@ public class UseUserCouponListener {
 			}
 
 			UserCoupon userCoupon = userCouponRepository.findById(event.userCouponId());
-			userCoupon.validateOwnerShip(event.userId());
+			if (!userCoupon.validateOwnerShip(event.userId())) {
+				throw new RestApiException(CouponErrorCode.INVALID_COUPON_OWNERSHIP);
+			}
 
 			Coupon findCoupon = couponRepository.findById(userCoupon.getCouponId());
-			findCoupon.validateNotExpired(now);
+			if (!findCoupon.validateNotExpired(now)) {
+				throw new RestApiException(CouponErrorCode.EXPIRED_COUPON);
+			}
 
 			discountPrice = couponDiscountService.calculateDiscount(findCoupon, event.totalOriginalPrice());
 			userCoupon.use(now);
