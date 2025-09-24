@@ -3,11 +3,13 @@ package kr.hhplus.be.application.product.usecase;
 import static kr.hhplus.be.global.common.redis.RedisKeyName.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
@@ -29,20 +31,36 @@ public class RankProductUseCase {
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yy-MM-dd");
 	private static final int TOP_RANK_LIMIT = 5;
 	private static final int AGGREGATE_DAYS = 3;
+	private final RankRepository rankRepository;
 
 	public List<ProductResponse.ProductRank> getTop5Products() {
-		// 1) 캐시(정렬된 ZSet)에서 바로 Top‑5 읽기
-		String topKey = PRODUCT_SALES_RANKING_3DAYS.toKey();
-		Set<ZSetOperations.TypedTuple<Long>> topRankCached = productRankingRedisRepository.get3DaysTopRanking(TOP_RANK_LIMIT);
+		LocalDateTime endDate = LocalDateTime.now();
+		LocalDateTime startDate = endDate.minusDays(3);
 
-		// 2) 캐시가 비었으면 집계하고 다시 읽는다
-		if (topRankCached == null || topRankCached.isEmpty()) {
-			aggregateAndCacheTop5(topKey);
-			topRankCached = productRankingRedisRepository.get3DaysTopRanking(TOP_RANK_LIMIT);
+		List<ProductRank2> top5Products = rankRepository.findTop5ByPeriod(startDate, endDate, PageRequest.of(0, 5));
+
+		List<ProductResponse.ProductRank> result = new ArrayList<>(List.of());
+
+		for (int i = 0; i < top5Products.size(); i++) {
+			result.add(ProductResponse.ProductRank.of(top5Products.get(i), i + 1));
 		}
 
-		return toRankDto(topRankCached);
+		return result;
 	}
+
+	// public List<ProductResponse.ProductRank> getTop5Products() {
+	// 	// 1) 캐시(정렬된 ZSet)에서 바로 Top‑5 읽기
+	// 	String topKey = PRODUCT_SALES_RANKING_3DAYS.toKey();
+	// 	Set<ZSetOperations.TypedTuple<Long>> topRankCached = productRankingRedisRepository.get3DaysTopRanking(TOP_RANK_LIMIT);
+	//
+	// 	// 2) 캐시가 비었으면 집계하고 다시 읽는다
+	// 	if (topRankCached == null || topRankCached.isEmpty()) {
+	// 		aggregateAndCacheTop5(topKey);
+	// 		topRankCached = productRankingRedisRepository.get3DaysTopRanking(TOP_RANK_LIMIT);
+	// 	}
+	//
+	// 	return toRankDto(topRankCached);
+	// }
 
 	private void aggregateAndCacheTop5(String targetKey) {
 		List<String> dailyKeys = new ArrayList<>();

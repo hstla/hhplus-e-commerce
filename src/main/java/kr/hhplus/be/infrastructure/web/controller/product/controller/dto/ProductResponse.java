@@ -3,6 +3,7 @@ package kr.hhplus.be.infrastructure.web.controller.product.controller.dto;
 import java.util.List;
 
 import kr.hhplus.be.application.product.dto.ProductResult;
+import kr.hhplus.be.application.product.usecase.ProductRank2;
 import kr.hhplus.be.domain.product.model.ProductCategory;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,11 @@ public class ProductResponse {
 		public static ProductRank of (Long productId, String productName, String productDescription, ProductCategory productCategory, Long totalSold, int rank) {
 			return new ProductRank(productId, productName, productDescription, productCategory, totalSold, rank);
 		}
+
+		public static ProductRank of (ProductRank2 a, int rank) {
+			return new ProductRank(a.getProductId(), a.getProductName(), a.getProductDescription(), a.getProductCategory(), a.getTotalSold(), rank);
+		}
+
 	}
 
 	public record ProductOptions(
