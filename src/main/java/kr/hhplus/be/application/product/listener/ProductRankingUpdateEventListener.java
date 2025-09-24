@@ -22,6 +22,7 @@ public class ProductRankingUpdateEventListener {
 	@Async
 	@TransactionalEventListener
 	public void updateProductRankingCache(OrderCompletedEvent event) {
+		log.info("랭킹 업데이트 시작");
 		LocalDateTime now =  LocalDateTime.now();
 		for (Map.Entry<Long, Integer> entry : event.productOrderCounts().entrySet()) {
 			productRankingRedisRepository.updateProductSalesRanking(entry.getKey(), entry.getValue(), now);
