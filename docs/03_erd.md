@@ -1,25 +1,17 @@
-## ✅ Domain Class Diagram
+# ✅ 주요 Diagram
+## 목차
+- [요구사항 분석](01_Requirements_Analysis.md)
+- [ERD](03_erd.md)
+- [핵심 로직 다이어그램](02_Sequence_Diagram.md)
+- [플로우 차트](04_flowchart.md)
+- [아키텍처 및 패키지 구조](05_Architecture.md)
+- [↩️ README로 돌아가기](../README.md#주요기능-및-아키텍처-링크들)
 
+## ✅ Domain Class Diagram
 ![도메인 클래스 다이어그램](./picture/domain_diagram.png)
 
-### Aggregate root 분리 이유
-user_coupon를 user, payment를 order와 하나의 aggregate로 묶을지 고민했지만, 다음과 같은 이유로 별도의 aggregate로 분리하기로 결정하였습니다.
-
-도메인의 책임이 명확히 분리되어 있음
-user_coupon은 쿠폰의 사용 가능 여부 및 상태 관리를 책임지며, payment는 결제 수단, 결제 승인 및 실패와 같은 결제 흐름을 책임집니다. 
-이는 user, order 도메인과는 별도로 독립적인 비즈니스 로직을 갖고 있습니다.
-
-라이프사이클이 다름
-order는 주문이 생성될 때부터 결제 완료까지의 흐름을 따르지만, payment는 주문이 생성된 이후에도 결제 요청, 승인, 실패, 취소 등 자체적인 라이프사이클을 가져, 
-동일한 aggregate로 묶는 것이 오히려 응집도를 해치게 됩니다.
-
-트랜잭션 경계를 작게 가져가기 위함
-하나의 order에 payment를 종속되게 하면 주문과 결제 시 트랜잭션의 크기가 너무 커져, 
-DB 성능 저하 및 Lock 경합이 발생할 수 있습니다.
-
-
 ## ✅ ERD
-<img src="./picture/erd.png" width="745" height="931" alt="ERD 다이어그램">
+![ERD 다이어그램](./picture/erd.png)
 
 ### 테이블 설명
 | 테이블명             | 책임 설명                                              |
@@ -34,7 +26,102 @@ DB 성능 저하 및 Lock 경합이 발생할 수 있습니다.
 | `coupon_stock`   | 쿠폰의 현재 재고를 정보를 정의(실시간 발급을 위한 쿠폰의 정규화) - redis에서 처리 |
 | `user_coupon`    | 사용자에게 발급된 쿠폰 정보(사용 여부, 만료일 등)를 관리                  |
 
-#### 이후 추가할 테이블
-| 테이블명           | 책임 설명                                             |
-|----------------|---------------------------------------------------|
-| `point_history` | 포인트 충전, 차감, 환불 등의 모든 포인트 변화 이력을 기록                |
+## 테이블 생성 쿼리 (DDL)
+
+```mysql
+CREATE TABLE `user` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '사용자 ID',
+    `name` VARCHAR(20) NOT NULL COMMENT '사용자 이름',
+    `email` VARCHAR(50) NOT NULL COMMENT '사용자 이메일',
+    `password` VARCHAR(255) NOT NULL COMMENT '사용자 비밀번호',
+    `point` BIGINT NOT NULL COMMENT '사용자 포인트',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `UK_user_email` (`email`) -- 유니크 설정은 자동으로 인덱스가 들어감.
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `user_coupon` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '사용자 쿠폰 ID',
+    `user_id` BIGINT NOT NULL COMMENT '사용자 ID',
+    `coupon_id` BIGINT NOT NULL COMMENT '쿠폰 ID',
+    `status` VARCHAR(255) NOT NULL COMMENT '쿠폰 상태 (ISSUED, USED)',
+    `issued_at` DATETIME(6) NOT NULL COMMENT '발급 시간',
+    `used_at` DATETIME(6) NULL COMMENT '사용 시간',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`),
+    KEY idx_user_coupon (`user_id`, `coupon_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `product` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '상품 ID',
+    `name` VARCHAR(30) NOT NULL COMMENT '상품 이름',
+    `category` VARCHAR(255) NOT NULL COMMENT '상품 카테고리',
+    `description` VARCHAR(200) NOT NULL COMMENT '상품 설명',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `product_option` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '상품 옵션 ID',
+    `product_id` BIGINT NOT NULL COMMENT '상품 ID',
+    `name` VARCHAR(30) NOT NULL COMMENT '옵션 이름',
+    `price` BIGINT NOT NULL COMMENT '가격',
+    `stock` INT NOT NULL COMMENT '재고',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`),
+    KEY idx_product_id (`product_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `payment` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '결제 ID',
+    `order_id` BIGINT NOT NULL COMMENT '주문 ID',
+    `payment_amount` BIGINT NOT NULL COMMENT '결제 금액',
+    `status` VARCHAR(255) NOT NULL COMMENT '결제 상태',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `orders` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '주문 ID',
+    `user_id` BIGINT NOT NULL COMMENT '사용자 ID',
+    `user_coupon_id` BIGINT NULL COMMENT '사용자 쿠폰 ID',
+    `original_price` BIGINT NOT NULL COMMENT '원래 가격',
+    `discount_price` BIGINT NOT NULL COMMENT '할인된 가격',
+    `total_price` BIGINT NOT NULL COMMENT '최종 결제 가격',
+    `status` VARCHAR(255) NOT NULL COMMENT '주문 상태',
+    `order_at` DATETIME(6) NOT NULL COMMENT '주문 시간',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `order_product` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '주문 상품 ID',
+    `order_id` BIGINT NOT NULL COMMENT '주문 ID',
+    `product_option_id` BIGINT NOT NULL COMMENT '상품 옵션 ID',
+    `product_name` VARCHAR(30) NOT NULL COMMENT '상품 이름 (스냅샷)',
+    `product_stock` INT NOT NULL COMMENT '상품 수량 (스냅샷)',
+    `product_price` BIGINT NOT NULL COMMENT '상품 가격 (스냅샷)',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`),
+    KEY idx_order_id (`order_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `coupon` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '쿠폰 ID',
+    `name` VARCHAR(30) NOT NULL COMMENT '쿠폰 이름',
+    `discount_type` VARCHAR(255) NOT NULL COMMENT '할인 타입 (PERCENT, FIXED)',
+    `discount_value` BIGINT NOT NULL COMMENT '할인 값',
+    `initial_stock` INT NOT NULL COMMENT '초기 수량',
+    `expire_at` DATETIME(6) NOT NULL COMMENT '만료 시간',
+    `created_at` DATETIME(6) NOT NULL COMMENT '생성 시간',
+    `updated_at` DATETIME(6) NOT NULL COMMENT '수정 시간',
+    PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
