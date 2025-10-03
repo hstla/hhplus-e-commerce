@@ -44,6 +44,10 @@ dependencies {
     // Redis
     implementation("org.redisson:redisson-spring-boot-starter:3.41.0")
 
+    // metric influx
+    implementation ("org.springframework.boot:spring-boot-starter-actuator")
+    implementation ("io.micrometer:micrometer-registry-influx")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
