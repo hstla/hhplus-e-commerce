@@ -3,9 +3,9 @@ import { check, sleep } from 'k6';
 
 export const options = {
     stages: [
-        { duration: '1m', target: 10 },
-        { duration: '2m', target: 10 },
-        { duration: '1m', target: 0 },
+        { duration: '30s', target: 35 },
+        { duration: '3m', target: 35 },
+        { duration: '30s', target: 0 },
     ],
 };
 
@@ -188,3 +188,9 @@ function getOrderInfo(orderId, headers) {
     console.log(`6. Got info for order ${orderId}.`);
     sleep(1);
 }
+
+// 실행 명령어
+// docker run --rm -i \
+// -v ./scripts:/scripts \
+// --network e-commerce-java_app-network \
+// grafana/k6 run /scripts/user_order_scripts.js --out influxdb=http://influxdb:8086/k6
