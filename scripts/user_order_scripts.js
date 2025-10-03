@@ -7,18 +7,8 @@ export const options = {
             executor: 'ramping-vus',
             startVUs: 0,
             stages: [
-                // 30
-                // { duration: '30s', target: 30 },
-                // { duration: '1m', target: 30 },
-                // { duration: '15s', target: 15 },
-                // { duration: '10s', target: 0 },
-
-                // 40
-                { duration: '30s', target: 30 },
-                { duration: '1m', target: 30 },
-                { duration: '30s', target: 35 },
                 { duration: '30s', target: 40 },
-                { duration: '30s', target: 20 },
+                { duration: '3m', target: 40 },
                 { duration: '30s', target: 0 },
             ],
         }
@@ -87,7 +77,7 @@ function getPopularProducts(headers) {
     }
 
     console.log('1. Got popular products successfully.');
-    sleep(Math.random() * 2 + 1);
+    sleep(1);
     return res.json('data');
 }
 
@@ -111,7 +101,7 @@ function getProductDetails(productId, headers) {
     }
 
     console.log(`2. Got details for product ${productId} successfully.`);
-    sleep(Math.random() * 2 + 1);
+    sleep(1);
     return res.json('data');
 }
 
@@ -133,7 +123,7 @@ function chargePoints(userId, productPrice, headers) {
     check(res, { '3. Charge Points: status 200': (r) => r.status === 200 });
 
     console.log(`3. Charged ${amountToCharge} points for user ${userId}.`);
-    sleep(Math.random() * 2 + 1);
+    sleep(1);
 }
 
 /**
@@ -161,7 +151,7 @@ function createOrder(userId, productOptionId, headers) {
 
     const orderId = res.json('data.id');
     console.log(`4. Created order ${orderId} successfully.`);
-    sleep(Math.random() * 2 + 1);
+    sleep(1);
     return orderId;
 }
 
@@ -185,7 +175,7 @@ function requestPayment(orderId, userId, headers) {
     check(res, { '5. Request Payment: status 200': (r) => r.status === 200 });
 
     console.log(`5. Payment requested for order ${orderId}.`);
-    sleep(Math.random() * 2 + 1);
+    sleep(1);
 }
 
 /**
@@ -202,9 +192,10 @@ function getOrderInfo(orderId, headers) {
     check(res, { '6. Get Order Info: status 200': (r) => r.status === 200 });
 
     console.log(`6. Got info for order ${orderId}.`);
-    sleep(Math.random() * 2 + 1);
+    sleep(1);
 }
 
+// 실행 명령어
 // docker run --rm -i \
 //      -v ./scripts:/scripts \
 //      --network e-commerce-java_app-network \
