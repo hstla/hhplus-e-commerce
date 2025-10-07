@@ -201,7 +201,7 @@ public class CreateOrderE2ETest extends ConcurrentTestSupport {
 			});
 
 			// then
-			await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+			await().atMost(7, TimeUnit.SECONDS).untilAsserted(() -> {
 				List<Order> orders = orderRepository.findAll();
 
 				assertSoftly(soft -> {

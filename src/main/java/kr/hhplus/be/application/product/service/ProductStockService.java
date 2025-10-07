@@ -1,15 +1,11 @@
 package kr.hhplus.be.application.product.service;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.hhplus.be.domain.common.event.dto.PricedOrderItemInfo;
 import kr.hhplus.be.domain.product.model.ProductOption;
 import kr.hhplus.be.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.global.common.aop.DistributedSpinLock;
@@ -23,7 +19,7 @@ public class ProductStockService {
 
 	private final ProductOptionRepository productOptionRepository;
 
-	@Transactional(isolation = Isolation.READ_COMMITTED)
+	@Transactional
 	@DistributedSpinLock(keys = "product_option_stock:#{#optionQuantities.keySet()}")
 	public Map<Long, ProductOption> decreaseStock(Map<Long, Integer> optionQuantities) {
 		Map<Long, ProductOption> result = new LinkedHashMap<>();
